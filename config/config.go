@@ -5,23 +5,22 @@ import (
 
 	"github.com/caarlos0/env/v9"
 	"github.com/joho/godotenv"
+	
 )
 
-type Config struct {
-	JWT   JWTConfig
-	Mongo MongoConfig
-}
-
-type JWTConfig struct {
-	SecretKey string
-}
-
 type MongoConfig struct {
-	Databse string `env: "MONGO_DATABASE"`
-	URI     string `env: "MONGO_URI"`
+	Database string `env:"MONGODB_DATABASE"` 
+	URI      string `env:"MONGODB_URI"`
 }
+type Config struct {
+	Mongo MongoConfig
+	
+}
+
+
 
 func Load() (*Config, error) {
+
 	err := godotenv.Load()
 	if err != nil {
 		fmt.Println("Error loading .env file")
@@ -29,6 +28,7 @@ func Load() (*Config, error) {
 	}
 
 	cfg := &Config{}
+	
 	err = env.Parse(cfg)
 	if err != nil {
 		return nil, err
