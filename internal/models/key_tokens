@@ -1,0 +1,14 @@
+package models
+
+import (
+	"time"
+)
+
+type KeyToken struct {
+	Id        primitive.ObjectID `bson:"id"`
+	Token     string             `bson:"token"`
+	UserId    string             `bson:"user_id"`
+	ExpireAt  time.Time          `bson:"expire_at"`
+	CreatedAt time.Time          `bson:"created_at"`
+	UpdatedAt time.Time          `bson:"updated_at"`
+}
