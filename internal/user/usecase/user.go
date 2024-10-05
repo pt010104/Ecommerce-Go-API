@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"errors"
-
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/user"
 	"golang.org/x/crypto/bcrypt"
@@ -47,7 +46,15 @@ func (uc implUsecase) SignIn(ctx context.Context, sit user.SignInType) (string, 
 		uc.l.Errorf(ctx, "error comparing passwords: %v", err)
 		return "", err
 	}
-	token, err := uc.GenerateJWT(u.UserName)
+
+	kt, err2 := uc.repo.CreateKeyToken(ctx, u.ID)
+
+	if err2 != nil {
+		uc.l.Errorf(ctx, "error during finding matching user: %v", err)
+		return "", err2
+	}
+
+	token, err := uc.GenerateJWT(u.UserName, kt.SecretKey)
 	if err != nil {
 		uc.l.Errorf(ctx, "error generating JWT: %v", err)
 		return "", err

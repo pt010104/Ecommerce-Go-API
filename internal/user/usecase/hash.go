@@ -17,7 +17,7 @@ func (uc implUsecase) HashPassword(password string) (string, error) {
 
 }
 
-func (uc implUsecase) GenerateJWT(userName string) (string, error) {
+func (uc implUsecase) GenerateJWT(userName string, secret string) (string, error) {
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": userName,
 		"iss": "US",
@@ -25,7 +25,7 @@ func (uc implUsecase) GenerateJWT(userName string) (string, error) {
 		"exp": time.Now().Add(time.Hour).Unix(),
 		"iat": time.Now().Unix(),
 	})
-	tokenString, err := claims.SignedString([]byte("supersecret"))
+	tokenString, err := claims.SignedString([]byte(secret))
 	if err != nil {
 		return "", err
 	}
