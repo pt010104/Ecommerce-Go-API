@@ -46,6 +46,10 @@ type signupReq struct {
 	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
+type signinReq struct {
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
 
 func (r signupReq) validate() error {
 
@@ -64,9 +68,30 @@ func (r signupReq) validate() error {
 	return nil
 }
 
+func (r signinReq) validate() error {
+
+	if !validateEmail(r.Email) {
+		return errInvalidEmail
+	}
+
+	if !validatePassword(r.Password) {
+		return errInvalidPassword
+	}
+
+	return nil
+}
+
 func (r signupReq) toInput() user.UseCaseType {
 	return user.UseCaseType{
 		UserName: r.UserName,
+		Email:    r.Email,
+		Password: r.Password,
+	}
+}
+
+func (r signinReq) toInput() user.SignInType {
+	return user.SignInType{
+
 		Email:    r.Email,
 		Password: r.Password,
 	}

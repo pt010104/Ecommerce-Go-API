@@ -5,6 +5,7 @@ go 1.22.7
 require (
 	github.com/caarlos0/env/v9 v9.0.0
 	github.com/gin-gonic/gin v1.10.0
+	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/joho/godotenv v1.5.1
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0

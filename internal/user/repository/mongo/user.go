@@ -5,6 +5,7 @@ import (
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/user"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -32,4 +33,21 @@ func (repo implRepo) CreateUserRepo(ctx context.Context, opt user.RepoOption) (m
 		return models.User{}, err
 	}
 	return u, nil
+}
+func (repo implRepo) GetUserRepo(ctx context.Context, email string) (models.User, error) {
+	col := repo.getUserCollection()
+
+	filter := bson.M{"email": email}
+
+	var user models.User
+
+	err := col.FindOne(ctx, filter).Decode(&user)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return models.User{}, nil
+		}
+		return models.User{}, err
+	}
+
+	return user, nil
 }

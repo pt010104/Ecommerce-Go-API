@@ -29,9 +29,8 @@ type Config struct {
 	Mongo      MongoConfig
 	JWT        JWTConfig
 }
-
 type JWTConfig struct {
-	SecretKey string `env: "JWT_SECRET"`
+	SecretKey string `env:"JWT_SECRET"`
 }
 
 func Load() (*Config, error) {

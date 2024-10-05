@@ -25,3 +25,22 @@ func (h handler) SignUp(c *gin.Context) {
 
 	response.OK(c, u)
 }
+
+func (h handler) SignIn(c *gin.Context) {
+	ctx := c.Request.Context()
+	req, err := h.processSignInRequest(c)
+	if err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.Signup.processSigninRequest: %v", err)
+		response.Error(c, err)
+		return
+	}
+
+	token, err := h.uc.SignIn(ctx, req.toInput())
+	if err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.Signin.uc.signIn: %v", err)
+		response.Error(c, err)
+		return
+	}
+	response.OK(c, token)
+
+}

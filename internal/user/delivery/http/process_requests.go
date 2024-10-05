@@ -20,3 +20,20 @@ func (h handler) processSignupRequest(c *gin.Context) (signupReq, error) {
 
 	return req, nil
 }
+
+func (h handler) processSignInRequest(c *gin.Context) (signinReq, error) {
+	ctx := c.Request.Context()
+
+	var req signinReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.processSigninRequest: invalid request")
+		return signinReq{}, errWrongBody
+	}
+
+	if err := req.validate(); err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.processSignupRequest: invalid request")
+		return signinReq{}, err
+	}
+
+	return req, nil
+}

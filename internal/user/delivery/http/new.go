@@ -8,6 +8,7 @@ import (
 
 type Handler interface {
 	SignUp(c *gin.Context)
+	SignIn(c *gin.Context)
 }
 type handler struct {
 	l  log.Logger

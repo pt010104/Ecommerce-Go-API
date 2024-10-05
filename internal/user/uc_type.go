@@ -7,3 +7,8 @@ type UseCaseType struct {
 	Password string
 	Email    string
 }
+
+type SignInType struct {
+	Email    string
+	Password string
+}
