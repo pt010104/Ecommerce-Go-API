@@ -18,6 +18,17 @@ func (h handler) processSignupRequest(c *gin.Context) (signupReq, error) {
 		return signupReq{}, err
 	}
 
+	exists, err := h.uc.EmailExisted(ctx, req.Email)
+	if err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.processSignupRequest: error checking email existence")
+		return signupReq{}, err
+	}
+
+	if exists {
+		h.l.Errorf(ctx, "user.delivery.http.handler.processSignupRequest: email existed")
+		return signupReq{}, errEmailExisted
+	}
+
 	return req, nil
 }
 

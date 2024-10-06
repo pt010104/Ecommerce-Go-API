@@ -4,6 +4,7 @@ import (
 	"errors"
 	"regexp"
 
+	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/user"
 )
 
@@ -11,6 +12,8 @@ var (
 	errInvalidEmail    = errors.New("Invalid email format")
 	errInvalidPassword = errors.New("Password must be at least 8 characters long and include letters and numbers")
 	errInvalidUserName = errors.New("Username must be at least 3 characters long")
+
+	errUserNameExisted = errors.New("Your name must be unique")
 )
 
 var passwordRegex = `^[A-Za-z\d]{8,}$`
@@ -95,4 +98,13 @@ func (r signinReq) toInput() user.SignInType {
 		Email:    r.Email,
 		Password: r.Password,
 	}
+}
+
+type SignUpResponse struct {
+	email    string
+	username string
+}
+
+func ResponseSignUp(u models.User) SignUpResponse {
+	return SignUpResponse{email: u.Email, username: u.UserName}
 }

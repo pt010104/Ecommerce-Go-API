@@ -22,4 +22,5 @@ var (
 	errWrongPaginationQuery = NewHTTPError(120001, "Wrong pagination query")
 	errWrongQuery           = NewHTTPError(120002, "Wrong query")
 	errWrongBody            = NewHTTPError(120003, "Wrong body")
+	errEmailExisted         = NewHTTPError(120004, "email has already been registered")
 )

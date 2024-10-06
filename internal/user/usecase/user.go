@@ -29,6 +29,19 @@ func (uc implUsecase) CreateUser(ctx context.Context, uct user.UseCaseType) (mod
 	return u, nil
 
 }
+func (uc implUsecase) EmailExisted(ctx context.Context, email string) (bool, error) {
+	u, err := uc.repo.GetUserRepo(ctx, email)
+	if err != nil {
+		uc.l.Errorf(ctx, "error finding user with given email: %v", err)
+		return false, err
+	}
+
+	if u.Email == email {
+		return true, nil
+	}
+
+	return false, nil
+}
 
 func (uc implUsecase) SignIn(ctx context.Context, sit user.SignInType) (string, error) {
 	u, err := uc.repo.GetUserRepo(ctx, sit.Email)
