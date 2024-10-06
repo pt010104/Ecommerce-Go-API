@@ -8,7 +8,10 @@ import (
 )
 
 type Repo interface {
-	CreateUserRepo(context context.Context, opt RepoOption) (models.User, error)
-	GetUserRepo(ctx context.Context, opt string) (models.User, error)
+	CreateUser(context context.Context, opt CreateUserOption) (models.User, error)
+	GetUser(ctx context.Context, opt GetUserOption) (models.User, error)
+	DetailUser(ctx context.Context, id string) (models.User, error)
+
+	DetailKeyToken(ctx context.Context, id string) (models.KeyToken, error)
 	CreateKeyToken(context context.Context, UserId primitive.ObjectID) (models.KeyToken, error)
 }

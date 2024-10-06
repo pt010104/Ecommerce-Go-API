@@ -19,6 +19,7 @@ func (h handler) SignUp(c *gin.Context) {
 	u, err := h.uc.CreateUser(ctx, req.toInput())
 	if err != nil {
 		h.l.Errorf(ctx, "user.delivery.http.handler.Signup.uc.CreateUser: %v", err)
+		err = h.mapErrors(err)
 		response.Error(c, err)
 		return
 	}
@@ -43,4 +44,23 @@ func (h handler) SignIn(c *gin.Context) {
 	}
 	response.OK(c, token)
 
+}
+
+func (h handler) Detail(c *gin.Context) {
+	ctx := c.Request.Context()
+	id, sc, err := h.processDetailRequest(c)
+	if err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.DetailUser.processDetailUserRequest: %v", err)
+		response.Error(c, err)
+		return
+	}
+
+	u, err := h.uc.Detail(ctx, sc, id)
+	if err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.DetailUser.uc.DetailUser: %v", err)
+		response.Error(c, err)
+		return
+	}
+
+	response.OK(c, h.newDetailResp(u))
 }

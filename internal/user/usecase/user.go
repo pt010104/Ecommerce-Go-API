@@ -2,22 +2,31 @@ package usecase
 
 import (
 	"context"
+	"time"
 
 	"errors"
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/user"
+	"github.com/pt010104/api-golang/pkg/jwt"
+	"github.com/pt010104/api-golang/pkg/mongo"
 	"golang.org/x/crypto/bcrypt"
 )
 
 func (uc implUsecase) CreateUser(ctx context.Context, uct user.UseCaseType) (models.User, error) {
-	hashedPass, err := uc.HashPassword(uct.Password)
+	err := uc.validateDataCreateUser(ctx, uct.Email)
+	if err != nil {
+		uc.l.Errorf(ctx, "error during validate data: %v", err)
+		return models.User{}, err
+	}
+
+	hashedPass, err := uc.hashPassword(uct.Password)
 	if err != nil {
 		uc.l.Errorf(ctx, "error during  hashing pass : %v", err)
 		return models.User{}, err
 	}
 
-	u, err := uc.repo.CreateUserRepo(ctx, user.RepoOption{
+	u, err := uc.repo.CreateUser(ctx, user.CreateUserOption{
 
 		Email:    uct.Email,
 		Password: hashedPass,
@@ -30,22 +39,11 @@ func (uc implUsecase) CreateUser(ctx context.Context, uct user.UseCaseType) (mod
 	return u, nil
 
 }
-func (uc implUsecase) EmailExisted(ctx context.Context, email string) (bool, error) {
-	u, err := uc.repo.GetUserRepo(ctx, email)
-	if err != nil {
-		uc.l.Errorf(ctx, "error finding user with given email: %v", err)
-		return false, err
-	}
-
-	if u.Email == email {
-		return true, nil
-	}
-
-	return false, nil
-}
 
 func (uc implUsecase) SignIn(ctx context.Context, sit user.SignInType) (string, error) {
-	u, err := uc.repo.GetUserRepo(ctx, sit.Email)
+	u, err := uc.repo.GetUser(ctx, user.GetUserOption{
+		Email: sit.Email,
+	})
 	if err != nil {
 		uc.l.Errorf(ctx, "error during finding matching user: %v", err)
 		return "", err
@@ -61,19 +59,37 @@ func (uc implUsecase) SignIn(ctx context.Context, sit user.SignInType) (string, 
 		return "", err
 	}
 
-	kt, err2 := uc.repo.CreateKeyToken(ctx, u.ID)
-
-	if err2 != nil {
+	kt, err := uc.repo.CreateKeyToken(ctx, u.ID)
+	if err != nil {
 		uc.l.Errorf(ctx, "error during finding matching user: %v", err)
-		return "", err2
+		return "", err
 	}
 
-	token, err := uc.GenerateJWT(u.UserName, kt.SecretKey)
+	payload := jwt.Payload{
+		UserID:  u.ID.Hex(),
+		Refresh: false,
+	}
+
+	expirationTime := time.Hour * 24
+	token, err := jwt.Sign(payload, expirationTime, kt.SecretKey)
 	if err != nil {
-		uc.l.Errorf(ctx, "error generating JWT: %v", err)
+		uc.l.Errorf(ctx, "error signing token: %v", err)
 		return "", err
 	}
 
 	return token, nil
+}
 
+func (uc implUsecase) Detail(ctx context.Context, sc models.Scope, id string) (models.User, error) {
+	u, err := uc.repo.DetailUser(ctx, id)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			uc.l.Warnf(ctx, "user.usecase.Detail.repo.DetailUser: %v", err)
+			return models.User{}, user.ErrUserNotFound
+		}
+		uc.l.Errorf(ctx, "user.usecase.Detail.repo.DetailUser: %v", err)
+		return models.User{}, err
+	}
+
+	return u, nil
 }

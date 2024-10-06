@@ -1,6 +1,7 @@
 package httpserver
 
 import (
+	"github.com/pt010104/api-golang/internal/middleware"
 	userHTTP "github.com/pt010104/api-golang/internal/user/delivery/http"
 
 	swaggerFiles "github.com/swaggo/files"
@@ -12,7 +13,6 @@ import (
 )
 
 func (srv HTTPServer) mapHandlers() error {
-	// jwtManager := jwt.NewManager(srv.jwtSecretKey)
 
 	//swagger
 	srv.gin.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -26,10 +26,12 @@ func (srv HTTPServer) mapHandlers() error {
 	// Handlers
 	userH := userHTTP.New(srv.l, userUC)
 
+	mw := middleware.New(srv.l, userRepo)
+
 	//Routes
 	api := srv.gin.Group("/api/v1")
 
-	userHTTP.MapRouters(api.Group("/user"), userH)
+	userHTTP.MapRouters(api.Group("/users"), userH, mw)
 
 	return nil
 }

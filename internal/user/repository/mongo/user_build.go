@@ -6,6 +6,7 @@ import (
 
 	"crypto/rand"
 	"encoding/base64"
+
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/user"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -22,7 +23,7 @@ func generateRandomString(size int) (string, error) {
 	// Encode the byte slice to base64 to get a safe string
 	return base64.URLEncoding.EncodeToString(b), nil
 }
-func (impl implRepo) buildUserModel(context context.Context, opt user.RepoOption) (models.User, error) {
+func (impl implRepo) buildUserModel(context context.Context, opt user.CreateUserOption) (models.User, error) {
 	u := models.User{
 		ID:       primitive.NewObjectID(),
 		Email:    opt.Email,

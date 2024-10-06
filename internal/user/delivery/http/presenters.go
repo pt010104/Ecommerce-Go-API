@@ -108,3 +108,15 @@ type SignUpResponse struct {
 func ResponseSignUp(u models.User) SignUpResponse {
 	return SignUpResponse{email: u.Email, username: u.UserName}
 }
+
+type detailResp struct {
+	Email    string `json:"email"`
+	UserName string `json:"name"`
+}
+
+func (h handler) newDetailResp(u models.User) detailResp {
+	return detailResp{
+		Email:    u.Email,
+		UserName: u.UserName,
+	}
+}
