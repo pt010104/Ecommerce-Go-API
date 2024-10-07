@@ -10,10 +10,11 @@ import (
 
 func (m Middleware) Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		userID := c.GetHeader("x-cliend-id")
+		userID := c.GetHeader("x-client-id")
+		sessionID := c.GetHeader("session-id")
 
 		ctx := c.Request.Context()
-		k, err := m.repo.DetailKeyToken(ctx, userID)
+		k, err := m.repo.DetailKeyToken(ctx, userID, sessionID)
 		if err != nil {
 			response.Unauthorized(c)
 			c.Abort()

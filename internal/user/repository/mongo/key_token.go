@@ -34,10 +34,10 @@ func (repo implRepo) CreateKeyToken(ctx context.Context, userId primitive.Object
 
 }
 
-func (repo implRepo) DetailKeyToken(ctx context.Context, userID string) (models.KeyToken, error) {
+func (repo implRepo) DetailKeyToken(ctx context.Context, userID string, sessionID string) (models.KeyToken, error) {
 	col := repo.getKeyTokenCollection()
 
-	filter, err := repo.buildKeyTokenDetailQuery(ctx, userID)
+	filter, err := repo.buildKeyTokenDetailQuery(ctx, userID, sessionID)
 	if err != nil {
 		repo.l.Errorf(ctx, "user.repository.mongo.DetailKeyToken.buildKeyTokenDetailQuery: %v", err)
 		return models.KeyToken{}, err

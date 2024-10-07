@@ -12,6 +12,6 @@ type Repo interface {
 	GetUser(ctx context.Context, opt GetUserOption) (models.User, error)
 	DetailUser(ctx context.Context, id string) (models.User, error)
 
-	DetailKeyToken(ctx context.Context, id string) (models.KeyToken, error)
+	DetailKeyToken(ctx context.Context, userID string, sessionID string) (models.KeyToken, error)
 	CreateKeyToken(context context.Context, UserId primitive.ObjectID) (models.KeyToken, error)
 }

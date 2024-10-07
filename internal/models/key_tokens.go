@@ -11,7 +11,7 @@ type KeyToken struct {
 	UserID       primitive.ObjectID `bson:"user_id"`
 	SecretKey    string             `bson:"secret_key"`
 	RefreshToken string             `bson:"refresh_token"`
-
-	CreatedAt time.Time `bson:"created_at"`
-	UpdatedAt time.Time `bson:"updated_at"`
+	SessionID    string             `bson:"session_id"`
+	CreatedAt    time.Time          `bson:"created_at"`
+	UpdatedAt    time.Time          `bson:"updated_at"`
 }

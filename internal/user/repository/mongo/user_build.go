@@ -43,14 +43,18 @@ func (impl implRepo) buildKeyTokenModel(context context.Context, userId primitiv
 	if err != nil {
 		return models.KeyToken{}, err
 	}
+	sessionID, err := generateRandomString(64)
+	if err != nil {
+		return models.KeyToken{}, err
+	}
 	u := models.KeyToken{
 		ID:           primitive.NewObjectID(),
 		UserID:       userId,
 		SecretKey:    secretKey,
 		RefreshToken: refreshToken,
-
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		SessionID:    sessionID,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
 	}
 	return u, nil
 
