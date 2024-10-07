@@ -33,7 +33,7 @@ func (impl implRepo) buildUserModel(context context.Context, opt user.CreateUser
 	return u, nil
 
 }
-func (impl implRepo) buildKeyTokenModel(context context.Context, userId primitive.ObjectID) (models.KeyToken, error) {
+func (impl implRepo) buildKeyTokenModel(context context.Context, userId primitive.ObjectID, sessionID string) (models.KeyToken, error) {
 	secretKey, err := generateRandomString(32)
 	if err != nil {
 		return models.KeyToken{}, err
@@ -43,10 +43,7 @@ func (impl implRepo) buildKeyTokenModel(context context.Context, userId primitiv
 	if err != nil {
 		return models.KeyToken{}, err
 	}
-	sessionID, err := generateRandomString(64)
-	if err != nil {
-		return models.KeyToken{}, err
-	}
+
 	u := models.KeyToken{
 		ID:           primitive.NewObjectID(),
 		UserID:       userId,

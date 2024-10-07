@@ -10,6 +10,7 @@ type Handler interface {
 	SignUp(c *gin.Context)
 	SignIn(c *gin.Context)
 	Detail(c *gin.Context)
+	SignOut(c *gin.Context)
 }
 type handler struct {
 	l  log.Logger

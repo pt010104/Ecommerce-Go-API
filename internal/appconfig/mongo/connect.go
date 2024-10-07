@@ -3,11 +3,12 @@ package mongo
 import (
 	"context"
 	"fmt"
+	"log"
+	"time"
+
 	"github.com/pt010104/api-golang/config"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
-	"time"
 )
 
 func ConnectDB(uri string) (*mongo.Client, *mongo.Database, error) {
@@ -23,7 +24,7 @@ func ConnectDB(uri string) (*mongo.Client, *mongo.Database, error) {
 		return nil, nil, fmt.Errorf("failed to create MongoDB client: %v", err)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	err = client.Ping(ctx, nil)

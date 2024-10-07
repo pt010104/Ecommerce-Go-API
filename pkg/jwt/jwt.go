@@ -9,9 +9,10 @@ import (
 
 type Payload struct {
 	jwt.StandardClaims
-	UserID  string `json:"sub"`
-	Type    string `json:"type"`
-	Refresh bool   `json:"refresh"`
+	UserID    string `json:"sub"`
+	SessionID string `json:"session_id"`
+	Type      string `json:"type"`
+	Refresh   bool   `json:"refresh"`
 }
 
 func Verify(token string, key string) (Payload, error) {

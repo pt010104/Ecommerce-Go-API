@@ -34,6 +34,8 @@ func (h handler) processSignInRequest(c *gin.Context) (signinReq, error) {
 		return signinReq{}, errWrongBody
 	}
 
+	req.SessionID = c.GetHeader("session-id")
+
 	if err := req.validate(); err != nil {
 		h.l.Errorf(ctx, "user.delivery.http.handler.processSignupRequest: invalid request")
 		return signinReq{}, err
@@ -60,4 +62,17 @@ func (h handler) processDetailRequest(c *gin.Context) (string, models.Scope, err
 	sc := jwt.NewScope(payload)
 
 	return id, sc, nil
+}
+func (h handler) processLogOutRequest(c *gin.Context) (models.Scope, error) {
+	ctx := c.Request.Context()
+
+	payload, ok := jwt.GetPayloadFromContext(ctx)
+	if !ok {
+		h.l.Errorf(ctx, "survey.delivery.http.handler.procesLogOutRequest: unauthorized")
+		return models.Scope{}, pkgErrors.NewUnauthorizedHTTPError()
+	}
+
+	sc := jwt.NewScope(payload)
+	return sc, nil
+
 }

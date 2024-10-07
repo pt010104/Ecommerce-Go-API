@@ -45,7 +45,17 @@ func (h handler) SignIn(c *gin.Context) {
 	response.OK(c, token)
 
 }
+func (h handler) SignOut(c *gin.Context) {
+	ctx := c.Request.Context()
+	sc, err := h.processLogOutRequest(c)
+	if err != nil {
+		h.l.Error(ctx, "user.delivery.http.handler.Signup.processSignOutRequest: %v", err)
+		response.Error(c, err)
+		return
+	}
+	h.uc.LogOut(ctx, sc)
 
+}
 func (h handler) Detail(c *gin.Context) {
 	ctx := c.Request.Context()
 	id, sc, err := h.processDetailRequest(c)

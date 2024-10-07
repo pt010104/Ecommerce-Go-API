@@ -16,9 +16,9 @@ func (repo implRepo) getKeyTokenCollection() mongo.Collection {
 	return *repo.database.Collection(keyTokenCollection)
 }
 
-func (repo implRepo) CreateKeyToken(ctx context.Context, userId primitive.ObjectID) (models.KeyToken, error) {
+func (repo implRepo) CreateKeyToken(ctx context.Context, userId primitive.ObjectID, sessionID string) (models.KeyToken, error) {
 	col := repo.getKeyTokenCollection()
-	u, err := repo.buildKeyTokenModel(ctx, userId)
+	u, err := repo.buildKeyTokenModel(ctx, userId, sessionID)
 	if err != nil {
 		repo.l.Errorf(ctx, "user.repository.mongo.Create.buldUserModel: %v", err)
 		return models.KeyToken{}, err
@@ -52,4 +52,22 @@ func (repo implRepo) DetailKeyToken(ctx context.Context, userID string, sessionI
 	}
 
 	return keyToken, nil
+}
+
+func (repo implRepo) DeleteRecord(ctx context.Context, userID string, sessionID string) error {
+	col := repo.getKeyTokenCollection()
+
+	filter, err := repo.buildKeyTokenDetailQuery(ctx, userID, sessionID)
+	if err != nil {
+		repo.l.Errorf(ctx, "user.repository.mongo.DetailKeyToken.buildKeyTokenDetailQuery: %v", err)
+		return err
+	}
+
+	_, err = col.DeleteOne(ctx, filter)
+	if err != nil {
+		repo.l.Errorf(ctx, "user.repository.mongo.DetailKeyToken.DeleteOne: %v", err)
+		return err
+	}
+	return nil
+
 }

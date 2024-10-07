@@ -1,7 +1,5 @@
 package user
 
-import ()
-
 type UseCaseType struct {
 	UserName string
 	Password string
@@ -9,6 +7,7 @@ type UseCaseType struct {
 }
 
 type SignInType struct {
-	Email    string
-	Password string
+	Email     string
+	Password  string
+	SessionID string
 }

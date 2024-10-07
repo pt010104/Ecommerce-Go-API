@@ -50,8 +50,9 @@ type signupReq struct {
 	Password string `json:"password" binding:"required"`
 }
 type signinReq struct {
-	Email    string `json:"email" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Email     string `json:"email" binding:"required"`
+	Password  string `json:"password" binding:"required"`
+	SessionID string
 }
 
 func (r signupReq) validate() error {
@@ -81,6 +82,10 @@ func (r signinReq) validate() error {
 		return errInvalidPassword
 	}
 
+	if r.SessionID == "" {
+		return errWrongBody
+	}
+
 	return nil
 }
 
@@ -94,9 +99,9 @@ func (r signupReq) toInput() user.UseCaseType {
 
 func (r signinReq) toInput() user.SignInType {
 	return user.SignInType{
-
-		Email:    r.Email,
-		Password: r.Password,
+		Email:     r.Email,
+		Password:  r.Password,
+		SessionID: r.SessionID,
 	}
 }
 

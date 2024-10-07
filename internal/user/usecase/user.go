@@ -59,15 +59,16 @@ func (uc implUsecase) SignIn(ctx context.Context, sit user.SignInType) (string, 
 		return "", err
 	}
 
-	kt, err := uc.repo.CreateKeyToken(ctx, u.ID)
+	kt, err := uc.repo.CreateKeyToken(ctx, u.ID, sit.SessionID)
 	if err != nil {
 		uc.l.Errorf(ctx, "error during finding matching user: %v", err)
 		return "", err
 	}
 
 	payload := jwt.Payload{
-		UserID:  u.ID.Hex(),
-		Refresh: false,
+		UserID:    u.ID.Hex(),
+		Refresh:   false,
+		SessionID: sit.SessionID,
 	}
 
 	expirationTime := time.Hour * 24
@@ -76,7 +77,7 @@ func (uc implUsecase) SignIn(ctx context.Context, sit user.SignInType) (string, 
 		uc.l.Errorf(ctx, "error signing token: %v", err)
 		return "", err
 	}
-
+	uc.repo.DeleteRecord(ctx, u.ID.Hex(), sit.SessionID)
 	return token, nil
 }
 
@@ -90,6 +91,15 @@ func (uc implUsecase) Detail(ctx context.Context, sc models.Scope, id string) (m
 		uc.l.Errorf(ctx, "user.usecase.Detail.repo.DetailUser: %v", err)
 		return models.User{}, err
 	}
-
+	uc.repo.DeleteRecord(ctx, sc.UserID, sc.SessionID)
 	return u, nil
 }
+func (uc implUsecase) LogOut(ctx context.Context, sc models.Scope) {
+	err := uc.repo.DeleteRecord(ctx, sc.UserID, sc.SessionID)
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.LogOut.repo.DeleteRecord")
+	}
+
+}
+
+// func (uc implUsecase) LogOut(ctx context.Context)
