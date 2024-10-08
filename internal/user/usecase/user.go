@@ -5,12 +5,12 @@ import (
 	"time"
 
 	"errors"
-
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/user"
 	"github.com/pt010104/api-golang/pkg/jwt"
 	"github.com/pt010104/api-golang/pkg/mongo"
 	"golang.org/x/crypto/bcrypt"
+	"os"
 )
 
 func (uc implUsecase) CreateUser(ctx context.Context, uct user.UseCaseType) (models.User, error) {
@@ -94,7 +94,7 @@ func (uc implUsecase) ForgetPasswordRequest(ctx context.Context, email string) (
 		Type:    "reset-request",
 	}
 	expirationTime := time.Hour * 1
-	token, err = jwt.Sign(payload, expirationTime, "supersecretkey")
+	token, err = jwt.Sign(payload, expirationTime, os.Getenv("SUPER_SECRET_KEY"))
 	if err != nil {
 		uc.l.Errorf(ctx, "error signing token: %v", err)
 		return "", err
