@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/pt010104/api-golang/internal/models"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -15,4 +16,7 @@ type Repo interface {
 	DetailKeyToken(ctx context.Context, userID string, sessionID string) (models.KeyToken, error)
 	CreateKeyToken(context context.Context, UserId primitive.ObjectID, sessionID string) (models.KeyToken, error)
 	DeleteRecord(context context.Context, userID string, sessionID string) error
+	UpdateRecord(context context.Context, userID string, updataData bson.M) error
+	UpdateRequestTokenRecord(ctx context.Context, id string, updateData bson.M) error
+	IsJWTresetVaLID(ctx context.Context, JWT string) (bool, error)
 }

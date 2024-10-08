@@ -5,12 +5,16 @@ import (
 	"time"
 
 	"errors"
+	"os"
+
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/user"
 	"github.com/pt010104/api-golang/pkg/jwt"
 	"github.com/pt010104/api-golang/pkg/mongo"
+	"go.mongodb.org/mongo-driver/bson"
+
 	"golang.org/x/crypto/bcrypt"
-	"os"
+	"log"
 )
 
 func (uc implUsecase) CreateUser(ctx context.Context, uct user.UseCaseType) (models.User, error) {
@@ -130,4 +134,49 @@ func (uc implUsecase) LogOut(ctx context.Context, sc models.Scope) {
 		uc.l.Errorf(ctx, "user.usecase.LogOut.repo.DeleteRecord")
 	}
 
+}
+func (uc implUsecase) ResetPassWord(ctx context.Context, UserId string, newPass string) error {
+	u, err := uc.repo.GetUser(ctx, user.GetUserOption{
+		ID: UserId,
+	})
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.ResetPassword.GetUser:", err)
+		return err
+	}
+
+	newHashesPass, err := uc.hashPassword(newPass)
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.user.ResetPassword.hashnewpass:", err)
+		return err
+	}
+	updateData := bson.M{
+		"password": newHashesPass,
+	}
+	err = uc.repo.UpdateRecord(ctx, u.ID.String(), updateData)
+	if err != nil {
+		log.Fatalf("Error updating record: %v", err)
+		return err
+	}
+
+	return nil
+}
+func (uc implUsecase) MartJWTasUsed(ctx context.Context, JWT string) error {
+	updateData := bson.M{
+		"is_used": true,
+	}
+	err := uc.repo.UpdateRequestTokenRecord(ctx, JWT, updateData)
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.MarkJWTASused:", err)
+		return err
+	}
+	return nil
+}
+
+func (uc implUsecase) IsJWTresetVaLID(ctx context.Context, JWT string) (bool, error) {
+
+	valid, err := uc.repo.IsJWTresetVaLID(ctx, JWT)
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.IsJwtValid", err)
+	}
+	return valid, nil
 }

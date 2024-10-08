@@ -97,7 +97,11 @@ func (r signinReq) validate() error {
 
 	return nil
 }
-
+func (r resetPasswordReq) toInput() user.ResetPassWordReq {
+	return user.ResetPassWordReq{
+		NewPassword: r.NewPassword,
+	}
+}
 func (r signupReq) toInput() user.UseCaseType {
 	return user.UseCaseType{
 		UserName: r.UserName,
@@ -114,6 +118,9 @@ func (r signinReq) toInput() user.SignInType {
 	}
 }
 
+type resetPasswordReq struct {
+	NewPassword string
+}
 type SignUpResponse struct {
 	email    string
 	username string

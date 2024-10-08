@@ -3,8 +3,11 @@ package mongo
 import (
 	"context"
 
+	"fmt"
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/user"
+	"go.mongodb.org/mongo-driver/bson"
+
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -53,7 +56,40 @@ func (repo implRepo) GetUser(ctx context.Context, opt user.GetUserOption) (model
 
 	return user, nil
 }
+func (repo implRepo) UpdateRecord(ctx context.Context, UserID string, updateData bson.M) error {
 
+	col := repo.getUserCollection()
+
+	filter := bson.M{"_id": UserID}
+
+	update := bson.M{
+		"$set": updateData,
+	}
+
+	_, err := col.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return fmt.Errorf("failed to update record: %v", err)
+	}
+
+	return nil
+}
+func (repo implRepo) UpdateRequestTokenRecord(ctx context.Context, JWT string, updateData bson.M) error {
+
+	col := repo.getRequestTokenCollection()
+
+	filter := bson.M{"token": JWT}
+
+	update := bson.M{
+		"$set": updateData,
+	}
+
+	_, err := col.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return fmt.Errorf("failed to update record: %v", err)
+	}
+
+	return nil
+}
 func (repo implRepo) DetailUser(ctx context.Context, id string) (models.User, error) {
 	col := repo.getUserCollection()
 
@@ -72,4 +108,29 @@ func (repo implRepo) DetailUser(ctx context.Context, id string) (models.User, er
 	}
 
 	return user, nil
+}
+func (repo implRepo) IsJWTresetVaLID(ctx context.Context, JWT string) (bool, error) {
+
+	col := repo.getRequestTokenCollection()
+
+	filter := bson.M{"token": JWT}
+
+	var tokenRecord struct {
+		Token  string `bson:"token"`
+		IsUsed bool   `bson:"is_used"`
+	}
+
+	err := col.FindOne(ctx, filter).Decode(&tokenRecord)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+
+			return false, nil
+		}
+
+		return false, err
+	}
+	if tokenRecord.IsUsed {
+		return false, nil
+	}
+	return true, nil
 }

@@ -15,3 +15,6 @@ type SignInType struct {
 type ForgetPasswordRequest struct {
 	Email string
 }
+type ResetPassWordReq struct {
+	NewPassword string
+}

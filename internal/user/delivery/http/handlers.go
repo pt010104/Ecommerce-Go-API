@@ -1,8 +1,8 @@
 package http
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
-
 	"github.com/pt010104/api-golang/pkg/response"
 )
 
@@ -31,7 +31,7 @@ func (h handler) SignIn(c *gin.Context) {
 	ctx := c.Request.Context()
 	req, err := h.processSignInRequest(c)
 	if err != nil {
-		h.l.Errorf(ctx, "user.delivery.http.handler.Signup.processSigninRequest: %v", err)
+		h.l.Errorf(ctx, "user.delivery.http.handler.Signin.processSigninRequest: %v", err)
 		response.Error(c, err)
 		return
 	}
@@ -84,4 +84,57 @@ func (h handler) Detail(c *gin.Context) {
 	}
 
 	response.OK(c, h.newDetailResp(u))
+}
+func (h handler) ResetPassword(c *gin.Context) {
+
+	ctx := c.Request.Context()
+	token := c.Query("token")
+	if token == "" {
+		h.l.Errorf(ctx, "user.delivery.http.handler.ResetPassword: missing token in request")
+		response.Error(c, errors.New("token is required"))
+		return
+	}
+	userID, exists := c.Get("userID")
+	if !exists {
+		h.l.Errorf(ctx, "user.delivery.http.handler.ResetPassword: missing userID in context")
+		response.Error(c, errors.New("user ID not found"))
+		return
+	}
+
+	var req struct {
+		NewPassword string `json:"newPassword" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.ResetPassword.ShouldBindJSON: %v", err)
+		response.Error(c, errors.New("new password is required"))
+		return
+	}
+	if validatePassword(req.NewPassword) == false {
+		h.l.Errorf(ctx, "user.delivery.http.handler.ResetPassword.ShouldBindJSON: %v", "password should contain numbers and digits")
+		response.Error(c, errors.New("wrong body"))
+		return
+	}
+	valid, err1 := h.uc.IsJWTresetVaLID(ctx, token)
+	if err1 != nil {
+
+		return
+	}
+
+	if valid == false {
+		h.l.Errorf(ctx, "user.delivery.http.handler.ResetPassword0: %v", "token is used")
+		response.Error(c, errors.New("token is used"))
+		return
+	}
+	err := h.uc.ResetPassWord(ctx, userID.(string), req.NewPassword)
+	if err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.ResetPassword.uc.ResetPassword: %v", err)
+		response.Error(c, errors.New("failed to reset password"))
+		return
+	}
+	err = h.uc.MartJWTasUsed(ctx, token)
+	if err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.ResetPassword.uc.Resetpass.MarkJWTasUsed: %v", err)
+	}
+
+	response.OK(c, gin.H{"message": "Password reset successfully"})
 }
