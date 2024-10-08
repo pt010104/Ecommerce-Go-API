@@ -56,3 +56,16 @@ func (impl implRepo) buildKeyTokenModel(context context.Context, userId primitiv
 	return u, nil
 
 }
+
+func (impl implRepo) buildRequestTokenModel(context context.Context, userId primitive.ObjectID, token string) (models.RequestToken, error) {
+
+	u := models.RequestToken{
+		ID:        primitive.NewObjectID(),
+		Token:     token,
+		UserID:    userId,
+		CreatedAt: time.Now(),
+		UpdateAt:  time.Now(),
+		Is_Used:   false,
+	}
+	return u, nil
+}

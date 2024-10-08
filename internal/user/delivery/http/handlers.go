@@ -53,6 +53,7 @@ func (h handler) ForgetPasswordRequest(c *gin.Context) {
 		response.Error(c, err)
 		return
 	}
+	response.OK(c, "password reset request sent")
 	h.uc.ForgetPasswordRequest(ctx, sc.Email)
 }
 func (h handler) SignOut(c *gin.Context) {

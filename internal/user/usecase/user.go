@@ -101,8 +101,13 @@ func (uc implUsecase) ForgetPasswordRequest(ctx context.Context, email string) (
 	}
 	err1 := uc.emailUC.SendVerificationEmail(u.Email, token)
 	if err1 != nil {
-		uc.l.Errorf(ctx, "user.usecase.ForgetPasswordRequest: %v", err)
+		uc.l.Errorf(ctx, "user.usecase.ForgetPasswordRequest: %v", err1)
 	}
+	_, err2 := uc.repo.CreateRequestToken(ctx, u.ID, token)
+	if err2 != nil {
+		uc.l.Errorf(ctx, "user.usecase.Forgetpasswordrequest.CreateRequestToken: ", err2)
+	}
+
 	return token, nil
 
 }
