@@ -24,7 +24,17 @@ func (h handler) processSignupRequest(c *gin.Context) (signupReq, error) {
 
 	return req, nil
 }
+func (h handler) processForgetPasswordRequest(c *gin.Context) (forgetPasswordReq, error) {
+	ctx := c.Request.Context()
 
+	var req forgetPasswordReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.processSigninRequest: invalid request")
+		return forgetPasswordReq{}, errWrongBody
+	}
+	return req, nil
+
+}
 func (h handler) processSignInRequest(c *gin.Context) (signinReq, error) {
 	ctx := c.Request.Context()
 

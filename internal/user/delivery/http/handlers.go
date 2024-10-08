@@ -45,6 +45,16 @@ func (h handler) SignIn(c *gin.Context) {
 	response.OK(c, token)
 
 }
+func (h handler) ForgetPasswordRequest(c *gin.Context) {
+	ctx := c.Request.Context()
+	sc, err := h.processForgetPasswordRequest(c)
+	if err != nil {
+		h.l.Error(ctx, "user.delivery.http.handler.Signup.processForgetPassRequest: %v", err)
+		response.Error(c, err)
+		return
+	}
+	h.uc.ForgetPasswordRequest(ctx, sc.Email)
+}
 func (h handler) SignOut(c *gin.Context) {
 	ctx := c.Request.Context()
 	sc, err := h.processLogOutRequest(c)

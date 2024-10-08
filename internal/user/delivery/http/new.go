@@ -11,6 +11,7 @@ type Handler interface {
 	SignIn(c *gin.Context)
 	Detail(c *gin.Context)
 	SignOut(c *gin.Context)
+	ForgetPasswordRequest(c *gin.Context)
 }
 type handler struct {
 	l  log.Logger

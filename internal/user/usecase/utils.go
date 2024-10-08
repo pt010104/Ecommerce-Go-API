@@ -51,3 +51,19 @@ func (uc implUsecase) validateDataCreateUser(ctx context.Context, email string) 
 	return user.ErrEmailExisted
 
 }
+
+func (uc implUsecase) generateVerificationJWT(userName string, secret string) (string, error) {
+	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"sub": userName,
+		"iss": "US",
+
+		"exp":     time.Now().Add(time.Hour).Unix(),
+		"iat":     time.Now().Unix(),
+		"purpose": "email_verification",
+	})
+	tokenString, err := claims.SignedString([]byte(secret))
+	if err != nil {
+		return "", err
+	}
+	return tokenString, nil
+}

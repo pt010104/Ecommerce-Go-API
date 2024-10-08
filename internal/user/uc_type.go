@@ -11,3 +11,7 @@ type SignInType struct {
 	Password  string
 	SessionID string
 }
+
+type ForgetPasswordRequest struct {
+	Email string
+}

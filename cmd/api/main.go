@@ -30,13 +30,16 @@ func main() {
 		Encoding: cfg.Logger.Encoding,
 	})
 
+	log.Println("Sending verification email...")
 	srv := httpServer.New(l, httpServer.Config{
 		Port:         cfg.HTTPServer.Port,
 		JWTSecretKey: cfg.JWT.SecretKey,
 		Mode:         cfg.HTTPServer.Mode,
 		Database:     *db,
 	})
+
 	if err := srv.Run(); err != nil {
+
 		panic(err)
 	}
 

@@ -80,7 +80,32 @@ func (uc implUsecase) SignIn(ctx context.Context, sit user.SignInType) (string, 
 	uc.repo.DeleteRecord(ctx, u.ID.Hex(), sit.SessionID)
 	return token, nil
 }
+func (uc implUsecase) ForgetPasswordRequest(ctx context.Context, email string) (token string, err error) {
+	u, err := uc.repo.GetUser(ctx, user.GetUserOption{
+		Email: email,
+	})
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.ForgetPasswordRequest: %v", err)
+		return "", err
+	}
+	payload := jwt.Payload{
+		UserID:  u.ID.Hex(),
+		Refresh: false,
+		Type:    "reset-request",
+	}
+	expirationTime := time.Hour * 1
+	token, err = jwt.Sign(payload, expirationTime, "supersecretkey")
+	if err != nil {
+		uc.l.Errorf(ctx, "error signing token: %v", err)
+		return "", err
+	}
+	err1 := uc.emailUC.SendVerificationEmail(u.Email, token)
+	if err1 != nil {
+		uc.l.Errorf(ctx, "user.usecase.ForgetPasswordRequest: %v", err)
+	}
+	return token, nil
 
+}
 func (uc implUsecase) Detail(ctx context.Context, sc models.Scope, id string) (models.User, error) {
 	u, err := uc.repo.DetailUser(ctx, id)
 	if err != nil {
@@ -101,5 +126,3 @@ func (uc implUsecase) LogOut(ctx context.Context, sc models.Scope) {
 	}
 
 }
-
-// func (uc implUsecase) LogOut(ctx context.Context)

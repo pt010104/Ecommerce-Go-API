@@ -49,10 +49,19 @@ type signupReq struct {
 	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
+type forgetPasswordReq struct {
+	Email string `json:"email" binding:"required"`
+}
 type signinReq struct {
 	Email     string `json:"email" binding:"required"`
 	Password  string `json:"password" binding:"required"`
 	SessionID string
+}
+
+func (r forgetPasswordReq) toInput() user.ForgetPasswordRequest {
+	return user.ForgetPasswordRequest{
+		Email: r.Email,
+	}
 }
 
 func (r signupReq) validate() error {
