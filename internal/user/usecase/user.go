@@ -4,19 +4,31 @@ import (
 	"context"
 	"time"
 
+	"crypto/rand"
+	"encoding/base64"
 	"errors"
-	"os"
-
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/user"
 	"github.com/pt010104/api-golang/pkg/jwt"
 	"github.com/pt010104/api-golang/pkg/mongo"
 	"go.mongodb.org/mongo-driver/bson"
+	"os"
 
 	"golang.org/x/crypto/bcrypt"
 	"log"
 )
 
+func generateRandomString(size int) (string, error) {
+	// Create a byte slice with the required size
+	b := make([]byte, size)
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", err
+	}
+
+	// Encode the byte slice to base64 to get a safe string
+	return base64.URLEncoding.EncodeToString(b), nil
+}
 func (uc implUsecase) CreateUser(ctx context.Context, uct user.UseCaseType) (models.User, error) {
 	err := uc.validateDataCreateUser(ctx, uct.Email)
 	if err != nil {
@@ -63,7 +75,20 @@ func (uc implUsecase) SignIn(ctx context.Context, sit user.SignInType) (string, 
 		return "", err
 	}
 
-	kt, err := uc.repo.CreateKeyToken(ctx, u.ID, sit.SessionID)
+	sessionId, err2 := generateRandomString(32)
+	if err2 != nil {
+		uc.l.Errorf(ctx, "user.usecase.SignIn.generateRandomstring: %v", err2)
+		return "", err2
+
+	}
+
+	e1 := uc.repo.DeleteRecord(ctx, u.ID.Hex(), sit.SessionID)
+	if e1 != nil {
+		uc.l.Errorf(ctx, "user.usecase.signin.deleterecord : ", e1)
+		println("delete")
+		return "", e1
+	}
+	kt, err := uc.repo.CreateKeyToken(ctx, u.ID, sessionId)
 	if err != nil {
 		uc.l.Errorf(ctx, "error during finding matching user: %v", err)
 		return "", err
@@ -72,7 +97,7 @@ func (uc implUsecase) SignIn(ctx context.Context, sit user.SignInType) (string, 
 	payload := jwt.Payload{
 		UserID:    u.ID.Hex(),
 		Refresh:   false,
-		SessionID: sit.SessionID,
+		SessionID: sessionId,
 	}
 
 	expirationTime := time.Hour * 24
@@ -81,7 +106,7 @@ func (uc implUsecase) SignIn(ctx context.Context, sit user.SignInType) (string, 
 		uc.l.Errorf(ctx, "error signing token: %v", err)
 		return "", err
 	}
-	uc.repo.DeleteRecord(ctx, u.ID.Hex(), sit.SessionID)
+
 	return token, nil
 }
 func (uc implUsecase) ForgetPasswordRequest(ctx context.Context, email string) (token string, err error) {
