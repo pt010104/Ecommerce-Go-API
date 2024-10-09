@@ -29,7 +29,6 @@ type CreateKeyTokenOption struct {
 
 type UpdateUserOption struct {
 	Model    models.User
-	ID       string
 	Email    string
 	Password string
 	UserName string

@@ -58,7 +58,7 @@ func (repo implRepo) UpdateUser(ctx context.Context, opt user.UpdateUserOption) 
 
 	col := repo.getUserCollection()
 
-	filter, err := repo.buildUserDetailQuery(ctx, opt.ID)
+	filter, err := repo.buildUserDetailQuery(ctx, opt.Model.ID.Hex())
 	if err != nil {
 		repo.l.Errorf(ctx, "user.repository.mongo.GetUser.buildUserDetailQuery: %v", err)
 		return models.User{}, err

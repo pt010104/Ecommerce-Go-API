@@ -109,5 +109,5 @@ func (h handler) ResetPassword(c *gin.Context) {
 		return
 	}
 
-	response.OK(c, "password reset successful")
+	response.OK(c, nil)
 }

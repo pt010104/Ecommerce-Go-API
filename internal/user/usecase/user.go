@@ -156,13 +156,35 @@ func (uc implUsecase) ForgetPasswordRequest(ctx context.Context, email string) (
 		uc.l.Errorf(ctx, "error signing token: %v", err)
 		return "", err
 	}
-	err1 := uc.emailUC.SendVerificationEmail(u.Email, token)
-	if err1 != nil {
-		uc.l.Errorf(ctx, "user.usecase.ForgetPasswordRequest: %v", err1)
-	}
-	_, err2 := uc.repo.CreateRequestToken(ctx, u.ID, token)
-	if err2 != nil {
-		uc.l.Errorf(ctx, "user.usecase.Forgetpasswordrequest.CreateRequestToken: ", err2)
+
+	wg := sync.WaitGroup{}
+	var wgErr error
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		err = uc.emailUC.SendVerificationEmail(u.Email, token)
+		if err != nil {
+			uc.l.Errorf(ctx, "user.usecase.ForgetPasswordRequest: %v", err)
+			wgErr = err
+			return
+		}
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_, err = uc.repo.CreateRequestToken(ctx, u.ID, token)
+		if err != nil {
+			uc.l.Errorf(ctx, "user.usecase.Forgetpasswordrequest.CreateRequestToken: ", err)
+			wgErr = err
+			return
+		}
+	}()
+
+	wg.Wait()
+	if wgErr != nil {
+		return "", wgErr
 	}
 
 	return token, nil

@@ -86,5 +86,7 @@ func (h handler) processResetPasswordRequest(c *gin.Context) (resetPasswordReq, 
 		return resetPasswordReq{}, errWrongBody
 	}
 
+	req.Token = c.Query("token")
+
 	return req, nil
 }

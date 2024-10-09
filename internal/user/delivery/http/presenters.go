@@ -19,13 +19,6 @@ type signinReq struct {
 	SessionID string `json:"session_id"`
 }
 
-func (r resetPasswordReq) toInput() user.ResetPasswordInput {
-	return user.ResetPasswordInput{
-		UserId:  r.UserID,
-		NewPass: r.NewPassword,
-		Token:   r.Token,
-	}
-}
 func (r signupReq) toInput() user.CreateUserInput {
 	return user.CreateUserInput{
 		UserName: r.UserName,
@@ -45,7 +38,15 @@ func (r signinReq) toInput() user.SignInType {
 type resetPasswordReq struct {
 	UserID      string `json:"user_id" binding:"required"`
 	NewPassword string `json:"new_password" binding:"required"`
-	Token       string `json:"token" binding:"required"`
+	Token       string
+}
+
+func (r resetPasswordReq) toInput() user.ResetPasswordInput {
+	return user.ResetPasswordInput{
+		UserId:  r.UserID,
+		NewPass: r.NewPassword,
+		Token:   r.Token,
+	}
 }
 
 type SignUpResponse struct {
