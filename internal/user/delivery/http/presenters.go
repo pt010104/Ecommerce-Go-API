@@ -55,7 +55,7 @@ type forgetPasswordReq struct {
 type signinReq struct {
 	Email     string `json:"email" binding:"required"`
 	Password  string `json:"password" binding:"required"`
-	SessionID string
+	SessionID string `json:"session_id"`
 }
 
 func (r forgetPasswordReq) toInput() user.ForgetPasswordRequest {
@@ -139,5 +139,21 @@ func (h handler) newDetailResp(u models.User) detailResp {
 	return detailResp{
 		Email:    u.Email,
 		UserName: u.UserName,
+	}
+}
+
+type signInResp struct {
+	Session  string `json: "session_id"`
+	Email    string `json:"email"`
+	Username string `json:"username"`
+	Jwt      string `json:"token"`
+}
+
+func (h handler) newSignInResp(u models.User, session string, jwt string) signInResp {
+	return signInResp{
+		Email:    u.Email,
+		Username: u.UserName,
+		Jwt:      jwt,
+		Session:  session,
 	}
 }

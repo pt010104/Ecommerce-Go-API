@@ -6,7 +6,7 @@ import (
 
 	"crypto/rand"
 	"encoding/base64"
-	"errors"
+
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/user"
 	"github.com/pt010104/api-golang/pkg/jwt"
@@ -56,29 +56,29 @@ func (uc implUsecase) CreateUser(ctx context.Context, uct user.UseCaseType) (mod
 
 }
 
-func (uc implUsecase) SignIn(ctx context.Context, sit user.SignInType) (string, error) {
+func (uc implUsecase) SignIn(ctx context.Context, sit user.SignInType) (models.User, string, string, error) {
 	u, err := uc.repo.GetUser(ctx, user.GetUserOption{
 		Email: sit.Email,
 	})
 	if err != nil {
 		uc.l.Errorf(ctx, "error during finding matching user: %v", err)
-		return "", err
+		return models.User{}, "", "", err
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(sit.Password))
 	if err != nil {
 		if err == bcrypt.ErrMismatchedHashAndPassword {
 			uc.l.Warnf(ctx, "password mismatch for user: %v", u.Email)
-			return "", errors.New("invalid email or password")
+			return models.User{}, "", "", err
 		}
 		uc.l.Errorf(ctx, "error comparing passwords: %v", err)
-		return "", err
+		return models.User{}, "", "", err
 	}
 
 	sessionId, err2 := generateRandomString(32)
 	if err2 != nil {
 		uc.l.Errorf(ctx, "user.usecase.SignIn.generateRandomstring: %v", err2)
-		return "", err2
+		return models.User{}, "", "", err2
 
 	}
 
@@ -86,12 +86,12 @@ func (uc implUsecase) SignIn(ctx context.Context, sit user.SignInType) (string, 
 	if e1 != nil {
 		uc.l.Errorf(ctx, "user.usecase.signin.deleterecord : ", e1)
 		println("delete")
-		return "", e1
+		return models.User{}, "", "", e1
 	}
 	kt, err := uc.repo.CreateKeyToken(ctx, u.ID, sessionId)
 	if err != nil {
 		uc.l.Errorf(ctx, "error during finding matching user: %v", err)
-		return "", err
+		return models.User{}, "", "", err
 	}
 
 	payload := jwt.Payload{
@@ -104,10 +104,10 @@ func (uc implUsecase) SignIn(ctx context.Context, sit user.SignInType) (string, 
 	token, err := jwt.Sign(payload, expirationTime, kt.SecretKey)
 	if err != nil {
 		uc.l.Errorf(ctx, "error signing token: %v", err)
-		return "", err
+		return models.User{}, "", "", err
 	}
 
-	return token, nil
+	return u, sessionId, token, nil
 }
 func (uc implUsecase) ForgetPasswordRequest(ctx context.Context, email string) (token string, err error) {
 	u, err := uc.repo.GetUser(ctx, user.GetUserOption{

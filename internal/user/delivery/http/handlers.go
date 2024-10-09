@@ -2,7 +2,9 @@ package http
 
 import (
 	"errors"
+
 	"github.com/gin-gonic/gin"
+
 	"github.com/pt010104/api-golang/pkg/response"
 )
 
@@ -36,13 +38,15 @@ func (h handler) SignIn(c *gin.Context) {
 		return
 	}
 
-	token, err := h.uc.SignIn(ctx, req.toInput())
+	u, sessionID, token, err := h.uc.SignIn(ctx, req.toInput())
 	if err != nil {
 		h.l.Errorf(ctx, "user.delivery.http.handler.Signin.uc.signIn: %v", err)
 		response.Error(c, err)
 		return
 	}
-	response.OK(c, token)
+
+	signInResp := h.newSignInResp(u, sessionID, token)
+	response.OK(c, signInResp)
 
 }
 func (h handler) ForgetPasswordRequest(c *gin.Context) {
