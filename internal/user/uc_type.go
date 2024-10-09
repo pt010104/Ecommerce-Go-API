@@ -1,6 +1,8 @@
 package user
 
-type UseCaseType struct {
+import "github.com/pt010104/api-golang/internal/models"
+
+type CreateUserInput struct {
 	UserName string
 	Password string
 	Email    string
@@ -15,6 +17,19 @@ type SignInType struct {
 type ForgetPasswordRequest struct {
 	Email string
 }
-type ResetPassWordReq struct {
-	NewPassword string
+
+type Token struct {
+	AccessToken  string
+	RefreshToken string
+}
+type SignInOutput struct {
+	User      models.User
+	Token     Token
+	SessionID string
+}
+
+type ResetPasswordInput struct {
+	UserId  string
+	NewPass string
+	Token   string
 }

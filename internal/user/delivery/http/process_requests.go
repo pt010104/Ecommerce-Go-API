@@ -17,11 +17,6 @@ func (h handler) processSignupRequest(c *gin.Context) (signupReq, error) {
 		return signupReq{}, errWrongBody
 	}
 
-	if err := req.validate(); err != nil {
-		h.l.Errorf(ctx, "user.delivery.http.handler.processSignupRequest: invalid request")
-		return signupReq{}, err
-	}
-
 	return req, nil
 }
 func (h handler) processForgetPasswordRequest(c *gin.Context) (forgetPasswordReq, error) {
@@ -45,11 +40,6 @@ func (h handler) processSignInRequest(c *gin.Context) (signinReq, error) {
 	}
 
 	req.SessionID = c.GetHeader("session-id")
-
-	if err := req.validate(); err != nil {
-		h.l.Errorf(ctx, "user.delivery.http.handler.processSignupRequest: invalid request")
-		return signinReq{}, err
-	}
 
 	return req, nil
 }
@@ -85,4 +75,16 @@ func (h handler) processLogOutRequest(c *gin.Context) (models.Scope, error) {
 	sc := jwt.NewScope(payload)
 	return sc, nil
 
+}
+
+func (h handler) processResetPasswordRequest(c *gin.Context) (resetPasswordReq, error) {
+	ctx := c.Request.Context()
+
+	var req resetPasswordReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.processResetPasswordRequest: invalid request")
+		return resetPasswordReq{}, errWrongBody
+	}
+
+	return req, nil
 }

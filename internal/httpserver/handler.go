@@ -19,6 +19,7 @@ func (srv HTTPServer) mapHandlers() error {
 	//Repo
 	userRepo := userRepo.New(srv.l, srv.database)
 	emailUC := emailUC.New(srv.l)
+
 	//Usecase
 	userUC := userUC.New(srv.l, userRepo, emailUC)
 

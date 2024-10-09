@@ -12,5 +12,5 @@ type RequestToken struct {
 	Token     string             `bson:"token"`
 	CreatedAt time.Time          `bson:"created_at"`
 	UpdateAt  time.Time          `bson:"update_at"`
-	Is_Used   bool               `bson:"is_used"`
+	IsUsed    bool               `bson:"is_used"`
 }

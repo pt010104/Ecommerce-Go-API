@@ -2,14 +2,16 @@ package usecase
 
 import (
 	"context"
+	"regexp"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/pt010104/api-golang/internal/user"
-	"github.com/pt010104/api-golang/pkg/mongo"
 
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
+
+	"github.com/pt010104/api-golang/pkg/util"
 )
 
 func (uc implUsecase) hashPassword(password string) (string, error) {
@@ -36,34 +38,52 @@ func (uc implUsecase) generateJWT(userName string, secret string) (string, error
 	}
 	return tokenString, nil
 }
-
-func (uc implUsecase) validateDataCreateUser(ctx context.Context, email string) error {
-	_, err := uc.repo.GetUser(ctx, user.GetUserOption{
-		Email: email,
-	})
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			return nil
-		}
-		uc.l.Errorf(ctx, "error during finding matching user: %v", err)
+func (uc implUsecase) validateDataUser(ctx context.Context, email, password string) error {
+	// Validate email
+	emailRegex := `^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$`
+	if !regexp.MustCompile(emailRegex).MatchString(email) {
+		return user.ErrInvalidEmailFormat
 	}
 
-	return user.ErrEmailExisted
+	// Validate password
+	passwordRegex := `^[A-Za-z\d]{8,}$`
+	hasLetter := false
+	hasDigit := false
 
+	for _, ch := range password {
+		if ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z') {
+			hasLetter = true
+		}
+		if '0' <= ch && ch <= '9' {
+			hasDigit = true
+		}
+	}
+
+	if !hasLetter || !hasDigit || !regexp.MustCompile(passwordRegex).MatchString(password) {
+		return user.ErrInvalidPasswordFormat
+	}
+
+	return nil
 }
 
-func (uc implUsecase) generateVerificationJWT(userName string, secret string) (string, error) {
-	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": userName,
-		"iss": "US",
-
-		"exp":     time.Now().Add(time.Hour).Unix(),
-		"iat":     time.Now().Unix(),
-		"purpose": "email_verification",
-	})
-	tokenString, err := claims.SignedString([]byte(secret))
+func (uc implUsecase) createKeyToken(ctx context.Context) (string, string, string, error) {
+	sessionID, err := util.GenerateRandomString(32)
 	if err != nil {
-		return "", err
+		uc.l.Errorf(ctx, "user.usecase.Signin.createKeyToken: %v", err)
+		return "", "", "", err
 	}
-	return tokenString, nil
+
+	secretKey, err := util.GenerateRandomString(32)
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.Signin.createKeyToken: %v", err)
+		return "", "", "", err
+	}
+
+	refreshToken, err := util.GenerateRandomString(32)
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.Signin.createKeyToken: %v", err)
+		return "", "", "", err
+	}
+
+	return sessionID, secretKey, refreshToken, nil
 }

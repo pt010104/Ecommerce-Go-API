@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/pt010104/api-golang/internal/models"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"github.com/pt010104/api-golang/internal/user"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -16,9 +16,9 @@ func (repo implRepo) getKeyTokenCollection() mongo.Collection {
 	return *repo.database.Collection(keyTokenCollection)
 }
 
-func (repo implRepo) CreateKeyToken(ctx context.Context, userId primitive.ObjectID, sessionID string) (models.KeyToken, error) {
+func (repo implRepo) CreateKeyToken(ctx context.Context, opt user.CreateKeyTokenOption) (models.KeyToken, error) {
 	col := repo.getKeyTokenCollection()
-	u, err := repo.buildKeyTokenModel(ctx, userId, sessionID)
+	u, err := repo.buildKeyTokenModel(ctx, opt)
 	if err != nil {
 		repo.l.Errorf(ctx, "user.repository.mongo.Create.buldUserModel: %v", err)
 		return models.KeyToken{}, err
@@ -54,18 +54,18 @@ func (repo implRepo) DetailKeyToken(ctx context.Context, userID string, sessionI
 	return keyToken, nil
 }
 
-func (repo implRepo) DeleteRecord(ctx context.Context, userID string, sessionID string) error {
+func (repo implRepo) DeleteKeyToken(ctx context.Context, userID string, sessionID string) error {
 	col := repo.getKeyTokenCollection()
 
 	filter, err := repo.buildKeyTokenDetailQuery(ctx, userID, sessionID)
 	if err != nil {
-		repo.l.Errorf(ctx, "user.repository.mongo.DetailKeyToken.buildKeyTokenDetailQuery: %v", err)
+		repo.l.Errorf(ctx, "user.repository.mongo.DeleteKeyToken.buildKeyTokenDetailQuery: %v", err)
 		return err
 	}
 
 	_, err = col.DeleteOne(ctx, filter)
 	if err != nil {
-		repo.l.Errorf(ctx, "user.repository.mongo.DetailKeyToken.DeleteOne: %v", err)
+		repo.l.Errorf(ctx, "user.repository.mongo.DeleteKeyToken.DeleteOne: %v", err)
 		return err
 	}
 	return nil
