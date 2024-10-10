@@ -11,6 +11,7 @@ import (
 	"github.com/pt010104/api-golang/internal/user"
 	"github.com/pt010104/api-golang/pkg/jwt"
 	"github.com/pt010104/api-golang/pkg/mongo"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -22,14 +23,17 @@ func (uc implUsecase) CreateUser(ctx context.Context, uct user.CreateUserInput) 
 		return models.User{}, err
 	}
 
-	_, err = uc.repo.GetUser(ctx, user.GetUserOption{
+	u, err := uc.repo.GetUser(ctx, user.GetUserOption{
 		Email: uct.Email,
 	})
 	if err != nil {
-		if err != mongo.ErrNoDocuments {
-			uc.l.Errorf(ctx, "error during finding matching user: %v", err)
-			return models.User{}, user.ErrEmailExisted
-		}
+		uc.l.Errorf(ctx, "user.usecase.CreateUser.repo.GetUser: %v", err)
+		return models.User{}, err
+	}
+
+	if u.ID != primitive.NilObjectID {
+		uc.l.Errorf(ctx, "user.usecase.CreateUser: user already exists")
+		return models.User{}, user.ErrEmailExisted
 	}
 
 	hashedPass, err := uc.hashPassword(uct.Password)
@@ -38,7 +42,7 @@ func (uc implUsecase) CreateUser(ctx context.Context, uct user.CreateUserInput) 
 		return models.User{}, err
 	}
 
-	u, err := uc.repo.CreateUser(ctx, user.CreateUserOption{
+	nu, err := uc.repo.CreateUser(ctx, user.CreateUserOption{
 		Email:    uct.Email,
 		Password: hashedPass,
 		UserName: uct.UserName,
@@ -47,7 +51,7 @@ func (uc implUsecase) CreateUser(ctx context.Context, uct user.CreateUserInput) 
 		uc.l.Errorf(ctx, "user.usecase.CreateUser.repo.Create: %v", err)
 		return models.User{}, err
 	}
-	return u, nil
+	return nu, nil
 
 }
 
@@ -318,9 +322,7 @@ func (uc implUsecase) ResetPassWord(ctx context.Context, input user.ResetPasswor
 	return nil
 }
 func (uc implUsecase) VerifyUser(ctx context.Context, input user.VerifyUserInput) error {
-	u, err := uc.repo.GetUser(ctx, user.GetUserOption{
-		ID: input.UserId,
-	})
+	u, err := uc.repo.DetailUser(ctx, input.UserId)
 	if err != nil {
 		uc.l.Errorf(ctx, " user.usecase.Verify.getuser:", err)
 		return err
