@@ -10,7 +10,7 @@ type MongoConfig struct {
 }
 
 type HTTPServerConfig struct {
-	Port int    `env:"APP_PORT" envDefault:"8080"`
+	Port int    `env:"PORT" envDefault:"8080"`
 	Mode string `env:"API_MODE" envDefault:"debug"`
 }
 
