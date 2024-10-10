@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
+
 	"github.com/pt010104/api-golang/internal/models"
 	pkgErrors "github.com/pt010104/api-golang/pkg/errors"
 	"github.com/pt010104/api-golang/pkg/jwt"
@@ -104,12 +105,15 @@ func (h handler) processVerifyRequestRequest(c *gin.Context) (verifyRequestReq, 
 }
 func (h handler) processVerifyUserRequesr(c *gin.Context) (verifyUserReq, error) {
 	ctx := c.Request.Context()
+
 	var req verifyUserReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		h.l.Errorf(ctx, "user.delivery.http.handler.processVerifyUserRequest: invalid request")
 		return verifyUserReq{}, errWrongBody
 	}
+
 	req.Token = c.Query("token")
+	req.UserID = c.GetHeader("x-client-id")
 	return req, nil
 
 }

@@ -32,7 +32,7 @@ type UpdateUserOption struct {
 	Email      string
 	Password   string
 	UserName   string
-	Isverified bool
+	IsVerified bool
 }
 
 type UpdateRequestTokenOption struct {

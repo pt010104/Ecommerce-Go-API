@@ -35,9 +35,9 @@ func (impl implRepo) buildUpdateUserModel(context context.Context, opt user.Upda
 		setFields["email"] = opt.Email
 		opt.Model.Email = opt.Email
 	}
-	if opt.Isverified {
-		setFields["is_verified"] = opt.Isverified
-		opt.Model.IsVerified = opt.Isverified
+	if opt.IsVerified {
+		setFields["is_verified"] = opt.IsVerified
+		opt.Model.IsVerified = opt.IsVerified
 	}
 	if opt.UserName != "" {
 		setFields["name"] = opt.UserName

@@ -337,7 +337,7 @@ func (uc implUsecase) VerifyUser(ctx context.Context, input user.VerifyUserInput
 	}
 	opt := user.UpdateUserOption{
 		Model:      u,
-		Isverified: true,
+		IsVerified: true,
 	}
 	_, err = uc.repo.UpdateUser(ctx, opt)
 	if err != nil {
