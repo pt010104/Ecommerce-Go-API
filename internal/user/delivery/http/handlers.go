@@ -13,7 +13,6 @@ import (
 // @Produce json
 //
 // @Param Access-Control-Allow-Origin header string false "Access-Control-Allow-Origin" default("*")
-// @Param Authorization header string true "Bearer JWT token" default("Bearer <token>")
 // @Param Name body string true "Name"
 // @Param Email body string true "Email"
 // @Param Password body string true "Password"
@@ -52,7 +51,7 @@ func (h handler) SignUp(c *gin.Context) {
 // @Produce json
 //
 // @Param Access-Control-Allow-Origin header string false "Access-Control-Allow-Origin" default("*")
-// @Param Authorization header string true "Bearer JWT token" default("Bearer <token>")
+// @Param session-id header string false "Session ID" default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
 // @Param email body string true "Email"
 // @Param password body string true "Password"
 //
@@ -90,7 +89,6 @@ func (h handler) SignIn(c *gin.Context) {
 // @Produce json
 //
 // @Param Access-Control-Allow-Origin header string false "Access-Control-Allow-Origin" default("*")
-// @Param Authorization header string true "Bearer JWT token" default("Bearer <token>")
 // @Param email body string true "Email"
 //
 // @Success 200 {object} interface{}
@@ -121,7 +119,6 @@ func (h handler) ForgetPasswordRequest(c *gin.Context) {
 // @Produce json
 //
 // @Param Access-Control-Allow-Origin header string false "Access-Control-Allow-Origin" default("*")
-// @Param Authorization header string true "Bearer JWT token" default("Bearer <token>")
 //
 // @Success 200 {object} interface{}
 // @Failure 400 {object} response.Resp "Bad Request"
@@ -154,7 +151,9 @@ func (h handler) SignOut(c *gin.Context) {
 // @Produce json
 //
 // @Param Access-Control-Allow-Origin header string false "Access-Control-Allow-Origin" default("*")
-// @Param Authorization header string true "Bearer JWT token" default("Bearer <token>")
+// @Param Authorization header string true "Bearer JWT token" default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
+// @Param x-client-id header string true "User ID" default(6707825d45804caaf8316957)
+// @Param session-id header string true "Session ID" default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
 // @Param id path string true "User ID"
 //
 // @Success 200 {object} detailResp
@@ -190,9 +189,9 @@ func (h handler) Detail(c *gin.Context) {
 // @Produce json
 //
 // @Param Access-Control-Allow-Origin header string false "Access-Control-Allow-Origin" default("*")
-// @Param Authorization header string true "Bearer JWT token" default("Bearer <token>")
+// @Param Authorization header string true "Bearer JWT token" default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
 // @Param token query string true "Reset token"
-// @Param x-client-id header string true "User ID"
+// @Param x-client-id header string true "User ID" default(6707825d45804caaf8316957)
 // @Param password body string true "New password"
 //
 // @Success 200 {object} interface{}
@@ -228,7 +227,7 @@ func (h handler) ResetPassword(c *gin.Context) {
 // @Produce json
 //
 // @Param Access-Control-Allow-Origin header string false "Access-Control-Allow-Origin" default("*")
-// @Param Authorization header string true "Bearer JWT token" default("Bearer <token>")
+// @Param Authorization header string true "Bearer JWT token" default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
 // @Param email body string true "Email"
 //
 // @Success 200 {object} interface{}
@@ -260,9 +259,9 @@ func (h handler) VerifyEmail(c *gin.Context) {
 // @Produce json
 //
 // @Param Access-Control-Allow-Origin header string false "Access-Control-Allow-Origin" default("*")
-// @Param Authorization header string true "Bearer JWT token" default("Bearer <token>")
+// @Param Authorization header string true "Bearer JWT token" default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
 // @Param token query string true "Verification token"
-// @Param x-client-id header string true "User ID"
+// @Param x-client-id header string true "User ID" default(6707825d45804caaf8316957)
 //
 // @Success 200 {object} interface{}
 // @Failure 400 {object} response.Resp "Bad Request"
@@ -296,9 +295,10 @@ func (h handler) VerifyUser(c *gin.Context) {
 // @Produce json
 //
 // @Param Access-Control-Allow-Origin header string false "Access-Control-Allow-Origin" default("*")
-// @Param Authorization header string true "Bearer JWT token" default("Bearer <token>")
+// @Param Authorization header string true "Bearer JWT token" default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
 // @Param token query string true "Verification token"
-// @Param x-client-id header string true "User ID"
+// @Param x-client-id header string true "User ID" default(6707825d45804caaf8316957)
+// @Param session-id header string true "Session ID" default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
 //
 // @Success 200 {object} distributeNewTokenResp
 // @Failure 400 {object} response.Resp "Bad Request"

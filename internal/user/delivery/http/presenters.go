@@ -89,12 +89,14 @@ func (h handler) newSignUpResponse(u models.User) signUpResponse {
 }
 
 type detailResp struct {
+	ID    string `json:"id"`
 	Email string `json:"email"`
 	Name  string `json:"name"`
 }
 
 func (h handler) newDetailResp(u models.User) detailResp {
 	return detailResp{
+		ID:    u.ID.Hex(),
 		Email: u.Email,
 		Name:  u.Name,
 	}
