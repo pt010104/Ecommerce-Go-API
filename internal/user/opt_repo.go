@@ -1,6 +1,8 @@
 package user
 
 import (
+	"time"
+
 	"github.com/pt010104/api-golang/internal/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -34,7 +36,11 @@ type UpdateUserOption struct {
 	UserName   string
 	IsVerified bool
 }
-
+type UpdateKeyTokenInput struct {
+	ID           primitive.ObjectID
+	UpdatedAt    time.Time
+	RefreshToken string
+}
 type UpdateRequestTokenOption struct {
 	IsUsed *bool
 	Token  string

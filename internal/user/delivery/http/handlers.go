@@ -146,3 +146,19 @@ func (h handler) VerifyUser(c *gin.Context) {
 	response.OK(c, nil)
 
 }
+func (h handler) DistributeNewToken(c *gin.Context) {
+	ctx := c.Request.Context()
+	req, err := h.processDistributeNewTokenRequest(c)
+	if err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.DistributeNewToken %v", err)
+		response.Error(c, err)
+		return
+	}
+	e, er := h.uc.DistributeNewToken(ctx, req.toInput())
+	if er != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.DistributeNewToken.ToInput %v", err)
+		response.Error(c, err)
+		return
+	}
+	response.OK(c, h.newDistributeNewTokenResp(e))
+}

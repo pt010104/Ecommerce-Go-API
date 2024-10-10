@@ -88,6 +88,20 @@ func (h handler) newDetailResp(u models.User) detailResp {
 	}
 }
 
+type distributeNewTokenReq struct {
+	UserId       string
+	SessionID    string
+	RefreshToken string `json:"refresh_token" binding:"required"`
+}
+
+func (r distributeNewTokenReq) toInput() user.DistributeNewTokenInput {
+	return user.DistributeNewTokenInput{
+		UserId:       r.UserId,
+		SessionID:    r.SessionID,
+		RefreshToken: r.RefreshToken,
+	}
+}
+
 type signInResp struct {
 	SessionID string     `json:"session_id"`
 	Email     string     `json:"email"`
@@ -101,5 +115,19 @@ func (h handler) newSignInResp(output user.SignInOutput) signInResp {
 		Username:  output.User.UserName,
 		Token:     output.Token,
 		SessionID: output.SessionID,
+	}
+}
+
+type distributeNewTokenResp struct {
+	NewAccessToken  string `json:"new_access_token"`
+	NewRefreshToken string `json:"new_refresh_token"`
+	UserID          string `json:"user_id"`
+}
+
+func (h handler) newDistributeNewTokenResp(output user.DistributeNewTokenOutPut) distributeNewTokenResp {
+	return distributeNewTokenResp{
+		UserID:          output.UserID,
+		NewAccessToken:  output.JWT,
+		NewRefreshToken: output.RefreshToken,
 	}
 }

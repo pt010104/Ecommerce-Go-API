@@ -7,14 +7,29 @@ import (
 
 	"os"
 
+	"crypto/rand"
+	"encoding/base64"
+
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/user"
 	"github.com/pt010104/api-golang/pkg/jwt"
 	"github.com/pt010104/api-golang/pkg/mongo"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-
 	"golang.org/x/crypto/bcrypt"
 )
+
+func GenerateRandomString(n int) (string, error) {
+	// Create a byte slice of size n
+	bytes := make([]byte, n)
+
+	// Read random bytes into the slice
+	if _, err := rand.Read(bytes); err != nil {
+		return "", err
+	}
+
+	// Encode the byte slice to a base64 string
+	return base64.URLEncoding.EncodeToString(bytes), nil
+}
 
 func (uc implUsecase) CreateUser(ctx context.Context, uct user.CreateUserInput) (models.User, error) {
 	err := uc.validateDataUser(ctx, uct.Email, uct.Password)
@@ -357,5 +372,58 @@ func (uc implUsecase) VerifyUser(ctx context.Context, input user.VerifyUserInput
 	}
 
 	return nil
+
+}
+func (uc implUsecase) DistributeNewToken(ctx context.Context, input user.DistributeNewTokenInput) (output user.DistributeNewTokenOutPut, er error) {
+	u, err := uc.repo.DetailUser(ctx, input.UserId)
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.DistributeNewToken.DetailUser :", err)
+		return user.DistributeNewTokenOutPut{}, err
+	}
+	kt, err := uc.repo.DetailKeyToken(ctx, u.ID.Hex(), input.SessionID)
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.DistributeNewToken.DetailKeyToken :", err)
+		return user.DistributeNewTokenOutPut{}, err
+	}
+	if kt.RefreshToken != input.RefreshToken {
+		uc.l.Errorf(ctx, "user.usecase.DistributeNewToken.Kt.RefreshToken!=input :")
+		return user.DistributeNewTokenOutPut{}, user.ErrRefreshTokenIsNotValid
+	}
+
+	if time.Since(kt.UpdatedAt) > time.Hour {
+		uc.l.Errorf(ctx, "user.usecase.DistributeNewToken.RefreshToken expired")
+		return user.DistributeNewTokenOutPut{}, user.ErrRefreshTokenIsExpired
+	}
+	newRefreshToken, err1 := GenerateRandomString(32)
+	if err1 != nil {
+		return user.DistributeNewTokenOutPut{}, err1
+	}
+	uc.repo.UpdateKeyToken(ctx, user.UpdateKeyTokenInput{
+		ID:           kt.ID,
+		RefreshToken: newRefreshToken,
+		UpdatedAt:    time.Now(),
+	})
+	payload := jwt.Payload{
+		UserID:    u.ID.Hex(),
+		Refresh:   false,
+		SessionID: kt.SessionID,
+	}
+
+	expirationTime := time.Hour * 24
+	t, err := jwt.Sign(payload, expirationTime, kt.SecretKey)
+	if err != nil {
+		uc.l.Errorf(ctx, "error signing token: %v", err)
+		return user.DistributeNewTokenOutPut{}, err
+	}
+	token := user.Token{
+		AccessToken:  t,
+		RefreshToken: newRefreshToken,
+	}
+	return user.DistributeNewTokenOutPut{
+
+		JWT:          token.AccessToken,
+		RefreshToken: token.RefreshToken,
+		UserID:       u.ID.String(),
+	}, nil
 
 }

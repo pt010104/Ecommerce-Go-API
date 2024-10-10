@@ -39,3 +39,13 @@ type VerifyUserInput struct {
 	UserId string
 	Token  string
 }
+type DistributeNewTokenInput struct {
+	UserId       string
+	SessionID    string
+	RefreshToken string
+}
+type DistributeNewTokenOutPut struct {
+	JWT          string
+	RefreshToken string
+	UserID       string
+}

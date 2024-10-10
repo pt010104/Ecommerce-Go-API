@@ -10,6 +10,7 @@ func MapRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
 	r.POST("/sign-in", h.SignIn)
 	r.POST("/forget-password", h.ForgetPasswordRequest)
 	r.POST("/verify-request", h.VerifyRequest)
+	r.POST("/distribute-new-token", h.DistributeNewToken)
 	r.POST("/reset-password", mw.ResetPasswordMiddleware(), h.ResetPassword)
 	r.POST("/verify", mw.VerifyMidleware(), h.VerifyUser)
 	r.Use(mw.Auth())

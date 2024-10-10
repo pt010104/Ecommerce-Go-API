@@ -15,6 +15,7 @@ type Handler interface {
 	ResetPassword(c *gin.Context)
 	VerifyRequest(c *gin.Context)
 	VerifyUser(c *gin.Context)
+	DistributeNewToken(c *gin.Context)
 }
 type handler struct {
 	l  log.Logger
