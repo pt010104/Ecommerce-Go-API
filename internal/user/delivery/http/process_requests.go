@@ -90,3 +90,26 @@ func (h handler) processResetPasswordRequest(c *gin.Context) (resetPasswordReq, 
 
 	return req, nil
 }
+func (h handler) processVerifyRequestRequest(c *gin.Context) (verifyRequestReq, error) {
+	ctx := c.Request.Context()
+
+	var req verifyRequestReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.processVerifyRequestRequest: invalid request")
+		return verifyRequestReq{}, errWrongBody
+	}
+
+	return req, nil
+
+}
+func (h handler) processVerifyUserRequesr(c *gin.Context) (verifyUserReq, error) {
+	ctx := c.Request.Context()
+	var req verifyUserReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.processVerifyUserRequest: invalid request")
+		return verifyUserReq{}, errWrongBody
+	}
+	req.Token = c.Query("token")
+	return req, nil
+
+}

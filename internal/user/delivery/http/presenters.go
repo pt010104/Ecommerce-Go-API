@@ -18,6 +18,15 @@ type signinReq struct {
 	Password  string `json:"password" binding:"required"`
 	SessionID string `json:"session_id"`
 }
+type verifyRequestReq struct {
+	Email string `json:"email" binding:"required"`
+}
+
+func (r verifyRequestReq) toInput() user.VerifyRequestInput {
+	return user.VerifyRequestInput{
+		Email: r.Email,
+	}
+}
 
 func (r signupReq) toInput() user.CreateUserInput {
 	return user.CreateUserInput{
@@ -35,6 +44,10 @@ func (r signinReq) toInput() user.SignInType {
 	}
 }
 
+type verifyUserReq struct {
+	UserID string
+	Token  string
+}
 type resetPasswordReq struct {
 	UserID      string `json:"user_id" binding:"required"`
 	NewPassword string `json:"new_password" binding:"required"`
@@ -47,6 +60,11 @@ func (r resetPasswordReq) toInput() user.ResetPasswordInput {
 		NewPass: r.NewPassword,
 		Token:   r.Token,
 	}
+}
+func (r verifyUserReq) toInput() user.VerifyUserInput {
+	return user.VerifyUserInput{
+		UserId: r.UserID,
+		Token:  r.Token}
 }
 
 type SignUpResponse struct {

@@ -27,9 +27,15 @@ type SignInOutput struct {
 	Token     Token
 	SessionID string
 }
-
+type VerifyRequestInput struct {
+	Email string
+}
 type ResetPasswordInput struct {
 	UserId  string
 	NewPass string
 	Token   string
+}
+type VerifyUserInput struct {
+	UserId string
+	Token  string
 }

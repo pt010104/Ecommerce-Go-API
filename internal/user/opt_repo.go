@@ -28,10 +28,11 @@ type CreateKeyTokenOption struct {
 }
 
 type UpdateUserOption struct {
-	Model    models.User
-	Email    string
-	Password string
-	UserName string
+	Model      models.User
+	Email      string
+	Password   string
+	UserName   string
+	Isverified bool
 }
 
 type UpdateRequestTokenOption struct {

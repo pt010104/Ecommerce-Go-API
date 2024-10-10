@@ -111,3 +111,37 @@ func (h handler) ResetPassword(c *gin.Context) {
 
 	response.OK(c, nil)
 }
+
+func (h handler) VerifyRequest(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	sc, err := h.processVerifyRequestRequest(c)
+	if err != nil {
+		h.l.Error(ctx, "user.delivery.http.handler.VerifyRequest.process: %v", err)
+		response.Error(c, err)
+		return
+	}
+
+	h.uc.VerifyRequest(ctx, sc.Email)
+
+	response.OK(c, nil)
+
+}
+func (h handler) VerifyUser(c *gin.Context) {
+	ctx := c.Request.Context()
+	req, err := h.processVerifyUserRequesr(c)
+	if err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.VerifyUser.uc.verifyuser: %v", err)
+		response.Error(c, err)
+		return
+	}
+	err = h.uc.VerifyUser(ctx, req.toInput())
+	if err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.VerifyUser.uc.verifyuser: %v", err)
+		response.Error(c, err)
+		return
+	}
+
+	response.OK(c, nil)
+
+}

@@ -23,7 +23,6 @@ func getClient() *http.Client {
 		RefreshToken: os.Getenv("GOOGLE_REFRESH_TOKEN"),
 	}
 
-	// Use the refresh token to get a new access token
 	client := config.Client(context.Background(), token)
 	return client
 }

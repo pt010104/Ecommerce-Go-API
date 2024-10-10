@@ -190,6 +190,58 @@ func (uc implUsecase) ForgetPasswordRequest(ctx context.Context, email string) (
 	return token, nil
 
 }
+func (uc implUsecase) VerifyRequest(ctx context.Context, email string) (token string, err error) {
+	u, err := uc.repo.GetUser(ctx, user.GetUserOption{
+		Email: email,
+	})
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.Verify: %v", err)
+		return "", err
+	}
+	payload := jwt.Payload{
+		UserID:  u.ID.Hex(),
+		Refresh: false,
+		Type:    "verify",
+	}
+	expirationTime := time.Hour * 1
+	token, err = jwt.Sign(payload, expirationTime, os.Getenv("SUPER_SECRET_KEY"))
+	if err != nil {
+		uc.l.Errorf(ctx, "error signing token user.usecase.verify: %v", err)
+		return "", err
+	}
+	wg := sync.WaitGroup{}
+	var wgErr error
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		err = uc.emailUC.SendVerificationEmail(u.Email, token)
+		if err != nil {
+			uc.l.Errorf(ctx, "user.usecase.ForgetPasswordRequest: %v", err)
+			wgErr = err
+			return
+		}
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_, err = uc.repo.CreateRequestToken(ctx, u.ID, token)
+		if err != nil {
+			uc.l.Errorf(ctx, "user.usecase.Forgetpasswordrequest.CreateRequestToken: ", err)
+			wgErr = err
+			return
+		}
+	}()
+
+	wg.Wait()
+	if wgErr != nil {
+		return "", wgErr
+	}
+
+	return token, nil
+
+}
 
 func (uc implUsecase) Detail(ctx context.Context, sc models.Scope, id string) (models.User, error) {
 	u, err := uc.repo.DetailUser(ctx, id)
@@ -259,4 +311,44 @@ func (uc implUsecase) ResetPassWord(ctx context.Context, input user.ResetPasswor
 	}
 
 	return nil
+}
+func (uc implUsecase) VerifyUser(ctx context.Context, input user.VerifyUserInput) error {
+	u, err := uc.repo.GetUser(ctx, user.GetUserOption{
+		ID: input.UserId,
+	})
+	if err != nil {
+		uc.l.Errorf(ctx, " user.usecase.Verify.getuser:", err)
+		return err
+	}
+	rt, err := uc.repo.DetailRequestToken(ctx, input.Token)
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.ResetPassword.DetailRequestToken: %v", err)
+		return err
+	}
+
+	if rt.IsUsed {
+		uc.l.Errorf(ctx, "user.usecase.ResetPassword: token is already used")
+		return user.ErrTokenUsed
+	}
+	opt := user.UpdateUserOption{
+		Model:      u,
+		Isverified: true,
+	}
+	_, err = uc.repo.UpdateUser(ctx, opt)
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.VerifyUser.UpdateUser: %v", err)
+		return err
+	}
+	isUsed := true
+	err = uc.repo.UpdateRequestToken(ctx, user.UpdateRequestTokenOption{
+		Token:  input.Token,
+		IsUsed: &isUsed,
+	})
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.ResetPassword.UpdateRequestToken: %v", err)
+		return err
+	}
+
+	return nil
+
 }
