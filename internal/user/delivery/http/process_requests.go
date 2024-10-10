@@ -88,7 +88,7 @@ func (h handler) processResetPasswordRequest(c *gin.Context) (resetPasswordReq, 
 	}
 
 	req.Token = c.Query("token")
-
+	req.UserID = c.GetHeader("x-client-id")
 	return req, nil
 }
 func (h handler) processVerifyRequestRequest(c *gin.Context) (verifyRequestReq, error) {
