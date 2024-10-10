@@ -16,7 +16,7 @@ func (impl implRepo) buildUserModel(context context.Context, opt user.CreateUser
 	u := models.User{
 		ID:         primitive.NewObjectID(),
 		Email:      opt.Email,
-		UserName:   opt.UserName,
+		Name:       opt.Name,
 		Password:   opt.Password,
 		CreatedAt:  now,
 		UpdatedAt:  now,
@@ -39,9 +39,9 @@ func (impl implRepo) buildUpdateUserModel(context context.Context, opt user.Upda
 		setFields["is_verified"] = opt.IsVerified
 		opt.Model.IsVerified = opt.IsVerified
 	}
-	if opt.UserName != "" {
-		setFields["name"] = opt.UserName
-		opt.Model.UserName = opt.UserName
+	if opt.Name != "" {
+		setFields["name"] = opt.Name
+		opt.Model.Name = opt.Name
 	}
 
 	if opt.Password != "" {

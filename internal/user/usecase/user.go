@@ -45,7 +45,7 @@ func (uc implUsecase) CreateUser(ctx context.Context, uct user.CreateUserInput) 
 	nu, err := uc.repo.CreateUser(ctx, user.CreateUserOption{
 		Email:    uct.Email,
 		Password: hashedPass,
-		UserName: uct.UserName,
+		Name:     uct.Name,
 	})
 	if err != nil {
 		uc.l.Errorf(ctx, "user.usecase.CreateUser.repo.Create: %v", err)
@@ -199,7 +199,7 @@ func (uc implUsecase) ForgetPasswordRequest(ctx context.Context, email string) (
 	return token, nil
 
 }
-func (uc implUsecase) VerifyRequest(ctx context.Context, email string) (token string, err error) {
+func (uc implUsecase) VerifyEmail(ctx context.Context, email string) (token string, err error) {
 	u, err := uc.repo.GetUser(ctx, user.GetUserOption{
 		Email: email,
 	})
@@ -266,12 +266,14 @@ func (uc implUsecase) Detail(ctx context.Context, sc models.Scope, id string) (m
 	return u, nil
 }
 
-func (uc implUsecase) LogOut(ctx context.Context, sc models.Scope) {
+func (uc implUsecase) LogOut(ctx context.Context, sc models.Scope) error {
 	err := uc.repo.DeleteKeyToken(ctx, sc.UserID, sc.SessionID)
 	if err != nil {
 		uc.l.Errorf(ctx, "user.usecase.LogOut.repo.DeleteKeyToken")
+		return err
 	}
 
+	return nil
 }
 func (uc implUsecase) ResetPassWord(ctx context.Context, input user.ResetPasswordInput) error {
 	u, err := uc.repo.GetUser(ctx, user.GetUserOption{

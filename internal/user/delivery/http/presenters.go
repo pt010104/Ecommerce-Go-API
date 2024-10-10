@@ -6,7 +6,7 @@ import (
 )
 
 type signupReq struct {
-	UserName string `json:"name" binding:"required"`
+	Name     string `json:"name" binding:"required"`
 	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
@@ -24,7 +24,7 @@ type verifyRequestReq struct {
 
 func (r signupReq) toInput() user.CreateUserInput {
 	return user.CreateUserInput{
-		UserName: r.UserName,
+		Name:     r.Name,
 		Email:    r.Email,
 		Password: r.Password,
 	}
@@ -42,8 +42,21 @@ type verifyUserReq struct {
 	UserID string
 	Token  string
 }
+
+func (r verifyUserReq) validate() error {
+	if r.UserID == "" {
+		return errWrongHeader
+	}
+
+	if r.Token == "" {
+		return errWrongQuery
+	}
+
+	return nil
+}
+
 type resetPasswordReq struct {
-	UserID      string `json:"user_id" binding:"required"`
+	UserID      string
 	NewPassword string `json:"new_password" binding:"required"`
 	Token       string
 }
@@ -61,24 +74,29 @@ func (r verifyUserReq) toInput() user.VerifyUserInput {
 		Token:  r.Token}
 }
 
-type SignUpResponse struct {
-	email    string
-	username string
+type signUpResponse struct {
+	ID    string `json:"id"`
+	Email string `json:"email"`
+	Name  string `json:"name"`
 }
 
-func ResponseSignUp(u models.User) SignUpResponse {
-	return SignUpResponse{email: u.Email, username: u.UserName}
+func (h handler) newSignUpResponse(u models.User) signUpResponse {
+	return signUpResponse{
+		ID:    u.ID.Hex(),
+		Email: u.Email,
+		Name:  u.Name,
+	}
 }
 
 type detailResp struct {
-	Email    string `json:"email"`
-	UserName string `json:"name"`
+	Email string `json:"email"`
+	Name  string `json:"name"`
 }
 
 func (h handler) newDetailResp(u models.User) detailResp {
 	return detailResp{
-		Email:    u.Email,
-		UserName: u.UserName,
+		Email: u.Email,
+		Name:  u.Name,
 	}
 }
 
@@ -105,6 +123,7 @@ func (r distributeNewTokenReq) toInput() user.DistributeNewTokenInput {
 }
 
 type signInResp struct {
+	ID        string     `json:"id"`
 	SessionID string     `json:"session_id"`
 	Email     string     `json:"email"`
 	Username  string     `json:"username"`
@@ -113,8 +132,9 @@ type signInResp struct {
 
 func (h handler) newSignInResp(output user.SignInOutput) signInResp {
 	return signInResp{
+		ID:        output.User.ID.Hex(),
 		Email:     output.User.Email,
-		Username:  output.User.UserName,
+		Username:  output.User.Name,
 		Token:     output.Token,
 		SessionID: output.SessionID,
 	}

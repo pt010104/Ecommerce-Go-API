@@ -89,31 +89,34 @@ func (h handler) processResetPasswordRequest(c *gin.Context) (resetPasswordReq, 
 
 	req.Token = c.Query("token")
 	req.UserID = c.GetHeader("x-client-id")
+
 	return req, nil
 }
-func (h handler) processVerifyRequestRequest(c *gin.Context) (verifyRequestReq, error) {
+func (h handler) processVerifyEmailRequest(c *gin.Context) (verifyRequestReq, error) {
 	ctx := c.Request.Context()
 
 	var req verifyRequestReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		h.l.Errorf(ctx, "user.delivery.http.handler.processVerifyRequestRequest: invalid request")
+		h.l.Errorf(ctx, "user.delivery.http.handler.processVerifyEmailRequest: invalid request")
 		return verifyRequestReq{}, errWrongBody
 	}
 
 	return req, nil
 
 }
-func (h handler) processVerifyUserRequesr(c *gin.Context) (verifyUserReq, error) {
+func (h handler) processVerifyUserRequest(c *gin.Context) (verifyUserReq, error) {
 	ctx := c.Request.Context()
 
 	var req verifyUserReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		h.l.Errorf(ctx, "user.delivery.http.handler.processVerifyUserRequest: invalid request")
-		return verifyUserReq{}, errWrongBody
-	}
 
 	req.Token = c.Query("token")
 	req.UserID = c.GetHeader("x-client-id")
+
+	if err := req.validate(); err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.processVerifyUserRequest: invalid request")
+		return verifyUserReq{}, err
+	}
+
 	return req, nil
 
 }

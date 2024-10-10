@@ -3,7 +3,7 @@ package user
 import "github.com/pt010104/api-golang/internal/models"
 
 type CreateUserInput struct {
-	UserName string
+	Name     string
 	Password string
 	Email    string
 }
@@ -28,7 +28,7 @@ type SignInOutput struct {
 	Token     Token
 	SessionID string
 }
-type VerifyRequestInput struct {
+type VerifyEmailInput struct {
 	Email string
 }
 type ResetPasswordInput struct {

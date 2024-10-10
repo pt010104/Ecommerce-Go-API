@@ -13,7 +13,7 @@ type Handler interface {
 	SignOut(c *gin.Context)
 	ForgetPasswordRequest(c *gin.Context)
 	ResetPassword(c *gin.Context)
-	VerifyRequest(c *gin.Context)
+	VerifyEmail(c *gin.Context)
 	VerifyUser(c *gin.Context)
 	DistributeNewToken(c *gin.Context)
 }

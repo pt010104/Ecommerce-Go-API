@@ -10,7 +10,7 @@ var (
 	ErrInvalidPasswordFormat = errors.New("password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number and one special character")
 	ErrInvalidEmailFormat    = errors.New("invalid email format")
 
-	ErrInvalidUserName        = errors.New("Username must be at least 3 characters long")
+	ErrInvalidName            = errors.New("Username must be at least 3 characters long")
 	ErrRefreshTokenIsNotValid = errors.New("Refresh Token is not valid")
 	ErrUserNotVerified        = errors.New("user not verified")
 	ErrRefreshTokenIsExpired  = errors.New("Refresh Token is expired")

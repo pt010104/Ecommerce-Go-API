@@ -6,7 +6,7 @@ import (
 )
 
 type CreateUserOption struct {
-	UserName string
+	Name     string
 	Password string
 	Email    string
 }
@@ -31,7 +31,7 @@ type UpdateUserOption struct {
 	Model      models.User
 	Email      string
 	Password   string
-	UserName   string
+	Name       string
 	IsVerified bool
 }
 type UpdateKeyTokenInput struct {
