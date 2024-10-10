@@ -16,5 +16,5 @@ type UseCase interface {
 	VerifyRequest(ctx context.Context, email string) (token string, err error)
 	ResetPassWord(ctx context.Context, input ResetPasswordInput) error
 	VerifyUser(ctx context.Context, input VerifyUserInput) error
-	DistributeNewToken(ctx context.Context, input DistributeNewTokenInput) (output DistributeNewTokenOutPut, er error)
+	DistributeNewToken(ctx context.Context, input DistributeNewTokenInput) (output DistributeNewTokenOutput, er error)
 }

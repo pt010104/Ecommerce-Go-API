@@ -22,6 +22,7 @@ type Token struct {
 	AccessToken  string
 	RefreshToken string
 }
+
 type SignInOutput struct {
 	User      models.User
 	Token     Token
@@ -44,8 +45,6 @@ type DistributeNewTokenInput struct {
 	SessionID    string
 	RefreshToken string
 }
-type DistributeNewTokenOutPut struct {
-	JWT          string
-	RefreshToken string
-	UserID       string
+type DistributeNewTokenOutput struct {
+	Token Token
 }

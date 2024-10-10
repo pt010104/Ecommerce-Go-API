@@ -116,14 +116,14 @@ func (h handler) ResetPassword(c *gin.Context) {
 func (h handler) VerifyRequest(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	sc, err := h.processVerifyRequestRequest(c)
+	req, err := h.processVerifyRequestRequest(c)
 	if err != nil {
 		h.l.Error(ctx, "user.delivery.http.handler.VerifyRequest.process: %v", err)
 		response.Error(c, err)
 		return
 	}
 
-	h.uc.VerifyRequest(ctx, sc.Email)
+	h.uc.VerifyRequest(ctx, req.Email)
 
 	response.OK(c, nil)
 

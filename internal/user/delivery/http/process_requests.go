@@ -119,13 +119,16 @@ func (h handler) processVerifyUserRequesr(c *gin.Context) (verifyUserReq, error)
 }
 func (h handler) processDistributeNewTokenRequest(c *gin.Context) (distributeNewTokenReq, error) {
 	ctx := c.Request.Context()
-
 	var req distributeNewTokenReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		h.l.Errorf(ctx, "user.delivery.http.handler.processDistributeNewTokenRequest: invalid request")
-		return distributeNewTokenReq{}, errWrongBody
-	}
+
 	req.SessionID = c.GetHeader("session-id")
 	req.UserId = c.GetHeader("x-client-id")
+	req.RefreshToken = c.GetHeader("refresh-token")
+
+	if err := req.validate(); err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.processDistributeNewTokenRequest: invalid request")
+		return distributeNewTokenReq{}, errWrongHeader
+	}
+
 	return req, nil
 }

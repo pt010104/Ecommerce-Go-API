@@ -3,12 +3,9 @@ package mongo
 import (
 	"context"
 
-	"errors"
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/user"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const (
@@ -36,34 +33,30 @@ func (repo implRepo) CreateKeyToken(ctx context.Context, opt user.CreateKeyToken
 	return u, nil
 
 }
-func (repo implRepo) UpdateKeyToken(ctx context.Context, opt user.UpdateKeyTokenInput) (models.KeyToken, error) {
+func (repo implRepo) UpdateKeyToken(ctx context.Context, opt user.UpdateKeyTokenInput) error {
 	col := repo.getKeyTokenCollection()
-	filter := bson.M{"_id": opt.ID}
 
-	update := bson.M{}
-
-	if opt.RefreshToken != "" {
-		update["refresh_token"] = opt.RefreshToken
-	}
-	if !opt.UpdatedAt.IsZero() {
-		update["updated_at"] = opt.UpdatedAt
+	filer, err := repo.buildKeyTokenDetailQuery(ctx, opt.UserID, opt.SessionID)
+	if err != nil {
+		repo.l.Errorf(ctx, "user.repository.mongo.UpdateKeyToken.buildKeyTokenDetailQuery: %v", err)
+		return err
 	}
 
-	if len(update) == 0 {
-		return models.KeyToken{}, errors.New("no fields to update")
+	update, err := repo.buildUpdateKeyTokenModel(ctx, opt)
+	if err != nil {
+		repo.l.Errorf(ctx, "user.repository.mongo.UpdateKeyToken.buildUpdateKeyTokenModel: %v", err)
+		return err
 	}
 
-	updateQuery := bson.M{"$set": update}
-
-	res := col.FindOneAndUpdate(ctx, filter, updateQuery, options.FindOneAndUpdate().SetReturnDocument(options.After))
-
-	var updatedKeyToken models.KeyToken
-	if err := res.Decode(&updatedKeyToken); err != nil {
-		return models.KeyToken{}, err
+	_, err = col.UpdateOne(ctx, filer, update)
+	if err != nil {
+		repo.l.Errorf(ctx, "user.repository.mongo.UpdateKeyToken.UpdateOne: %v", err)
+		return err
 	}
 
-	return updatedKeyToken, nil
+	return nil
 }
+
 func (repo implRepo) DetailKeyToken(ctx context.Context, userID string, sessionID string) (models.KeyToken, error) {
 	col := repo.getKeyTokenCollection()
 

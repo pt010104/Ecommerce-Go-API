@@ -7,29 +7,14 @@ import (
 
 	"os"
 
-	"crypto/rand"
-	"encoding/base64"
-
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/user"
 	"github.com/pt010104/api-golang/pkg/jwt"
 	"github.com/pt010104/api-golang/pkg/mongo"
+	"github.com/pt010104/api-golang/pkg/util"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 )
-
-func GenerateRandomString(n int) (string, error) {
-	// Create a byte slice of size n
-	bytes := make([]byte, n)
-
-	// Read random bytes into the slice
-	if _, err := rand.Read(bytes); err != nil {
-		return "", err
-	}
-
-	// Encode the byte slice to a base64 string
-	return base64.URLEncoding.EncodeToString(bytes), nil
-}
 
 func (uc implUsecase) CreateUser(ctx context.Context, uct user.CreateUserInput) (models.User, error) {
 	err := uc.validateDataUser(ctx, uct.Email, uct.Password)
@@ -374,56 +359,68 @@ func (uc implUsecase) VerifyUser(ctx context.Context, input user.VerifyUserInput
 	return nil
 
 }
-func (uc implUsecase) DistributeNewToken(ctx context.Context, input user.DistributeNewTokenInput) (output user.DistributeNewTokenOutPut, er error) {
+func (uc implUsecase) DistributeNewToken(ctx context.Context, input user.DistributeNewTokenInput) (output user.DistributeNewTokenOutput, er error) {
+	if input.UserId == "" || input.SessionID == "" || input.RefreshToken == "" {
+		uc.l.Errorf(ctx, "user.usecase.DistributeNewToken: invalid input")
+		return user.DistributeNewTokenOutput{}, user.ErrInvalidInput
+	}
+
 	u, err := uc.repo.DetailUser(ctx, input.UserId)
 	if err != nil {
 		uc.l.Errorf(ctx, "user.usecase.DistributeNewToken.DetailUser :", err)
-		return user.DistributeNewTokenOutPut{}, err
+		return user.DistributeNewTokenOutput{}, err
 	}
+
 	kt, err := uc.repo.DetailKeyToken(ctx, u.ID.Hex(), input.SessionID)
 	if err != nil {
 		uc.l.Errorf(ctx, "user.usecase.DistributeNewToken.DetailKeyToken :", err)
-		return user.DistributeNewTokenOutPut{}, err
-	}
-	if kt.RefreshToken != input.RefreshToken {
-		uc.l.Errorf(ctx, "user.usecase.DistributeNewToken.Kt.RefreshToken!=input :")
-		return user.DistributeNewTokenOutPut{}, user.ErrRefreshTokenIsNotValid
+		return user.DistributeNewTokenOutput{}, err
 	}
 
-	if time.Since(kt.UpdatedAt) > time.Hour {
+	if kt.RefreshToken != input.RefreshToken {
+		uc.l.Errorf(ctx, "user.usecase.DistributeNewToken.Kt.RefreshToken!=input :")
+		return user.DistributeNewTokenOutput{}, user.ErrRefreshTokenIsNotValid
+	}
+
+	if time.Since(kt.UpdatedAt) > refrestTokenExpireTime {
 		uc.l.Errorf(ctx, "user.usecase.DistributeNewToken.RefreshToken expired")
-		return user.DistributeNewTokenOutPut{}, user.ErrRefreshTokenIsExpired
+		return user.DistributeNewTokenOutput{}, user.ErrRefreshTokenIsExpired
 	}
-	newRefreshToken, err1 := GenerateRandomString(32)
-	if err1 != nil {
-		return user.DistributeNewTokenOutPut{}, err1
+
+	newRefreshToken, err := util.GenerateRandomString(32)
+	if err != nil {
+		return user.DistributeNewTokenOutput{}, err
 	}
-	uc.repo.UpdateKeyToken(ctx, user.UpdateKeyTokenInput{
-		ID:           kt.ID,
+
+	err = uc.repo.UpdateKeyToken(ctx, user.UpdateKeyTokenInput{
+		UserID:       u.ID.Hex(),
+		SessionID:    input.SessionID,
 		RefreshToken: newRefreshToken,
-		UpdatedAt:    time.Now(),
 	})
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.DistributeNewToken.UpdateKeyToken :", err)
+		return user.DistributeNewTokenOutput{}, err
+	}
+
 	payload := jwt.Payload{
 		UserID:    u.ID.Hex(),
 		Refresh:   false,
 		SessionID: kt.SessionID,
 	}
-
-	expirationTime := time.Hour * 24
+	expirationTime := accessTokenExpireTime
 	t, err := jwt.Sign(payload, expirationTime, kt.SecretKey)
 	if err != nil {
 		uc.l.Errorf(ctx, "error signing token: %v", err)
-		return user.DistributeNewTokenOutPut{}, err
+		return user.DistributeNewTokenOutput{}, err
 	}
+
 	token := user.Token{
 		AccessToken:  t,
 		RefreshToken: newRefreshToken,
 	}
-	return user.DistributeNewTokenOutPut{
 
-		JWT:          token.AccessToken,
-		RefreshToken: token.RefreshToken,
-		UserID:       u.ID.String(),
+	return user.DistributeNewTokenOutput{
+		Token: token,
 	}, nil
 
 }

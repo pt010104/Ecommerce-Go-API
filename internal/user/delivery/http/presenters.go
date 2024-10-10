@@ -22,12 +22,6 @@ type verifyRequestReq struct {
 	Email string `json:"email" binding:"required"`
 }
 
-func (r verifyRequestReq) toInput() user.VerifyRequestInput {
-	return user.VerifyRequestInput{
-		Email: r.Email,
-	}
-}
-
 func (r signupReq) toInput() user.CreateUserInput {
 	return user.CreateUserInput{
 		UserName: r.UserName,
@@ -91,7 +85,15 @@ func (h handler) newDetailResp(u models.User) detailResp {
 type distributeNewTokenReq struct {
 	UserId       string
 	SessionID    string
-	RefreshToken string `json:"refresh_token" binding:"required"`
+	RefreshToken string
+}
+
+func (r distributeNewTokenReq) validate() error {
+	if r.UserId == "" || r.SessionID == "" || r.RefreshToken == "" {
+		return errWrongHeader
+	}
+
+	return nil
 }
 
 func (r distributeNewTokenReq) toInput() user.DistributeNewTokenInput {
@@ -121,13 +123,11 @@ func (h handler) newSignInResp(output user.SignInOutput) signInResp {
 type distributeNewTokenResp struct {
 	NewAccessToken  string `json:"new_access_token"`
 	NewRefreshToken string `json:"new_refresh_token"`
-	UserID          string `json:"user_id"`
 }
 
-func (h handler) newDistributeNewTokenResp(output user.DistributeNewTokenOutPut) distributeNewTokenResp {
+func (h handler) newDistributeNewTokenResp(output user.DistributeNewTokenOutput) distributeNewTokenResp {
 	return distributeNewTokenResp{
-		UserID:          output.UserID,
-		NewAccessToken:  output.JWT,
-		NewRefreshToken: output.RefreshToken,
+		NewAccessToken:  output.Token.AccessToken,
+		NewRefreshToken: output.Token.RefreshToken,
 	}
 }

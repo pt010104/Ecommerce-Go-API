@@ -3,7 +3,6 @@ package mongo
 import (
 	"context"
 
-	//"github.com/pt010104/api-golang/pkg/mongo"
 	"github.com/pt010104/api-golang/pkg/mongo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"

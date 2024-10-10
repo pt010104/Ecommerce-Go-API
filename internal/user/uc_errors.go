@@ -14,4 +14,6 @@ var (
 	ErrRefreshTokenIsNotValid = errors.New("Refresh Token is not valid")
 	ErrUserNotVerified        = errors.New("user not verified")
 	ErrRefreshTokenIsExpired  = errors.New("Refresh Token is expired")
+
+	ErrInvalidInput = errors.New("invalid input")
 )
