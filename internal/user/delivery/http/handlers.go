@@ -39,6 +39,7 @@ func (h handler) SignIn(c *gin.Context) {
 	output, err := h.uc.SignIn(ctx, req.toInput())
 	if err != nil {
 		h.l.Errorf(ctx, "user.delivery.http.handler.Signin.uc.signIn: %v", err)
+		err = h.mapErrors(err)
 		response.Error(c, err)
 		return
 	}

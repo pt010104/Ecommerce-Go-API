@@ -13,5 +13,5 @@ type User struct {
 	Password   string             `bson:"password"`
 	CreatedAt  time.Time          `bson:"created_at"`
 	UpdatedAt  time.Time          `bson:"updated_at"`
-	Isverified bool               `bson:"is_verified"`
+	IsVerified bool               `bson:"is_verified"`
 }

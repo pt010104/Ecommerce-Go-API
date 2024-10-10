@@ -11,4 +11,6 @@ var (
 	ErrInvalidEmailFormat    = errors.New("invalid email format")
 
 	ErrInvalidUserName = errors.New("Username must be at least 3 characters long")
+
+	ErrUserNotVerified = errors.New("user not verified")
 )

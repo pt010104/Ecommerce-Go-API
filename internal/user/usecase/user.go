@@ -60,6 +60,11 @@ func (uc implUsecase) SignIn(ctx context.Context, sit user.SignInType) (user.Sig
 		return user.SignInOutput{}, err
 	}
 
+	if !u.IsVerified {
+		uc.l.Errorf(ctx, "user.usecase.SignIn: user is not verified")
+		return user.SignInOutput{}, user.ErrUserNotVerified
+	}
+
 	err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(sit.Password))
 	if err != nil {
 		if err == bcrypt.ErrMismatchedHashAndPassword {

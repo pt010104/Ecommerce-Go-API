@@ -10,13 +10,16 @@ var (
 	errWrongQuery           = pkgErrors.NewHTTPError(120002, "Wrong query")
 	errWrongBody            = pkgErrors.NewHTTPError(120003, "Wrong body")
 
-	ErrEmailExisted = pkgErrors.NewHTTPError(120004, "email has already been registered")
+	ErrEmailExisted    = pkgErrors.NewHTTPError(120004, "email has already been registered")
+	ErrUserNotVerified = pkgErrors.NewHTTPError(120005, "user not verified")
 )
 
 func (h handler) mapErrors(e error) error {
 	switch e {
 	case user.ErrEmailExisted:
 		return ErrEmailExisted
+	case user.ErrUserNotVerified:
+		return ErrUserNotVerified
 	}
 
 	return e

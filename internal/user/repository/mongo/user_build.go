@@ -20,7 +20,7 @@ func (impl implRepo) buildUserModel(context context.Context, opt user.CreateUser
 		Password:   opt.Password,
 		CreatedAt:  now,
 		UpdatedAt:  now,
-		Isverified: false,
+		IsVerified: false,
 	}
 
 	return u, nil
@@ -37,7 +37,7 @@ func (impl implRepo) buildUpdateUserModel(context context.Context, opt user.Upda
 	}
 	if opt.Isverified {
 		setFields["is_verified"] = opt.Isverified
-		opt.Model.Isverified = opt.Isverified
+		opt.Model.IsVerified = opt.Isverified
 	}
 	if opt.UserName != "" {
 		setFields["name"] = opt.UserName
