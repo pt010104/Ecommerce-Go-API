@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/pt010104/api-golang/pkg/mongo"
 	"go.mongodb.org/mongo-driver/bson"
@@ -13,6 +14,8 @@ func (repo implRepo) buildKeyTokenDetailQuery(ctx context.Context, userID string
 	var err error
 
 	filter = mongo.BuildQueryWithSoftDelete(filter)
+
+	fmt.Println("userID", userID, "sessionID", sessionID)
 
 	filter["user_id"], err = primitive.ObjectIDFromHex(userID)
 	if err != nil {

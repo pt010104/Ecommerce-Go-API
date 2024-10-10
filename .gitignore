@@ -21,3 +21,5 @@ mock_*
 coverage.out
 
 .env
+
+deploy.sh

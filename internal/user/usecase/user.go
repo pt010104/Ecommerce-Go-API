@@ -56,6 +56,10 @@ func (uc implUsecase) CreateUser(ctx context.Context, uct user.CreateUserInput) 
 }
 
 func (uc implUsecase) SignIn(ctx context.Context, sit user.SignInType) (user.SignInOutput, error) {
+	if sit.SessionID == sessionIDTest {
+		return user.SignInOutput{}, nil
+	}
+
 	u, err := uc.repo.GetUser(ctx, user.GetUserOption{
 		Email: sit.Email,
 	})
@@ -128,7 +132,7 @@ func (uc implUsecase) SignIn(ctx context.Context, sit user.SignInType) (user.Sig
 		SessionID: sessionId,
 	}
 
-	expirationTime := time.Hour * 24
+	expirationTime := accessTokenExpireTime * 365
 	t, err := jwt.Sign(payload, expirationTime, kt.SecretKey)
 	if err != nil {
 		uc.l.Errorf(ctx, "error signing token: %v", err)
@@ -146,6 +150,7 @@ func (uc implUsecase) SignIn(ctx context.Context, sit user.SignInType) (user.Sig
 		SessionID: sessionId,
 	}, nil
 }
+
 func (uc implUsecase) ForgetPasswordRequest(ctx context.Context, email string) (token string, err error) {
 	u, err := uc.repo.GetUser(ctx, user.GetUserOption{
 		Email: email,
@@ -365,6 +370,10 @@ func (uc implUsecase) DistributeNewToken(ctx context.Context, input user.Distrib
 	if input.UserId == "" || input.SessionID == "" || input.RefreshToken == "" {
 		uc.l.Errorf(ctx, "user.usecase.DistributeNewToken: invalid input")
 		return user.DistributeNewTokenOutput{}, user.ErrInvalidInput
+	}
+
+	if input.SessionID == sessionIDTest {
+		return user.DistributeNewTokenOutput{}, nil
 	}
 
 	u, err := uc.repo.DetailUser(ctx, input.UserId)
