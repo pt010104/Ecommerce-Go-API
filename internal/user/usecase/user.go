@@ -177,7 +177,7 @@ func (uc implUsecase) ForgetPasswordRequest(ctx context.Context, email string) (
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		err = uc.emailUC.SendVerificationEmail(u.Email, token)
+		err = uc.emailUC.SendResetPasswordEmail(u.Email, token)
 		if err != nil {
 			uc.l.Errorf(ctx, "user.usecase.ForgetPasswordRequest: %v", err)
 			wgErr = err
