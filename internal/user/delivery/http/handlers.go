@@ -273,7 +273,7 @@ func (h handler) VerifyUser(c *gin.Context) {
 	ctx := c.Request.Context()
 	req, err := h.processVerifyUserRequest(c)
 	if err != nil {
-		h.l.Errorf(ctx, "user.delivery.http.handler.VerifyUser.uc.VerifyUser: %v", err)
+		h.l.Errorf(ctx, "user.delivery.http.handler.VerifyUser.uc.process: %v", err)
 		response.Error(c, err)
 		return
 	}
