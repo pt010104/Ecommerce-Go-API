@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	"log"
+	"github.com/pt010104/api-golang/pkg/log"
 
 	"github.com/pt010104/api-golang/internal/shop"
 )

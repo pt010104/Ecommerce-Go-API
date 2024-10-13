@@ -7,7 +7,7 @@ import (
 	"github.com/pt010104/api-golang/pkg/jwt"
 )
 
-func (h handler) processRegisterRequest(c *gin.Context) (models.Scope, registerRequest, error) {
+func (h handler) processCreateRequest(c *gin.Context) (models.Scope, registerRequest, error) {
 	ctx := c.Request.Context()
 
 	payload, ok := jwt.GetPayloadFromContext(ctx)
@@ -18,12 +18,12 @@ func (h handler) processRegisterRequest(c *gin.Context) (models.Scope, registerR
 
 	var req registerRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		h.l.Errorf(ctx, "shop.delivery.http.handler.processRegisterRequest: invalid request")
+		h.l.Errorf(ctx, "shop.delivery.http.handler.processCreateRequest: invalid request")
 		return models.Scope{}, req, errWrongBody
 	}
 
 	if err := req.validate(); err != nil {
-		h.l.Errorf(ctx, "shop.delivery.http.handler.processRegisterRequest: invalid request")
+		h.l.Errorf(ctx, "shop.delivery.http.handler.processCreateRequest: invalid request")
 		return models.Scope{}, req, err
 	}
 
@@ -31,4 +31,50 @@ func (h handler) processRegisterRequest(c *gin.Context) (models.Scope, registerR
 
 	return sc, req, nil
 
+}
+
+func (h handler) processGetRequest(c *gin.Context) (models.Scope, getShopRequest, error) {
+	ctx := c.Request.Context()
+
+	payload, ok := jwt.GetPayloadFromContext(ctx)
+	if !ok {
+		h.l.Errorf(ctx, "survey.delivery.http.handler.processDetailRequest: unauthorized")
+		return models.Scope{}, getShopRequest{}, pkgErrors.NewUnauthorizedHTTPError()
+	}
+
+	var req getShopRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.handler.processGetRequest: invalid request")
+		return models.Scope{}, req, errWrongBody
+	}
+
+	if err := req.validate(); err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.handler.processGetRequest: invalid request")
+		return models.Scope{}, req, err
+	}
+
+	sc := jwt.NewScope(payload)
+
+	return sc, req, nil
+
+}
+
+func (h handler) processDetailRequest(c *gin.Context) (models.Scope, string, error) {
+	ctx := c.Request.Context()
+
+	payload, ok := jwt.GetPayloadFromContext(ctx)
+	if !ok {
+		h.l.Errorf(ctx, "survey.delivery.http.handler.processDetailRequest: unauthorized")
+		return models.Scope{}, "", pkgErrors.NewUnauthorizedHTTPError()
+	}
+
+	id := c.Param("id")
+	if id == "" {
+		h.l.Errorf(ctx, "shop.delivery.http.handler.processDetailRequest: invalid request")
+		return models.Scope{}, "", errWrongBody
+	}
+
+	sc := jwt.NewScope(payload)
+
+	return sc, id, nil
 }

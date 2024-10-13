@@ -1,26 +1,23 @@
 package http
 
 import (
-	"github.com/pt010104/api-golang/internal/user"
+	"github.com/pt010104/api-golang/internal/shop"
 	pkgErrors "github.com/pt010104/api-golang/pkg/errors"
 )
 
 var (
-	errWrongPaginationQuery = pkgErrors.NewHTTPError(120001, "Wrong pagination query")
-	errWrongQuery           = pkgErrors.NewHTTPError(120002, "Wrong query")
-	errWrongBody            = pkgErrors.NewHTTPError(120003, "Wrong body")
-	errWrongHeader          = pkgErrors.NewHTTPError(120004, "Wrong header")
+	errWrongPaginationQuery = pkgErrors.NewHTTPError(130001, "Wrong pagination query")
+	errWrongQuery           = pkgErrors.NewHTTPError(130002, "Wrong query")
+	errWrongBody            = pkgErrors.NewHTTPError(130003, "Wrong body")
+	errWrongHeader          = pkgErrors.NewHTTPError(130004, "Wrong header")
 
-	ErrEmailExisted    = pkgErrors.NewHTTPError(120005, "email has already been registered")
-	ErrUserNotVerified = pkgErrors.NewHTTPError(120006, "user not verified")
+	ErrInvalidPhone = pkgErrors.NewHTTPError(130005, "Invalid phone")
 )
 
 func (h handler) mapErrors(e error) error {
 	switch e {
-	case user.ErrEmailExisted:
-		return ErrEmailExisted
-	case user.ErrUserNotVerified:
-		return ErrUserNotVerified
+	case shop.ErrInvalidPhone:
+		return ErrInvalidPhone
 	}
 
 	return e

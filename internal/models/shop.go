@@ -1,22 +1,23 @@
 package models
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"time"
 
-type address struct {
-	Street   string `bson:"street"`
-	District string `bson:"district"`
-	City     string `bson:"city"`
-}
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type Shop struct {
-	ID        int                  `bson:"_id"`
-	UserID    int                  `bson:"user_id"`
-	Name      string               `bson:"name"`
+	ID     primitive.ObjectID `bson:"_id"`
+	UserID primitive.ObjectID `bson:"user_id"`
+	Name   string             `bson:"name"`
+	//TODO (cai nay lam sau khi co domain media): Avarta shop
 	Alias     string               `bson:"alias"`
-	Address   address              `bson:"address"`
+	City      string               `bson:"city"`
+	Street    string               `bson:"street"`
+	District  string               `bson:"district"`
 	Phone     string               `bson:"phone,omitempty"`
 	Followers []primitive.ObjectID `bson:"followers,omitempty"`
 	AvgRate   float64              `bson:"avg_rate"`
-	UpdatedAt string               `bson:"updated_at"`
-	CreatedAt string               `bson:"created_at"`
+	UpdatedAt time.Time            `bson:"updated_at"`
+	CreatedAt time.Time            `bson:"created_at"`
 }

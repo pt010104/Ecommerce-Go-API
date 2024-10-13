@@ -1,0 +1,98 @@
+package mongo
+
+import (
+	"context"
+
+	"github.com/pt010104/api-golang/internal/models"
+	"github.com/pt010104/api-golang/internal/shop"
+	"github.com/pt010104/api-golang/pkg/paginator"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+)
+
+const (
+	shopCollection = "shops"
+)
+
+func (repo implRepo) getShopCollection() mongo.Collection {
+	return *repo.database.Collection(shopCollection)
+}
+
+func (repo implRepo) Create(ctx context.Context, sc models.Scope, opt shop.CreateOption) (models.Shop, error) {
+	col := repo.getShopCollection()
+
+	s := repo.buildShopModel(ctx, sc, opt)
+
+	_, err := col.InsertOne(ctx, s)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.Create.InsertOne: %v", err)
+		return models.Shop{}, err
+	}
+
+	return s, nil
+}
+
+func (repo implRepo) Get(ctx context.Context, sc models.Scope, opt shop.GetOption) ([]models.Shop, paginator.Paginator, error) {
+	col := repo.getShopCollection()
+
+	filter, err := repo.buildShopQuery(ctx, sc, opt)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.Get.buildShopQuery: %v", err)
+		return nil, paginator.Paginator{}, err
+	}
+
+	cursor, err := col.Find(ctx, filter, options.Find().
+		SetSkip(opt.PagQuery.Offset()).
+		SetLimit(opt.PagQuery.Limit).
+		SetSort(bson.D{
+			{Key: "created_at", Value: -1},
+			{Key: "_id", Value: -1},
+		}),
+	)
+	if err != nil {
+		repo.l.Errorf(ctx, "recruitment.candidate.repository.mongo.GetCandidates.Find: %v", err)
+		return nil, paginator.Paginator{}, err
+	}
+
+	var shops []models.Shop
+	err = cursor.All(ctx, &shops)
+	if err != nil {
+		repo.l.Errorf(ctx, "recruitment.candidate.repository.mongo.GetCandidates.All: %v", err)
+		return nil, paginator.Paginator{}, err
+	}
+
+	total, err := col.CountDocuments(ctx, filter)
+	if err != nil {
+		repo.l.Errorf(ctx, "recruitment.candidate.repository.mongo.GetCandidates.CountDocuments: %v", err)
+		return nil, paginator.Paginator{}, err
+	}
+
+	return shops, paginator.Paginator{
+		Total:       total,
+		Count:       int64(len(shops)),
+		PerPage:     opt.PagQuery.Limit,
+		CurrentPage: opt.PagQuery.Page,
+	}, nil
+
+}
+
+func (repo implRepo) Detail(ctx context.Context, sc models.Scope, id string) (models.Shop, error) {
+	col := repo.getShopCollection()
+
+	filter, err := repo.buildShopDetailQuery(ctx, sc, id)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.Detail.buildShopDetailQuery: %v", err)
+		return models.Shop{}, err
+	}
+
+	var s models.Shop
+
+	err = col.FindOne(ctx, filter).Decode(&s)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.Detail.FindOne: %v", err)
+		return models.Shop{}, err
+	}
+
+	return s, nil
+}
