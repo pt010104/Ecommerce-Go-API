@@ -6,15 +6,23 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/gin-gonic/gin"
+	"github.com/pt010104/api-golang/internal/middleware"
 )
 
 func (srv HTTPServer) Run() error {
+	ctx := context.Background()
+
+	srv.gin = gin.Default()
+
+	srv.gin.Use(middleware.CORSMiddleware())
+
 	err := srv.mapHandlers()
 	if err != nil {
 		return err
 	}
 
-	ctx := context.Background()
 	go func() {
 		srv.gin.Run(fmt.Sprintf(":%d", srv.port))
 	}()
