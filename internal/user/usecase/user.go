@@ -65,7 +65,7 @@ func (uc implUsecase) SignIn(ctx context.Context, sit user.SignInType) (user.Sig
 	})
 	if err != nil {
 		uc.l.Errorf(ctx, "user.usecase.SignIn.GetUser: %v", err)
-		return user.SignInOutput{}, err
+		return user.SignInOutput{}, user.ErrMismatchedHashAndPassword
 	}
 
 	if !u.IsVerified {
