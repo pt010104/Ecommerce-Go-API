@@ -78,3 +78,19 @@ func (h handler) processDetailRequest(c *gin.Context) (models.Scope, string, err
 
 	return sc, id, nil
 }
+func (h handler) processDeleteShopRequest(c *gin.Context) (models.Scope, string, error) {
+	ctx := c.Request.Context()
+	payload, err := jwt.GetPayloadFromContext(ctx)
+	if err != true {
+		h.l.Errorf(ctx, " shop.Delivery.processDeleteShopRequest : ", err)
+		return models.Scope{}, "", pkgErrors.NewUnauthorizedHTTPError()
+	}
+
+	id := c.Query("id")
+	if id == "" {
+		h.l.Errorf(ctx, "shop.Http.ProcessDelete.id: bad request")
+		return models.Scope{}, "", errWrongBody
+	}
+	sc := jwt.NewScope(payload)
+	return sc, id, nil
+}

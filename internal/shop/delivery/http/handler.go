@@ -142,3 +142,23 @@ func (h handler) Detail(c *gin.Context) {
 
 	response.OK(c, h.newDetailResponse(shop))
 }
+func (h handler) Delete(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	sc, id, err := h.processDeleteShopRequest(c)
+	if err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.Delete: %v", err)
+		response.Error(c, err)
+		return
+	}
+
+	shopDelete, err := h.uc.Delete(ctx, sc, id)
+	if err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.Delete: %v", err)
+		err := h.mapErrors(err)
+		response.Error(c, err)
+		return
+	}
+	response.OK(c, h.newGetDeleteResp(shopDelete))
+
+}

@@ -17,6 +17,9 @@ type GetShopsFilter struct {
 	IDs    []string
 	Search string
 }
+type DeleteInput struct {
+	ID string
+}
 
 type GetInput struct {
 	GetShopsFilter

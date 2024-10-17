@@ -10,5 +10,6 @@ func MapRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
 
 	r.POST("", h.Create)
 	r.GET("", h.Get)
+	r.POST("/delete", h.Delete)
 
 }

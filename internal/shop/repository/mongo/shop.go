@@ -3,10 +3,13 @@ package mongo
 import (
 	"context"
 
+	"errors"
+	"fmt"
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/pkg/paginator"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -95,4 +98,54 @@ func (repo implRepo) Detail(ctx context.Context, sc models.Scope, id string) (mo
 	}
 
 	return s, nil
+}
+func (repo implRepo) FindByid(ctx context.Context, sc models.Scope, id string) (models.Shop, error) {
+	var shop models.Shop
+	col := repo.getShopCollection()
+
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return shop, errors.New("invalid id format")
+	}
+
+	filter := bson.M{
+		"_id":        objectId,
+		"deleted_at": nil,
+	}
+
+	fmt.Printf("filter: %+v\n", filter)
+
+	err = col.FindOne(ctx, filter).Decode(&shop)
+	if err == mongo.ErrNoDocuments {
+		return shop, errors.New("shop not found")
+	} else if err != nil {
+		return shop, err
+	}
+
+	return shop, nil
+}
+
+func (repo implRepo) Delete(ctx context.Context, sc models.Scope, id string) (models.Shop, error) {
+	var shop models.Shop
+	col := repo.getShopCollection()
+
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return shop, errors.New("invalid id format")
+	}
+
+	filter := bson.M{
+		"_id":        objectId,
+		"deleted_at": nil,
+	}
+
+	fmt.Printf("filter: %+v\n", filter)
+	_, err = col.DeleteOne(ctx, filter)
+
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.Detail.DeleteOne: %v", err)
+		return models.Shop{}, err
+	}
+
+	return models.Shop{}, nil
 }

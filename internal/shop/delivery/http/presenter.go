@@ -61,7 +61,15 @@ type getShopRequest struct {
 	IDs    []string `json:"ids"`
 	Search string   `json:"search"`
 }
+type deleteReq struct {
+	ID string
+}
 
+func (r deleteReq) toInput() shop.DeleteInput {
+	return shop.DeleteInput{
+		ID: r.ID,
+	}
+}
 func (r getShopRequest) validate() error {
 	for _, id := range r.IDs {
 		if !mongo.IsObjectID(id) {
@@ -149,5 +157,15 @@ func (h handler) newDetailResponse(s models.Shop) getDetailResp {
 		AvgRate:   s.AvgRate,
 		Followers: mongo.HexFromObjectIDsOrNil(s.Followers),
 		CreatedAt: s.CreatedAt,
+	}
+}
+
+type deleteResp struct {
+	ID string `json:"id"`
+}
+
+func (h handler) newGetDeleteResp(s models.Shop) deleteResp {
+	return deleteResp{
+		ID: s.ID.Hex(),
 	}
 }

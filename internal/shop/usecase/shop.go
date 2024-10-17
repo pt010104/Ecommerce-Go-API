@@ -5,6 +5,7 @@ import (
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
+
 	"github.com/pt010104/api-golang/pkg/util"
 )
 
@@ -67,4 +68,23 @@ func (uc implUsecase) Detail(ctx context.Context, sc models.Scope, id string) (m
 	}
 
 	return s, nil
+}
+func (uc implUsecase) Delete(ctx context.Context, sc models.Scope, id string) (models.Shop, error) {
+
+	shop1, err := uc.repo.FindByid(ctx, sc, id)
+	if err != nil {
+		uc.l.Errorf(ctx, "shop.delete.FindById:", err)
+		return models.Shop{}, err
+	}
+	if shop1.UserID.Hex() != sc.UserID {
+		uc.l.Errorf(ctx, "shop.usecase.Delete.Repodele", err)
+		return models.Shop{}, shop.ErrNoPermissionToDelete
+	}
+	res, err := uc.repo.Delete(ctx, sc, id)
+	if err != nil {
+		uc.l.Errorf(ctx, "shop.usecase.Delete.Repodele", err)
+		return models.Shop{}, shop.ErrShopDoesNotExist
+	}
+
+	return res, nil
 }
