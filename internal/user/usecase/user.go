@@ -77,7 +77,7 @@ func (uc implUsecase) SignIn(ctx context.Context, sit user.SignInType) (user.Sig
 	if err != nil {
 		if err == bcrypt.ErrMismatchedHashAndPassword {
 			uc.l.Errorf(ctx, "user.usecase.SignIn.CompareHashAndPassword: %v", err)
-			return user.SignInOutput{}, err
+			return user.SignInOutput{}, user.ErrMismatchedHashAndPassword
 		}
 		uc.l.Errorf(ctx, "error comparing passwords: %v", err)
 		return user.SignInOutput{}, err

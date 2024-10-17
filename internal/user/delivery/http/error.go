@@ -6,13 +6,13 @@ import (
 )
 
 var (
-	errWrongPaginationQuery = pkgErrors.NewHTTPError(120001, "Wrong pagination query")
-	errWrongQuery           = pkgErrors.NewHTTPError(120002, "Wrong query")
-	errWrongBody            = pkgErrors.NewHTTPError(120003, "Wrong body")
-	errWrongHeader          = pkgErrors.NewHTTPError(120004, "Wrong header")
-
-	ErrEmailExisted    = pkgErrors.NewHTTPError(120005, "email has already been registered")
-	ErrUserNotVerified = pkgErrors.NewHTTPError(120006, "user not verified")
+	errWrongPaginationQuery      = pkgErrors.NewHTTPError(120001, "Wrong pagination query")
+	errWrongQuery                = pkgErrors.NewHTTPError(120002, "Wrong query")
+	errWrongBody                 = pkgErrors.NewHTTPError(120003, "Wrong body")
+	errWrongHeader               = pkgErrors.NewHTTPError(120004, "Wrong header")
+	ErrMismatchedHashAndPassword = pkgErrors.NewHTTPError(120004, "Wrong credentials")
+	ErrEmailExisted              = pkgErrors.NewHTTPError(120005, "email has already been registered")
+	ErrUserNotVerified           = pkgErrors.NewHTTPError(120006, "user not verified")
 )
 
 func (h handler) mapErrors(e error) error {
@@ -21,6 +21,8 @@ func (h handler) mapErrors(e error) error {
 		return ErrEmailExisted
 	case user.ErrUserNotVerified:
 		return ErrUserNotVerified
+	case user.ErrMismatchedHashAndPassword:
+		return ErrMismatchedHashAndPassword
 	}
 
 	return e
