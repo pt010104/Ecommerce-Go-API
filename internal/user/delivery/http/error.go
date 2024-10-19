@@ -13,6 +13,9 @@ var (
 	ErrMismatchedHashAndPassword = pkgErrors.NewHTTPError(120004, "Wrong credentials")
 	ErrEmailExisted              = pkgErrors.NewHTTPError(120005, "email has already been registered")
 	ErrUserNotVerified           = pkgErrors.NewHTTPError(120006, "user not verified")
+	ErrInvalidPasswordFormat     = pkgErrors.NewHTTPError(120007, "password must contain number and digits")
+	ErrInvalidEmailFormat        = pkgErrors.NewHTTPError(120007, "invalid email")
+	ErrInvalidNameFormat         = pkgErrors.NewHTTPError(120007, "invalid name")
 )
 
 func (h handler) mapErrors(e error) error {
@@ -23,6 +26,12 @@ func (h handler) mapErrors(e error) error {
 		return ErrUserNotVerified
 	case user.ErrMismatchedHashAndPassword:
 		return ErrMismatchedHashAndPassword
+	case user.ErrInvalidPasswordFormat:
+		return ErrInvalidPasswordFormat
+	case user.ErrInvalidEmailFormat:
+		return ErrInvalidEmailFormat
+	case user.ErrInvalidName:
+		return ErrInvalidNameFormat
 	}
 
 	return e
