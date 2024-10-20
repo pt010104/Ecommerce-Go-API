@@ -27,8 +27,9 @@ func (uc implUsecase) CreateUser(ctx context.Context, uct user.CreateUserInput) 
 		Email: uct.Email,
 	})
 	if err != nil {
-		uc.l.Errorf(ctx, "user.usecase.CreateUser.repo.GetUser: %v", err)
-		return models.User{}, err
+		if err != mongo.ErrNoDocuments {
+			return models.User{}, err
+		}
 	}
 
 	if u.ID != primitive.NilObjectID {
