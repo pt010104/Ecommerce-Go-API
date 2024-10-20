@@ -149,3 +149,15 @@ func (repo implRepo) Delete(ctx context.Context, sc models.Scope, id string) (mo
 
 	return models.Shop{}, nil
 }
+func (repo implRepo) Update(ctx context.Context, sc models.Scope, option shop.UpdateOption) error {
+	col := repo.getShopCollection()
+	objectId, err := primitive.ObjectIDFromHex(option.ID)
+	if err != nil {
+		return errors.New("invalid id format")
+	}
+	filter := bson.M{"_id": objectId}
+	update := bson.M{"$set": option.UpdateData}
+	_, err1 := col.UpdateOne(ctx, filter, update)
+	return err1
+
+}

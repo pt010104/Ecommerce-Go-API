@@ -5,8 +5,9 @@ import (
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
-
 	"github.com/pt010104/api-golang/pkg/util"
+	"go.mongodb.org/mongo-driver/bson"
+	"time"
 )
 
 func (uc implUsecase) Create(ctx context.Context, sc models.Scope, input shop.CreateInput) (models.Shop, error) {
@@ -87,4 +88,57 @@ func (uc implUsecase) Delete(ctx context.Context, sc models.Scope, id string) (m
 	}
 
 	return res, nil
+}
+
+func (uc implUsecase) Update(ctx context.Context, sc models.Scope, input shop.UpdateInput) (models.Shop, error) {
+	shop1, err := uc.repo.FindByid(ctx, sc, input.ID)
+	if err != nil {
+		uc.l.Errorf(ctx, "shop.Update.FindById:", err)
+		return models.Shop{}, err
+	}
+	if shop1.UserID.Hex() != sc.UserID {
+		uc.l.Errorf(ctx, "shop.usecase.Update.RepoUpdate", err)
+		return models.Shop{}, shop.ErrNoPermissionToUpdate
+	}
+	updateData := bson.M{}
+	if input.Name != nil {
+		updateData["name"] = *input.Name
+	}
+	if input.Alias != nil {
+		updateData["alias"] = *input.Alias
+	}
+	if input.City != nil {
+		updateData["city"] = *input.City
+	}
+	if input.Street != nil {
+		updateData["street"] = *input.Street
+	}
+	if input.District != nil {
+		updateData["district"] = *input.District
+	}
+	if input.Phone != nil {
+		updateData["phone"] = *input.Phone
+	}
+	if input.Followers != nil {
+		updateData["followers"] = *input.Followers
+	}
+	if input.AvgRate != nil {
+		updateData["avg_rate"] = *input.AvgRate
+	}
+
+	updateData["updated_at"] = time.Now()
+	updateOption := shop.UpdateOption{
+		ID:         input.ID,
+		UpdateData: updateData,
+	}
+	err = uc.repo.Update(ctx, sc, updateOption)
+	if err != nil {
+		return models.Shop{}, err
+	}
+	updatedShop, err := uc.repo.FindByid(ctx, sc, input.ID)
+	if err != nil {
+		return models.Shop{}, err
+	}
+
+	return updatedShop, nil
 }

@@ -8,4 +8,5 @@ var (
 	ErrInvalidPhone         = errors.New("invalid phone")
 	ErrShopExist            = errors.New("shop exist")
 	ErrShopDoesNotExist     = errors.New("shop doesnot exist")
+	ErrNoPermissionToUpdate = errors.New("no permission to update")
 )

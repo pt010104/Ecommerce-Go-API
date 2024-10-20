@@ -11,4 +11,5 @@ type UseCase interface {
 	Get(ctx context.Context, sc models.Scope, input GetInput) (GetOutput, error)
 	Detail(ctx context.Context, sc models.Scope, id string) (models.Shop, error)
 	Delete(ctx context.Context, sc models.Scope, id string) (models.Shop, error)
+	Update(ctx context.Context, sc models.Scope, input UpdateInput) (models.Shop, error)
 }

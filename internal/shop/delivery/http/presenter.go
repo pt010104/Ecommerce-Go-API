@@ -169,3 +169,44 @@ func (h handler) newGetDeleteResp(s models.Shop) deleteResp {
 		ID: s.ID.Hex(),
 	}
 }
+
+type updateResp struct {
+	ID      string  `json:"id"`
+	Name    string  `json:"name"`
+	Phone   string  `json:"phone"`
+	Address address `json:"address"`
+	AvgRate float64 `json:"avg_rate"`
+}
+type updateShopRequest struct {
+	Name     *string  `json:"name,omitempty"`
+	Phone    *string  `json:"phone,omitempty"`
+	City     *string  `json:"city,omitempty"`
+	Street   *string  `json:"street,omitempty"`
+	District *string  `json:"district,omitempty"`
+	AvgRate  *float64 `json:"avg_rate,omitempty"`
+}
+
+func (r updateShopRequest) toInput(id string) shop.UpdateInput {
+	return shop.UpdateInput{
+		ID:       id,
+		Name:     r.Name,
+		Phone:    r.Phone,
+		City:     r.City,
+		Street:   r.Street,
+		District: r.District,
+		AvgRate:  r.AvgRate,
+	}
+}
+func (h handler) newUpdateShopResp(s models.Shop) updateResp {
+	return updateResp{
+		ID:    s.ID.Hex(),
+		Name:  s.Name,
+		Phone: s.Phone,
+		Address: address{
+			City:     s.City,
+			Street:   s.Street,
+			District: s.District,
+		},
+		AvgRate: s.AvgRate,
+	}
+}

@@ -162,3 +162,23 @@ func (h handler) Delete(c *gin.Context) {
 	response.OK(c, h.newGetDeleteResp(shopDelete))
 
 }
+func (h handler) Update(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	sc, req, id, err := h.processUpdateShopRequest(c)
+	if err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.Update: %v", err)
+		response.Error(c, err)
+		return
+	}
+
+	updatedShop, err := h.uc.Update(ctx, sc, req.toInput(id))
+	if err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.Update: %v", err)
+		err := h.mapErrors(err)
+		response.Error(c, err)
+		return
+	}
+
+	response.OK(c, h.newUpdateShopResp(updatedShop))
+}

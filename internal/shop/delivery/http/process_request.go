@@ -94,3 +94,28 @@ func (h handler) processDeleteShopRequest(c *gin.Context) (models.Scope, string,
 	sc := jwt.NewScope(payload)
 	return sc, id, nil
 }
+func (h handler) processUpdateShopRequest(c *gin.Context) (models.Scope, updateShopRequest, string, error) {
+	ctx := c.Request.Context()
+
+	payload, ok := jwt.GetPayloadFromContext(ctx)
+	if !ok {
+		h.l.Errorf(ctx, "shop.delivery.http.handler.processUpdateShopRequest: unauthorized")
+		return models.Scope{}, updateShopRequest{}, "", pkgErrors.NewUnauthorizedHTTPError()
+	}
+
+	id := c.Query("id")
+	if id == "" {
+		h.l.Errorf(ctx, "shop.delivery.http.handler.processUpdateShopRequest: missing shop ID")
+		return models.Scope{}, updateShopRequest{}, "", errWrongBody
+	}
+
+	var req updateShopRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.handler.processUpdateShopRequest: invalid request body")
+		return models.Scope{}, req, id, errWrongBody
+	}
+
+	sc := jwt.NewScope(payload)
+
+	return sc, req, id, nil
+}

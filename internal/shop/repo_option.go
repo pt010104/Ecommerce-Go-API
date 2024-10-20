@@ -1,6 +1,9 @@
 package shop
 
-import "github.com/pt010104/api-golang/pkg/paginator"
+import (
+	"github.com/pt010104/api-golang/pkg/paginator"
+	"go.mongodb.org/mongo-driver/bson"
+)
 
 type CreateOption struct {
 	Name     string
@@ -18,4 +21,8 @@ type GetOption struct {
 
 type DetailOption struct {
 	ID string
+}
+type UpdateOption struct {
+	ID         string
+	UpdateData bson.M
 }
