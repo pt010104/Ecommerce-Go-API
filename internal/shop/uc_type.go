@@ -5,7 +5,8 @@ import (
 	"github.com/pt010104/api-golang/pkg/paginator"
 )
 
-type CreateInput struct {
+// Shop
+type CreateShop struct {
 	Name     string
 	City     string
 	Street   string
@@ -17,11 +18,11 @@ type GetShopsFilter struct {
 	IDs    []string
 	Search string
 }
-type DeleteInput struct {
+type DeleteShopInput struct {
 	ID string
 }
 
-type GetInput struct {
+type GetShopInput struct {
 	GetShopsFilter
 	PagQuery paginator.PaginatorQuery
 }
@@ -32,7 +33,19 @@ type UpdateInput struct {
 	District string
 	Phone    string
 }
-type GetOutput struct {
+type GetShopOutput struct {
 	Shops []models.Shop
 	Pag   paginator.Paginator
+}
+
+// Inventory
+type CreateInventoryInput struct {
+	ProductID       string
+	StockLevel      int
+	ReorderLevel    *int
+	ReorderQuantity *int
+}
+
+type CreateInventoryOutput struct {
+	Inventory models.Inventory
 }

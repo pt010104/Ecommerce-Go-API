@@ -21,8 +21,8 @@ func (r registerRequest) validate() error {
 	return nil
 }
 
-func (r registerRequest) toInput() shop.CreateInput {
-	return shop.CreateInput{
+func (r registerRequest) toInput() shop.CreateShop {
+	return shop.CreateShop{
 		Name:     r.Name,
 		Phone:    r.Phone,
 		City:     r.City,
@@ -98,7 +98,7 @@ type getShopResp struct {
 	Items []getShopRespItem `json:"items"`
 }
 
-func (h handler) newGetShopsResp(ucOutput shop.GetOutput) getShopResp {
+func (h handler) newGetShopsResp(ucOutput shop.GetShopOutput) getShopResp {
 	var items []getShopRespItem
 	for _, s := range ucOutput.Shops {
 		shopItem := getShopRespItem{

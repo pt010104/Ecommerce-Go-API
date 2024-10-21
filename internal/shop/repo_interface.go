@@ -8,10 +8,12 @@ import (
 )
 
 type Repo interface {
-	Create(ctx context.Context, sc models.Scope, opt CreateOption) (models.Shop, error)
-	Get(ctx context.Context, sc models.Scope, opt GetOption) ([]models.Shop, paginator.Paginator, error)
-	Detail(ctx context.Context, sc models.Scope, id string) (models.Shop, error)
-	Delete(ctx context.Context, sc models.Scope) error
-	FindByid(ctx context.Context, sc models.Scope, id string) (models.Shop, error)
-	Update(ctx context.Context, sc models.Scope, option UpdateOption) (models.Shop, error)
+	CreateShop(ctx context.Context, sc models.Scope, opt CreateShopOption) (models.Shop, error)
+	GetShop(ctx context.Context, sc models.Scope, opt GetOption) ([]models.Shop, paginator.Paginator, error)
+	DetailShop(ctx context.Context, sc models.Scope, id string) (models.Shop, error)
+	DeleteShop(ctx context.Context, sc models.Scope) error
+	UpdateShop(ctx context.Context, sc models.Scope, option UpdateOption) (models.Shop, error)
+
+	// Inventory
+	CreateInventory(ctx context.Context, sc models.Scope, opt CreateInventoryOption) (models.Inventory, error)
 }

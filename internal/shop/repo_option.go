@@ -5,7 +5,7 @@ import (
 	"github.com/pt010104/api-golang/pkg/paginator"
 )
 
-type CreateOption struct {
+type CreateShopOption struct {
 	Name     string
 	Alias    string
 	City     string
@@ -30,4 +30,11 @@ type UpdateOption struct {
 	Street   string
 	District string
 	Phone    string
+}
+
+type CreateInventoryOption struct {
+	ProductID       string
+	StockLevel      int
+	ReorderLevel    *int
+	ReorderQuantity *int
 }

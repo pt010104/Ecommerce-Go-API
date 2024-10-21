@@ -5,18 +5,18 @@ import (
 	"github.com/pt010104/api-golang/internal/models"
 )
 
-func (h handler) processCreateRequest(c *gin.Context) (createReq, models.Scope, error) {
+func (h handler) processCreateInventoryRequest(c *gin.Context) (createInventoryReq, models.Scope, error) {
 	ctx := c.Request.Context()
 
-	var req createReq
+	var req createInventoryReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		h.l.Errorf(ctx, "inventory.delivery.http.handler.processCreateRequest: invalid request")
-		return createReq{}, models.Scope{}, err
+		return createInventoryReq{}, models.Scope{}, errWrongBody
 	}
 
 	if err := req.validate(); err != nil {
 		h.l.Errorf(ctx, "inventory.delivery.http.handler.processCreateRequest: invalid request")
-		return createReq{}, models.Scope{}, errWrongBody
+		return createInventoryReq{}, models.Scope{}, errWrongBody
 	}
 
 	return req, models.Scope{}, nil

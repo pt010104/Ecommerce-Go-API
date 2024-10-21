@@ -14,22 +14,22 @@ import (
 //
 // @Param Access-Control-Allow-Origin header string false "Access-Control-Allow-Origin" default("*")
 //
-// @Success 200 {object}
+// @Success 200 {object} createInventoryResp
 // @Failure 400 {object} response.Resp "Bad Request"
 // @Failure 500 {object} response.Resp "Internal Server Error"
 //
 // @Router /api/v1/inventories/ [POST]
-func (h handler) Create(c *gin.Context) {
+func (h handler) CreateInventory(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	req, sc, err := h.processCreateRequest(c)
+	req, sc, err := h.processCreateInventoryRequest(c)
 	if err != nil {
 		h.l.Errorf(ctx, "inventory.delivery.http.handler.Create.processCreateRequest: %v", err)
 		response.Error(c, err)
 		return
 	}
 
-	u, err := h.uc.Create(ctx, sc, req.toInput())
+	u, err := h.uc.CreateInventory(ctx, sc, req.toInput())
 	if err != nil {
 		h.l.Errorf(ctx, "inventory.delivery.http.handler.Create.Create: %v", err)
 		err = h.mapErrors(err)
@@ -37,5 +37,5 @@ func (h handler) Create(c *gin.Context) {
 		return
 	}
 
-	response.OK(c, h.newCreateResp(u))
+	response.OK(c, h.newCreateInventoryResp(u))
 }

@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func (repo implRepo) buildShopModel(ctx context.Context, sc models.Scope, opt shop.CreateOption) models.Shop {
+func (repo implRepo) buildShopModel(ctx context.Context, sc models.Scope, opt shop.CreateShopOption) models.Shop {
 	now := time.Now()
 
 	s := models.Shop{

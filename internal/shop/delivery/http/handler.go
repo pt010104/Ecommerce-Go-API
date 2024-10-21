@@ -90,7 +90,7 @@ func (h handler) Get(c *gin.Context) {
 
 	pagQuery.Adjust()
 
-	s, err := h.uc.Get(ctx, sc, shop.GetInput{
+	s, err := h.uc.Get(ctx, sc, shop.GetShopInput{
 		PagQuery:       pagQuery,
 		GetShopsFilter: req.toInput(),
 	})

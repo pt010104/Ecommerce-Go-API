@@ -4,14 +4,10 @@ import (
 	"context"
 	"time"
 
-	"errors"
-	"fmt"
-
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/pkg/paginator"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -24,7 +20,7 @@ func (repo implRepo) getShopCollection() mongo.Collection {
 	return *repo.database.Collection(shopCollection)
 }
 
-func (repo implRepo) Create(ctx context.Context, sc models.Scope, opt shop.CreateOption) (models.Shop, error) {
+func (repo implRepo) CreateShop(ctx context.Context, sc models.Scope, opt shop.CreateShopOption) (models.Shop, error) {
 	col := repo.getShopCollection()
 
 	s := repo.buildShopModel(ctx, sc, opt)
@@ -38,7 +34,7 @@ func (repo implRepo) Create(ctx context.Context, sc models.Scope, opt shop.Creat
 	return s, nil
 }
 
-func (repo implRepo) Get(ctx context.Context, sc models.Scope, opt shop.GetOption) ([]models.Shop, paginator.Paginator, error) {
+func (repo implRepo) GetShop(ctx context.Context, sc models.Scope, opt shop.GetOption) ([]models.Shop, paginator.Paginator, error) {
 	col := repo.getShopCollection()
 
 	filter, err := repo.buildShopQuery(ctx, sc, opt)
@@ -82,7 +78,7 @@ func (repo implRepo) Get(ctx context.Context, sc models.Scope, opt shop.GetOptio
 
 }
 
-func (repo implRepo) Detail(ctx context.Context, sc models.Scope, id string) (models.Shop, error) {
+func (repo implRepo) DetailShop(ctx context.Context, sc models.Scope, id string) (models.Shop, error) {
 	col := repo.getShopCollection()
 
 	filter, err := repo.buildShopDetailQuery(ctx, sc, id)
@@ -101,33 +97,8 @@ func (repo implRepo) Detail(ctx context.Context, sc models.Scope, id string) (mo
 
 	return s, nil
 }
-func (repo implRepo) FindByid(ctx context.Context, sc models.Scope, id string) (models.Shop, error) {
-	var shop models.Shop
-	col := repo.getShopCollection()
 
-	objectId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return shop, errors.New("invalid id format")
-	}
-
-	filter := bson.M{
-		"_id":        objectId,
-		"deleted_at": nil,
-	}
-
-	fmt.Printf("filter: %+v\n", filter)
-
-	err = col.FindOne(ctx, filter).Decode(&shop)
-	if err == mongo.ErrNoDocuments {
-		return shop, errors.New("shop not found")
-	} else if err != nil {
-		return shop, err
-	}
-
-	return shop, nil
-}
-
-func (repo implRepo) Delete(ctx context.Context, sc models.Scope) error {
+func (repo implRepo) DeleteShop(ctx context.Context, sc models.Scope) error {
 
 	col := repo.getShopCollection()
 	filter, err := repo.buildShopDetailQuery(ctx, sc, "")
@@ -140,7 +111,7 @@ func (repo implRepo) Delete(ctx context.Context, sc models.Scope) error {
 
 	return nil
 }
-func (repo implRepo) Update(ctx context.Context, sc models.Scope, option shop.UpdateOption) (models.Shop, error) {
+func (repo implRepo) UpdateShop(ctx context.Context, sc models.Scope, option shop.UpdateOption) (models.Shop, error) {
 	col := repo.getShopCollection()
 	filter, err := repo.buildShopDetailQuery(ctx, sc, "")
 	if err != nil {

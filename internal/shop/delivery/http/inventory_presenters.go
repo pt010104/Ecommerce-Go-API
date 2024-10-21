@@ -1,18 +1,18 @@
 package http
 
 import (
-	"github.com/pt010104/api-golang/internal/inventory"
+	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/pkg/mongo"
 )
 
-type createReq struct {
+type createInventoryReq struct {
 	ProductID       string `json:"product_id" binding:"required"`
 	StockLevel      int    `json:"stock_level" binding:"required"`
 	ReorderLevel    *int   `json:"reorder_level"`
 	ReorderQuantity *int   `json:"reorder_quantity"`
 }
 
-func (r createReq) validate() error {
+func (r createInventoryReq) validate() error {
 	if r.ReorderLevel != nil {
 		if *r.ReorderLevel < 0 {
 			return errWrongBody
@@ -36,8 +36,8 @@ func (r createReq) validate() error {
 	return nil
 }
 
-func (r createReq) toInput() inventory.CreateInput {
-	input := inventory.CreateInput{
+func (r createInventoryReq) toInput() shop.CreateInventoryInput {
+	input := shop.CreateInventoryInput{
 		ProductID:  r.ProductID,
 		StockLevel: r.StockLevel,
 	}
@@ -51,16 +51,16 @@ func (r createReq) toInput() inventory.CreateInput {
 	return input
 }
 
-type createResp struct {
+type createInventoryResp struct {
 	ID              string `json:"id"`
 	ProductID       string `json:"product_id"`
 	StockLevel      int    `json:"stock_level"`
-	ReorderLevel    *int   `json:"reorder_level"`
-	ReorderQuantity *int   `json:"reorder_quantity"`
+	ReorderLevel    *int   `json:"reorder_level,omitempty"`
+	ReorderQuantity *int   `json:"reorder_quantity,omitempty"`
 }
 
-func (h handler) newCreateResp(output inventory.CreateOutput) createResp {
-	resp := createResp{
+func (h handler) newCreateInventoryResp(output shop.CreateInventoryOutput) createInventoryResp {
+	resp := createInventoryResp{
 		ID:         output.Inventory.ID.Hex(),
 		ProductID:  output.Inventory.ProductID.Hex(),
 		StockLevel: output.Inventory.StockLevel,
