@@ -44,7 +44,7 @@ func (repo implRepo) buildShopDetailQuery(ctx context.Context, sc models.Scope, 
 	filter = mongo.BuildQueryWithSoftDelete(filter)
 
 	if id != "" {
-		filter["_id"] = id
+		filter["_id"] = mongo.ObjectIDFromHexOrNil(id)
 	}
 
 	return filter, nil
