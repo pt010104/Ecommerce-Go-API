@@ -2,9 +2,9 @@ package mongo
 
 import (
 	"context"
-	"log"
 
 	"github.com/pt010104/api-golang/internal/models"
+	"github.com/pt010104/api-golang/pkg/log"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )

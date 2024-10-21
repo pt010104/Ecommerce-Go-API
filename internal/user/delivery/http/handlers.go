@@ -7,7 +7,7 @@ import (
 
 // @Summary User Sign Up
 // @Schemes http https
-// @Description Register a new user account
+// @Description Create a new user account
 // @Tags User
 // @Accept json
 // @Produce json
