@@ -3,7 +3,6 @@ package shop
 import (
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/pkg/paginator"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type CreateInput struct {
@@ -27,15 +26,12 @@ type GetInput struct {
 	PagQuery paginator.PaginatorQuery
 }
 type UpdateInput struct {
-	ID        string
-	Name      *string
-	Alias     *string
-	City      *string
-	Street    *string
-	District  *string
-	Phone     *string
-	Followers *[]primitive.ObjectID
-	AvgRate   *float64
+	ID       string
+	Name     string
+	City     string
+	Street   string
+	District string
+	Phone    string
 }
 type GetOutput struct {
 	Shops []models.Shop

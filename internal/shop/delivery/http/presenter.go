@@ -61,15 +61,7 @@ type getShopRequest struct {
 	IDs    []string `json:"ids"`
 	Search string   `json:"search"`
 }
-type deleteReq struct {
-	ID string
-}
 
-func (r deleteReq) toInput() shop.DeleteInput {
-	return shop.DeleteInput{
-		ID: r.ID,
-	}
-}
 func (r getShopRequest) validate() error {
 	for _, id := range r.IDs {
 		if !mongo.IsObjectID(id) {
@@ -160,10 +152,6 @@ func (h handler) newDetailResponse(s models.Shop) getDetailResp {
 	}
 }
 
-type deleteResp struct {
-	ID string `json:"id"`
-}
-
 type updateResp struct {
 	ID      string  `json:"id"`
 	Name    string  `json:"name"`
@@ -172,23 +160,20 @@ type updateResp struct {
 	AvgRate float64 `json:"avg_rate"`
 }
 type updateShopRequest struct {
-	Name     *string  `json:"name,omitempty"`
-	Phone    *string  `json:"phone,omitempty"`
-	City     *string  `json:"city,omitempty"`
-	Street   *string  `json:"street,omitempty"`
-	District *string  `json:"district,omitempty"`
-	AvgRate  *float64 `json:"avg_rate,omitempty"`
+	Name     string `json:"name"`
+	Phone    string `json:"phone"`
+	City     string `json:"city"`
+	Street   string `json:"street"`
+	District string `json:"district"`
 }
 
 func (r updateShopRequest) toInput() shop.UpdateInput {
 	return shop.UpdateInput{
-
 		Name:     r.Name,
 		Phone:    r.Phone,
 		City:     r.City,
 		Street:   r.Street,
 		District: r.District,
-		AvgRate:  r.AvgRate,
 	}
 }
 func (h handler) newUpdateShopResp(s models.Shop) updateResp {

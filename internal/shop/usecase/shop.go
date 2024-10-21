@@ -69,7 +69,6 @@ func (uc implUsecase) Detail(ctx context.Context, sc models.Scope, id string) (m
 	return s, nil
 }
 func (uc implUsecase) Delete(ctx context.Context, sc models.Scope) error {
-
 	err := uc.repo.Delete(ctx, sc)
 	if err != nil {
 		uc.l.Errorf(ctx, "shop.usecase.Delete.Repodele", err)
@@ -80,10 +79,16 @@ func (uc implUsecase) Delete(ctx context.Context, sc models.Scope) error {
 }
 
 func (uc implUsecase) Update(ctx context.Context, sc models.Scope, input shop.UpdateInput) (models.Shop, error) {
+	s, err := uc.repo.Detail(ctx, sc, "")
+	if err != nil {
+		uc.l.Errorf(ctx, "shop.usecase.update.repo.detail:", err)
+		return models.Shop{}, err
+	}
 
 	shop, err := uc.repo.Update(ctx, sc, shop.UpdateOption{
+		Model:    s,
 		Name:     input.Name,
-		Alias:    input.Alias,
+		Alias:    util.BuildAlias(input.Name),
 		City:     input.City,
 		District: input.District,
 		Street:   input.Street,
