@@ -35,7 +35,7 @@ func (uc implUsecase) SendResetPasswordEmail(userEmail string, verificationToken
 		return fmt.Errorf("unable to retrieve Gmail client: %v", err)
 	}
 
-	message := createResetPassMessage(os.Getenv("EMAIL_USERNAME"), userEmail, "Verify Your Email", verificationToken)
+	message := createResetPassMessage(os.Getenv("EMAIL_USERNAME"), userEmail, "Reset your password", verificationToken)
 
 	_, err = service.Users.Messages.Send("me", message).Do()
 	if err != nil {
