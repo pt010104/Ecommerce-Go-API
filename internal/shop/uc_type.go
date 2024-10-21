@@ -28,14 +28,14 @@ type GetInput struct {
 }
 type UpdateInput struct {
 	ID        string
-	Name      *string               `json:"name,omitempty"`
-	Alias     *string               `json:"alias,omitempty"`
-	City      *string               `json:"city,omitempty"`
-	Street    *string               `json:"street,omitempty"`
-	District  *string               `json:"district,omitempty"`
-	Phone     *string               `json:"phone,omitempty"`
-	Followers *[]primitive.ObjectID `json:"followers,omitempty"`
-	AvgRate   *float64              `json:"avg_rate,omitempty"`
+	Name      *string
+	Alias     *string
+	City      *string
+	Street    *string
+	District  *string
+	Phone     *string
+	Followers *[]primitive.ObjectID
+	AvgRate   *float64
 }
 type GetOutput struct {
 	Shops []models.Shop

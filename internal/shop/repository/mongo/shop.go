@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"time"
 
 	"errors"
 	"fmt"
@@ -139,17 +140,47 @@ func (repo implRepo) Delete(ctx context.Context, sc models.Scope) error {
 
 	return nil
 }
-func (repo implRepo) Update(ctx context.Context, sc models.Scope, option shop.UpdateOption) error {
+func (repo implRepo) Update(ctx context.Context, sc models.Scope, option shop.UpdateOption) (models.Shop, error) {
 	col := repo.getShopCollection()
-
 	filter, err := repo.buildShopDetailQuery(ctx, sc, "")
 	if err != nil {
-		repo.l.Errorf(ctx, "shop.repository.mongo.Update : %v", err)
-		return err
+		repo.l.Errorf(ctx, "shop.repo.Update.buildshopdetailquery,", err)
+		return models.Shop{}, err
 	}
 
-	update := bson.M{"$set": option.UpdateData}
-	_, err1 := col.UpdateOne(ctx, filter, update)
-	return err1
+	updateData := bson.M{}
+	if option.Name != nil {
+		updateData["name"] = *option.Name
+		option.Model.Name = *option.Name
+	}
+	if option.Alias != nil {
+		updateData["alias"] = *option.Alias
+		option.Model.Alias = *option.Alias
+	}
+	if option.City != nil {
+		updateData["city"] = *option.City
+		option.Model.City = *option.City
+	}
+	if option.Street != nil {
+		updateData["street"] = *option.Street
+		option.Model.Street = *option.Street
+	}
+	if option.District != nil {
+		updateData["district"] = *option.District
+		option.Model.District = *option.District
+	}
+	if option.Phone != nil {
+		updateData["phone"] = *option.Phone
+		option.Model.Phone = *option.Phone
+	}
 
+	updateData["updated_at"] = time.Now()
+	var updatedShop models.Shop
+	err = col.FindOneAndUpdate(ctx, filter, bson.M{"$set": updateData}).Decode(&updatedShop)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repo.Update.FindOneAndUpdate:", err)
+		return models.Shop{}, err
+	}
+
+	return updatedShop, nil
 }

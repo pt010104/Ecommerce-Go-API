@@ -6,8 +6,6 @@ import (
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/pkg/util"
-	"go.mongodb.org/mongo-driver/bson"
-	"time"
 )
 
 func (uc implUsecase) Create(ctx context.Context, sc models.Scope, input shop.CreateInput) (models.Shop, error) {
@@ -82,46 +80,17 @@ func (uc implUsecase) Delete(ctx context.Context, sc models.Scope) error {
 }
 
 func (uc implUsecase) Update(ctx context.Context, sc models.Scope, input shop.UpdateInput) (models.Shop, error) {
-	shopID, err := uc.repo.Detail(ctx, sc, "")
-	updateData := bson.M{}
-	if input.Name != nil {
-		updateData["name"] = *input.Name
-	}
-	if input.Alias != nil {
-		updateData["alias"] = *input.Alias
-	}
-	if input.City != nil {
-		updateData["city"] = *input.City
-	}
-	if input.Street != nil {
-		updateData["street"] = *input.Street
-	}
-	if input.District != nil {
-		updateData["district"] = *input.District
-	}
-	if input.Phone != nil {
-		updateData["phone"] = *input.Phone
-	}
-	if input.Followers != nil {
-		updateData["followers"] = *input.Followers
-	}
-	if input.AvgRate != nil {
-		updateData["avg_rate"] = *input.AvgRate
-	}
 
-	updateData["updated_at"] = time.Now()
-	updateOption := shop.UpdateOption{
-		ID:         shopID.ID.Hex(),
-		UpdateData: updateData,
-	}
-	err = uc.repo.Update(ctx, sc, updateOption)
+	shop, err := uc.repo.Update(ctx, sc, shop.UpdateOption{
+		Name:     input.Name,
+		Alias:    input.Alias,
+		City:     input.City,
+		District: input.District,
+		Street:   input.Street,
+	})
 	if err != nil {
+		uc.l.Errorf(ctx, "shop.usecase.update.repo.update:", err)
 		return models.Shop{}, err
 	}
-	updatedShop, err := uc.repo.FindByid(ctx, sc, shopID.ID.Hex())
-	if err != nil {
-		return models.Shop{}, err
-	}
-
-	return updatedShop, nil
+	return shop, nil
 }
