@@ -164,12 +164,6 @@ type deleteResp struct {
 	ID string `json:"id"`
 }
 
-func (h handler) newGetDeleteResp(s models.Shop) deleteResp {
-	return deleteResp{
-		ID: s.ID.Hex(),
-	}
-}
-
 type updateResp struct {
 	ID      string  `json:"id"`
 	Name    string  `json:"name"`
@@ -186,9 +180,9 @@ type updateShopRequest struct {
 	AvgRate  *float64 `json:"avg_rate,omitempty"`
 }
 
-func (r updateShopRequest) toInput(id string) shop.UpdateInput {
+func (r updateShopRequest) toInput() shop.UpdateInput {
 	return shop.UpdateInput{
-		ID:       id,
+
 		Name:     r.Name,
 		Phone:    r.Phone,
 		City:     r.City,

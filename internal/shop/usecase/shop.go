@@ -70,36 +70,19 @@ func (uc implUsecase) Detail(ctx context.Context, sc models.Scope, id string) (m
 
 	return s, nil
 }
-func (uc implUsecase) Delete(ctx context.Context, sc models.Scope, id string) (models.Shop, error) {
+func (uc implUsecase) Delete(ctx context.Context, sc models.Scope) error {
 
-	shop1, err := uc.repo.FindByid(ctx, sc, id)
-	if err != nil {
-		uc.l.Errorf(ctx, "shop.delete.FindById:", err)
-		return models.Shop{}, err
-	}
-	if shop1.UserID.Hex() != sc.UserID {
-		uc.l.Errorf(ctx, "shop.usecase.Delete.Repodele", err)
-		return models.Shop{}, shop.ErrNoPermissionToDelete
-	}
-	res, err := uc.repo.Delete(ctx, sc, id)
+	err := uc.repo.Delete(ctx, sc)
 	if err != nil {
 		uc.l.Errorf(ctx, "shop.usecase.Delete.Repodele", err)
-		return models.Shop{}, shop.ErrShopDoesNotExist
+		return shop.ErrShopDoesNotExist
 	}
 
-	return res, nil
+	return nil
 }
 
 func (uc implUsecase) Update(ctx context.Context, sc models.Scope, input shop.UpdateInput) (models.Shop, error) {
-	shop1, err := uc.repo.FindByid(ctx, sc, input.ID)
-	if err != nil {
-		uc.l.Errorf(ctx, "shop.Update.FindById:", err)
-		return models.Shop{}, err
-	}
-	if shop1.UserID.Hex() != sc.UserID {
-		uc.l.Errorf(ctx, "shop.usecase.Update.RepoUpdate", err)
-		return models.Shop{}, shop.ErrNoPermissionToUpdate
-	}
+	shopID, err := uc.repo.Detail(ctx, sc, "")
 	updateData := bson.M{}
 	if input.Name != nil {
 		updateData["name"] = *input.Name
@@ -128,14 +111,14 @@ func (uc implUsecase) Update(ctx context.Context, sc models.Scope, input shop.Up
 
 	updateData["updated_at"] = time.Now()
 	updateOption := shop.UpdateOption{
-		ID:         input.ID,
+		ID:         shopID.ID.Hex(),
 		UpdateData: updateData,
 	}
 	err = uc.repo.Update(ctx, sc, updateOption)
 	if err != nil {
 		return models.Shop{}, err
 	}
-	updatedShop, err := uc.repo.FindByid(ctx, sc, input.ID)
+	updatedShop, err := uc.repo.FindByid(ctx, sc, shopID.ID.Hex())
 	if err != nil {
 		return models.Shop{}, err
 	}

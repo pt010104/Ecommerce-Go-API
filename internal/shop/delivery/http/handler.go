@@ -145,34 +145,35 @@ func (h handler) Detail(c *gin.Context) {
 func (h handler) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	sc, id, err := h.processDeleteShopRequest(c)
+	sc, err := h.processDeleteShopRequest(c)
 	if err != nil {
 		h.l.Errorf(ctx, "shop.delivery.http.Delete: %v", err)
 		response.Error(c, err)
 		return
 	}
 
-	shopDelete, err := h.uc.Delete(ctx, sc, id)
+	err = h.uc.Delete(ctx, sc)
 	if err != nil {
 		h.l.Errorf(ctx, "shop.delivery.http.Delete: %v", err)
 		err := h.mapErrors(err)
 		response.Error(c, err)
 		return
 	}
-	response.OK(c, h.newGetDeleteResp(shopDelete))
+
+	response.OK(c, nil)
 
 }
 func (h handler) Update(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	sc, req, id, err := h.processUpdateShopRequest(c)
+	sc, req, err := h.processUpdateShopRequest(c)
 	if err != nil {
 		h.l.Errorf(ctx, "shop.delivery.http.Update: %v", err)
 		response.Error(c, err)
 		return
 	}
 
-	updatedShop, err := h.uc.Update(ctx, sc, req.toInput(id))
+	updatedShop, err := h.uc.Update(ctx, sc, req.toInput())
 	if err != nil {
 		h.l.Errorf(ctx, "shop.delivery.http.Update: %v", err)
 		err := h.mapErrors(err)

@@ -125,37 +125,28 @@ func (repo implRepo) FindByid(ctx context.Context, sc models.Scope, id string) (
 	return shop, nil
 }
 
-func (repo implRepo) Delete(ctx context.Context, sc models.Scope, id string) (models.Shop, error) {
-	var shop models.Shop
+func (repo implRepo) Delete(ctx context.Context, sc models.Scope) error {
+
 	col := repo.getShopCollection()
-
-	objectId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return shop, errors.New("invalid id format")
-	}
-
-	filter := bson.M{
-		"_id":        objectId,
-		"deleted_at": nil,
-	}
-
-	fmt.Printf("filter: %+v\n", filter)
+	filter, err := repo.buildShopDetailQuery(ctx, sc, "")
 	_, err = col.DeleteOne(ctx, filter)
 
 	if err != nil {
 		repo.l.Errorf(ctx, "shop.repository.mongo.Detail.DeleteOne: %v", err)
-		return models.Shop{}, err
+		return err
 	}
 
-	return models.Shop{}, nil
+	return nil
 }
 func (repo implRepo) Update(ctx context.Context, sc models.Scope, option shop.UpdateOption) error {
 	col := repo.getShopCollection()
-	objectId, err := primitive.ObjectIDFromHex(option.ID)
+
+	filter, err := repo.buildShopDetailQuery(ctx, sc, "")
 	if err != nil {
-		return errors.New("invalid id format")
+		repo.l.Errorf(ctx, "shop.repository.mongo.Update : %v", err)
+		return err
 	}
-	filter := bson.M{"_id": objectId}
+
 	update := bson.M{"$set": option.UpdateData}
 	_, err1 := col.UpdateOne(ctx, filter, update)
 	return err1
