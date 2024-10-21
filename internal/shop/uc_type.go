@@ -26,7 +26,6 @@ type GetInput struct {
 	PagQuery paginator.PaginatorQuery
 }
 type UpdateInput struct {
-	ID       string
 	Name     string
 	City     string
 	Street   string
