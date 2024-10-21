@@ -28,6 +28,7 @@ func (uc implUsecase) CreateUser(ctx context.Context, uct user.CreateUserInput) 
 	})
 	if err != nil {
 		if err != mongo.ErrNoDocuments {
+			uc.l.Errorf(ctx, "USER.usecase.createuser.getuser:")
 			return models.User{}, err
 		}
 	}
@@ -66,7 +67,7 @@ func (uc implUsecase) SignIn(ctx context.Context, sit user.SignInType) (user.Sig
 	})
 	if err != nil {
 		uc.l.Errorf(ctx, "user.usecase.SignIn.GetUser: %v", err)
-		return user.SignInOutput{}, err
+		return user.SignInOutput{}, user.ErrMismatchedHashAndPassword
 	}
 
 	if !u.IsVerified {
@@ -78,7 +79,7 @@ func (uc implUsecase) SignIn(ctx context.Context, sit user.SignInType) (user.Sig
 	if err != nil {
 		if err == bcrypt.ErrMismatchedHashAndPassword {
 			uc.l.Errorf(ctx, "user.usecase.SignIn.CompareHashAndPassword: %v", err)
-			return user.SignInOutput{}, err
+			return user.SignInOutput{}, user.ErrMismatchedHashAndPassword
 		}
 		uc.l.Errorf(ctx, "error comparing passwords: %v", err)
 		return user.SignInOutput{}, err
@@ -178,7 +179,7 @@ func (uc implUsecase) ForgetPasswordRequest(ctx context.Context, email string) (
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		err = uc.emailUC.SendVerificationEmail(u.Email, token)
+		err = uc.emailUC.SendResetPasswordEmail(u.Email, token)
 		if err != nil {
 			uc.l.Errorf(ctx, "user.usecase.ForgetPasswordRequest: %v", err)
 			wgErr = err

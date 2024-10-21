@@ -88,8 +88,11 @@ func (h handler) processResetPasswordRequest(c *gin.Context) (resetPasswordReq, 
 	}
 
 	req.Token = c.Query("token")
-	req.UserID = c.GetHeader("x-client-id")
-
+	userID, exist := c.Get("userID")
+	if !exist {
+		return resetPasswordReq{}, errWrongBody
+	}
+	req.UserID = userID.(string)
 	return req, nil
 }
 func (h handler) processVerifyEmailRequest(c *gin.Context) (verifyRequestReq, error) {
@@ -110,8 +113,11 @@ func (h handler) processVerifyUserRequest(c *gin.Context) (verifyUserReq, error)
 	var req verifyUserReq
 
 	req.Token = c.Query("token")
-	req.UserID = c.GetHeader("x-client-id")
-
+	userID, exist := c.Get("userID")
+	if !exist {
+		return verifyUserReq{}, errWrongBody
+	}
+	req.UserID = userID.(string)
 	if err := req.validate(); err != nil {
 		h.l.Errorf(ctx, "user.delivery.http.handler.processVerifyUserRequest: invalid request")
 		return verifyUserReq{}, err

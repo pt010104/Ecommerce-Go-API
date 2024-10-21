@@ -28,10 +28,34 @@ func getClient() *http.Client {
 }
 
 func createMessage(from, to, subject, token string) *gmail.Message {
-	verificationURL := fmt.Sprintf("https://your-app.com/verify-email?token=%s", token)
+
+	clientBaseURL := os.Getenv("CLIENT_BASE_URL")
+	if clientBaseURL == "" {
+		clientBaseURL = "http://localhost:3000"
+	}
+
+	verificationURL := fmt.Sprintf("%s/verify-email?token=%s", clientBaseURL, token)
+
 	message := []byte(fmt.Sprintf("To: %s\r\nSubject: %s\r\n\r\nPlease verify your email by clicking this link: %s", to, subject, verificationURL))
 
 	var msg gmail.Message
 	msg.Raw = base64.URLEncoding.EncodeToString(message)
+
+	return &msg
+}
+func createResetPassMessage(from, to, subject, token string) *gmail.Message {
+
+	clientBaseURL := os.Getenv("CLIENT_BASE_URL")
+	if clientBaseURL == "" {
+		clientBaseURL = "http://localhost:3000"
+	}
+
+	resetPasswordURL := fmt.Sprintf("%s/reset-password?token=%s", clientBaseURL, token)
+
+	message := []byte(fmt.Sprintf("To: %s\r\nSubject: %s\r\n\r\nPlease reset your password by clicking this link: %s", to, subject, resetPasswordURL))
+
+	var msg gmail.Message
+	msg.Raw = base64.URLEncoding.EncodeToString(message)
+
 	return &msg
 }
