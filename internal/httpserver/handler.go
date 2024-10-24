@@ -35,7 +35,7 @@ func (srv HTTPServer) mapHandlers() error {
 	emailUC := emailUC.New(srv.l)
 	userUC := userUC.New(srv.l, userRepo, emailUC)
 	shopUC := shopUC.New(srv.l, shopRepo)
-	adminUC := adminUC.New(adminRepo, srv.l)
+	adminUC := adminUC.New(adminRepo, srv.l, shopUC)
 
 	// Handlers
 	userH := userHTTP.New(srv.l, userUC)

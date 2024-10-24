@@ -27,11 +27,13 @@ type GetShopInput struct {
 	PagQuery paginator.PaginatorQuery
 }
 type UpdateInput struct {
-	Name     string
-	City     string
-	Street   string
-	District string
-	Phone    string
+	ShopID     string
+	Name       string
+	City       string
+	Street     string
+	District   string
+	Phone      string
+	IsVerified bool
 }
 type GetShopOutput struct {
 	Shops []models.Shop

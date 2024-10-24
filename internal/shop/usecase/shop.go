@@ -79,19 +79,20 @@ func (uc implUsecase) Delete(ctx context.Context, sc models.Scope) error {
 }
 
 func (uc implUsecase) Update(ctx context.Context, sc models.Scope, input shop.UpdateInput) (models.Shop, error) {
-	s, err := uc.repo.DetailShop(ctx, sc, "")
+	s, err := uc.repo.DetailShop(ctx, sc, input.ShopID)
 	if err != nil {
 		uc.l.Errorf(ctx, "shop.usecase.update.repo.detail:", err)
 		return models.Shop{}, err
 	}
 
 	shop, err := uc.repo.UpdateShop(ctx, sc, shop.UpdateOption{
-		Model:    s,
-		Name:     input.Name,
-		Alias:    util.BuildAlias(input.Name),
-		City:     input.City,
-		District: input.District,
-		Street:   input.Street,
+		Model:      s,
+		Name:       input.Name,
+		Alias:      util.BuildAlias(input.Name),
+		City:       input.City,
+		District:   input.District,
+		Street:     input.Street,
+		IsVerified: input.IsVerified,
 	})
 	if err != nil {
 		uc.l.Errorf(ctx, "shop.usecase.update.repo.update:", err)
