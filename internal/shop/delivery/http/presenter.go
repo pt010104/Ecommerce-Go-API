@@ -58,8 +58,9 @@ func (h handler) newCreateResponse(s models.Shop) registerResponse {
 }
 
 type getShopRequest struct {
-	IDs    []string `json:"ids"`
-	Search string   `json:"search"`
+	IDs        []string `json:"ids"`
+	Search     string   `json:"search"`
+	IsVerified *bool    `json:"is_verified"`
 }
 
 func (r getShopRequest) validate() error {
@@ -74,8 +75,9 @@ func (r getShopRequest) validate() error {
 
 func (r getShopRequest) toInput() shop.GetShopsFilter {
 	return shop.GetShopsFilter{
-		IDs:    r.IDs,
-		Search: r.Search,
+		IDs:        r.IDs,
+		Search:     r.Search,
+		IsVerified: r.IsVerified,
 	}
 }
 
@@ -84,13 +86,15 @@ type listMetaResponse struct {
 }
 
 type getShopRespItem struct {
-	ID        string    `json:"id"`
-	Name      string    `json:"name"`
-	Phone     string    `json:"phone"`
-	Address   address   `json:"address"`
-	Followers []string  `json:"followers,omitempty"`
-	AvgRate   float64   `json:"avg_rate"`
-	CreatedAt time.Time `json:"created_at"`
+	ID         string    `json:"id"`
+	UserID     string    `json:"user_id"`
+	Name       string    `json:"name"`
+	Phone      string    `json:"phone"`
+	Address    address   `json:"address"`
+	Followers  []string  `json:"followers,omitempty"`
+	AvgRate    float64   `json:"avg_rate"`
+	IsVerified *bool     `json:"is_verified,omitempty"`
+	CreatedAt  time.Time `json:"created_at"`
 }
 
 type getShopResp struct {
@@ -110,9 +114,11 @@ func (h handler) newGetShopsResp(ucOutput shop.GetShopOutput) getShopResp {
 				Street:   s.Street,
 				District: s.District,
 			},
-			AvgRate:   s.AvgRate,
-			Followers: mongo.HexFromObjectIDsOrNil(s.Followers),
-			CreatedAt: s.CreatedAt,
+			AvgRate:    s.AvgRate,
+			Followers:  mongo.HexFromObjectIDsOrNil(s.Followers),
+			UserID:     s.UserID.Hex(),
+			IsVerified: &s.IsVerified,
+			CreatedAt:  s.CreatedAt,
 		}
 
 		items = append(items, shopItem)

@@ -15,8 +15,9 @@ type CreateShop struct {
 }
 
 type GetShopsFilter struct {
-	IDs    []string
-	Search string
+	IDs        []string
+	Search     string
+	IsVerified *bool
 }
 type DeleteShopInput struct {
 	ID string

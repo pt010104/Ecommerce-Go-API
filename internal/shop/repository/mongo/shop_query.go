@@ -31,6 +31,10 @@ func (repo implRepo) buildShopQuery(ctx context.Context, sc models.Scope, opt sh
 		filter["_id"] = bson.M{"$in": opt.IDs}
 	}
 
+	if opt.IsVerified != nil {
+		filter["is_verified"] = opt.IsVerified
+	}
+
 	return filter, nil
 }
 
