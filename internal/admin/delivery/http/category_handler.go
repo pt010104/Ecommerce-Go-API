@@ -14,7 +14,7 @@ func (h handler) CreateCategory(c *gin.Context) {
 		response.Error(c, err)
 		return
 	}
-
+	h.l.Debugf(ctx, "role:", sc.Role)
 	u, err := h.uc.CreateCategory(ctx, sc, req.toInput())
 	if err != nil {
 		h.l.Errorf(ctx, "category.delivery.http.handler.Create.Create: %v", err)
@@ -22,6 +22,6 @@ func (h handler) CreateCategory(c *gin.Context) {
 		response.Error(c, err)
 		return
 	}
-
+	h.l.Debugf(ctx, "role:", sc.Role)
 	response.OK(c, u)
 }

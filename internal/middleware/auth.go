@@ -49,6 +49,7 @@ func (m Middleware) Auth() gin.HandlerFunc {
 		scope.Role = role
 		fmt.Print(scope.Role)
 		m.l.Debugf(ctx, "role", scope.Role)
+		c.Set("role", scope.Role)
 		ctx = jwt.SetScopeToContext(ctx, scope)
 
 		c.Request = c.Request.WithContext(ctx)
