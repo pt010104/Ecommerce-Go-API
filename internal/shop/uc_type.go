@@ -40,15 +40,3 @@ type GetShopOutput struct {
 	Shops []models.Shop
 	Pag   paginator.Paginator
 }
-
-// Inventory
-type CreateInventoryInput struct {
-	ProductID       string
-	StockLevel      int
-	ReorderLevel    *int
-	ReorderQuantity *int
-}
-
-type CreateInventoryOutput struct {
-	Inventory models.Inventory
-}

@@ -6,6 +6,7 @@ import (
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
 
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -33,4 +34,73 @@ func (repo implRepo) CreateInventory(ctx context.Context, sc models.Scope, opt s
 		return models.Inventory{}, err
 	}
 	return u, nil
+}
+
+func (repo implRepo) DetailInventory(ctx context.Context, sc models.Scope, productID primitive.ObjectID) (models.Inventory, error) {
+	col := repo.getInventoryCollection()
+
+	filter, err := repo.buildInventoryDetailQuery(ctx, sc, productID)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.DetailInventory.buildInventoryDetailQuery: %v", err)
+		return models.Inventory{}, err
+	}
+
+	var u models.Inventory
+	err = col.FindOne(ctx, filter).Decode(&u)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.DetailInventory.FindOne: %v", err)
+		return models.Inventory{}, err
+	}
+	return u, nil
+}
+
+func (repo implRepo) ListInventory(ctx context.Context, sc models.Scope, productIDs []primitive.ObjectID) ([]models.Inventory, error) {
+	col := repo.getInventoryCollection()
+
+	filter, err := repo.buildInventoryQuery(ctx, sc, productIDs)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.ListInventory.buildInventoryQuery: %v", err)
+		return []models.Inventory{}, err
+	}
+
+	cursor, err := col.Find(ctx, filter)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.ListInventory.Find: %v", err)
+		return []models.Inventory{}, err
+	}
+	defer cursor.Close(ctx)
+
+	var inventories []models.Inventory
+	err = cursor.All(ctx, &inventories)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.ListInventory.All: %v", err)
+		return []models.Inventory{}, err
+	}
+
+	return inventories, nil
+}
+
+func (repo implRepo) UpdateInventory(ctx context.Context, sc models.Scope, opt shop.UpdateInventoryOption) (models.Inventory, error) {
+	col := repo.getInventoryCollection()
+
+	filter, err := repo.buildInventoryDetailQuery(ctx, sc, opt.Model.ProductID)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.UpdateInventory.buildInventoryDetailQuery: %v", err)
+		return models.Inventory{}, err
+	}
+
+	nm, update, err := repo.buildInventoryUpdateModel(ctx, opt)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.UpdateInventory.buildInventoryUpdateModel: %v", err)
+		return models.Inventory{}, err
+	}
+
+	var u models.Inventory
+	err = col.FindOneAndUpdate(ctx, filter, update).Decode(&u)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.UpdateInventory.FindOneAndUpdate: %v", err)
+		return models.Inventory{}, err
+	}
+
+	return nm, nil
 }

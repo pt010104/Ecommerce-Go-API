@@ -7,10 +7,9 @@ import (
 )
 
 type Shop struct {
-	ID     primitive.ObjectID `bson:"_id"`
-	UserID primitive.ObjectID `bson:"user_id"`
-	Name   string             `bson:"name"`
-	//TODO (cai nay lam sau khi co domain media): Avarta shop
+	ID         primitive.ObjectID   `bson:"_id"`
+	UserID     primitive.ObjectID   `bson:"user_id"`
+	Name       string               `bson:"name"`
 	Alias      string               `bson:"alias"`
 	City       string               `bson:"city"`
 	Street     string               `bson:"street"`

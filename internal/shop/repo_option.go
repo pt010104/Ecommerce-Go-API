@@ -3,6 +3,7 @@ package shop
 import (
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/pkg/paginator"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type CreateShopOption struct {
@@ -34,8 +35,15 @@ type UpdateOption struct {
 }
 
 type CreateInventoryOption struct {
-	ProductID       string
-	StockLevel      int
-	ReorderLevel    *int
-	ReorderQuantity *int
+	ProductID       primitive.ObjectID
+	StockLevel      uint
+	ReorderLevel    *uint
+	ReorderQuantity *uint
+}
+
+type UpdateInventoryOption struct {
+	Model           models.Inventory
+	StockLevel      *uint
+	ReorderLevel    *uint
+	ReorderQuantity *uint
 }

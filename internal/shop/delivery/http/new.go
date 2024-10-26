@@ -11,9 +11,6 @@ type Handler interface {
 	Get(c *gin.Context)
 	Delete(c *gin.Context)
 	Update(c *gin.Context)
-
-	// Inventory
-	CreateInventory(c *gin.Context)
 }
 
 type handler struct {
