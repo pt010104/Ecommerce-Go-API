@@ -175,6 +175,7 @@ type updateShopRequest struct {
 
 func (r updateShopRequest) toInput() shop.UpdateInput {
 	return shop.UpdateInput{
+
 		Name:     r.Name,
 		Phone:    r.Phone,
 		City:     r.City,

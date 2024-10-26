@@ -8,5 +8,5 @@ import (
 
 type UseCase interface {
 	CreateCategory(ctx context.Context, sc models.Scope, input CreateCategoryInput) (models.Category, error)
-	VerifyShop(ctx context.Context, sc models.Scope, input VerifyShopInput) (models.Shop, error)
+	VerifyShop(ctx context.Context, sc models.Scope, input VerifyShopInput) ([]models.Shop, error)
 }

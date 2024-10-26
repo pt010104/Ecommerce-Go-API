@@ -23,6 +23,7 @@ type DetailOption struct {
 	ID string
 }
 type UpdateOption struct {
+	ID         string
 	Model      models.Shop
 	Name       string
 	Alias      string

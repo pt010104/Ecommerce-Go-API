@@ -7,5 +7,5 @@ type CreateCategoryInput struct {
 	Description string
 }
 type VerifyShopInput struct {
-	ShopID string
+	ShopID []string
 }
