@@ -84,7 +84,6 @@ func (uc implUsecase) Update(ctx context.Context, sc models.Scope, input shop.Up
 		uc.l.Errorf(ctx, "shop.usecase.update.repo.detail:", err)
 		return models.Shop{}, err
 	}
-	uc.l.Debugf(ctx, "shopID:", input.ShopID)
 
 	shop, err := uc.repo.UpdateShop(ctx, sc, shop.UpdateOption{
 		Model:      s,

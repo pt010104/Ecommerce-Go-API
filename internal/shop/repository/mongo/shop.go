@@ -2,14 +2,14 @@ package mongo
 
 import (
 	"context"
-	"fmt"
+	"time"
+
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/pkg/paginator"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"time"
 )
 
 const (
@@ -113,12 +113,12 @@ func (repo implRepo) DeleteShop(ctx context.Context, sc models.Scope) error {
 }
 func (repo implRepo) UpdateShop(ctx context.Context, sc models.Scope, option shop.UpdateOption) (models.Shop, error) {
 	col := repo.getShopCollection()
-	filter, err := repo.buildShopDetailQuery(ctx, sc, option.ID)
+	filter, err := repo.buildShopDetailQuery(ctx, sc, option.Model.ID.Hex())
 	if err != nil {
 		repo.l.Errorf(ctx, "shop.repo.Update.buildshopdetailquery,", err)
 		return models.Shop{}, err
 	}
-	fmt.Printf("Filter used in UpdateShop: %v\n", filter)
+
 	updateData := bson.M{}
 	if option.Name != "" {
 		updateData["name"] = option.Name
