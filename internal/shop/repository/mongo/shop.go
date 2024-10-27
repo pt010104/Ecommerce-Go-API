@@ -37,7 +37,7 @@ func (repo implRepo) CreateShop(ctx context.Context, sc models.Scope, opt shop.C
 func (repo implRepo) GetShop(ctx context.Context, sc models.Scope, opt shop.GetOption) ([]models.Shop, paginator.Paginator, error) {
 	col := repo.getShopCollection()
 
-	filter, err := repo.buildShopQuery(ctx, sc, opt)
+	filter, err := repo.buildShopQuery(ctx, models.Scope{}, opt)
 	if err != nil {
 		repo.l.Errorf(ctx, "shop.repository.mongo.Get.buildShopQuery: %v", err)
 		return nil, paginator.Paginator{}, err
