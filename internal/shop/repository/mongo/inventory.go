@@ -104,3 +104,21 @@ func (repo implRepo) UpdateInventory(ctx context.Context, sc models.Scope, opt s
 
 	return nm, nil
 }
+
+func (repo implRepo) DeleteInventory(ctx context.Context, sc models.Scope, productIDs []primitive.ObjectID) error {
+	col := repo.getInventoryCollection()
+
+	filter, err := repo.buildInventoryQuery(ctx, sc, productIDs)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.DeleteInventory.buildInventoryQuery: %v", err)
+		return err
+	}
+
+	_, err = col.DeleteMany(ctx, filter)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.DeleteInventory.DeleteMany: %v", err)
+		return err
+	}
+
+	return nil
+}

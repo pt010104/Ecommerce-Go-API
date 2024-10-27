@@ -451,3 +451,201 @@ func TestUpdateInventory(t *testing.T) {
 		})
 	}
 }
+
+func TestListlInventory(t *testing.T) {
+	scope := models.Scope{
+		UserID:    "test",
+		SessionID: "test",
+		Role:      0,
+	}
+
+	type mockRepoList struct {
+		isCalled   bool
+		productIDs []primitive.ObjectID
+		output     []models.Inventory
+		err        error
+	}
+
+	ids := []primitive.ObjectID{
+		mongo.ObjectIDFromHexOrNil("6654408a9b657b844db56a74"),
+		mongo.ObjectIDFromHexOrNil("6654408a9b657b844db56a75"),
+		mongo.ObjectIDFromHexOrNil("6654408a9b657b844db56a76"),
+	}
+
+	tcs := map[string]struct {
+		productIDs []primitive.ObjectID
+		mockRepo   mockRepoList
+		wantRes    []models.Inventory
+		wantErr    error
+	}{
+		"success": {
+			productIDs: ids,
+			mockRepo: mockRepoList{
+				isCalled:   true,
+				productIDs: ids,
+				output: []models.Inventory{
+					{
+						ProductID: ids[0],
+					},
+					{
+						ProductID: ids[1],
+					},
+					{
+						ProductID: ids[2],
+					},
+				},
+				err: nil,
+			},
+			wantRes: []models.Inventory{
+				{
+					ProductID: ids[0],
+				},
+				{
+					ProductID: ids[1],
+				},
+				{
+					ProductID: ids[2],
+				},
+			},
+			wantErr: nil,
+		},
+		"success with not exist 1 productID": {
+			productIDs: ids,
+			mockRepo: mockRepoList{
+				isCalled:   true,
+				productIDs: ids,
+				output: []models.Inventory{
+					{
+						ProductID: ids[0],
+					},
+					{
+						ProductID: ids[1],
+					},
+				},
+				err: nil,
+			},
+			wantRes: []models.Inventory{
+				{
+					ProductID: ids[0],
+				},
+				{
+					ProductID: ids[1],
+				},
+			},
+			wantErr: mongo.ErrNoDocuments,
+		},
+		"success with not exist any productID": {
+			productIDs: ids,
+			mockRepo: mockRepoList{
+				isCalled:   true,
+				productIDs: ids,
+				output:     []models.Inventory{},
+				err:        nil,
+			},
+			wantRes: []models.Inventory{},
+			wantErr: mongo.ErrNoDocuments,
+		},
+	}
+
+	for name, tc := range tcs {
+		t.Run(name, func(t *testing.T) {
+			ctx := context.Background()
+
+			uc, deps := initUseCase(t)
+
+			if tc.mockRepo.isCalled {
+				deps.repo.EXPECT().ListInventory(ctx, scope, tc.mockRepo.productIDs).
+					Return(
+						tc.mockRepo.output,
+						tc.mockRepo.err,
+					)
+			}
+
+			res, err := uc.ListInventory(ctx, scope, tc.productIDs)
+			if err != nil {
+				require.Equal(t, tc.wantErr, err)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, tc.wantRes, res)
+			}
+
+		})
+	}
+}
+
+func TestDeleteInventory(t *testing.T) {
+	scope := models.Scope{
+		UserID:    "test",
+		SessionID: "test",
+		Role:      0,
+	}
+
+	type mockRepoDelete struct {
+		isCalled   bool
+		productIDs []primitive.ObjectID
+		err        error
+	}
+
+	ids := []primitive.ObjectID{
+		mongo.ObjectIDFromHexOrNil("6654408a9b657b844db56a74"),
+		mongo.ObjectIDFromHexOrNil("6654408a9b657b844db56a75"),
+		mongo.ObjectIDFromHexOrNil("6654408a9b657b844db56a76"),
+	}
+
+	tcs := map[string]struct {
+		productIDs []primitive.ObjectID
+		mockRepo   mockRepoDelete
+		wantErr    error
+	}{
+		"success": {
+			productIDs: ids,
+			mockRepo: mockRepoDelete{
+				isCalled:   true,
+				productIDs: ids,
+				err:        nil,
+			},
+			wantErr: nil,
+		},
+		"success with not exist 1 productID": {
+			productIDs: ids,
+			mockRepo: mockRepoDelete{
+				isCalled:   true,
+				productIDs: ids,
+				err:        nil,
+			},
+			wantErr: nil,
+		},
+		"success with not exist any productID": {
+			productIDs: ids,
+			mockRepo: mockRepoDelete{
+				isCalled:   true,
+				productIDs: ids,
+				err:        nil,
+			},
+			wantErr: nil,
+		},
+	}
+
+	for name, tc := range tcs {
+		t.Run(name, func(t *testing.T) {
+			ctx := context.Background()
+
+			uc, deps := initUseCase(t)
+
+			if tc.mockRepo.isCalled {
+				deps.repo.EXPECT().DeleteInventory(ctx, scope, tc.mockRepo.productIDs).
+					Return(
+						tc.mockRepo.err,
+					)
+			}
+
+			err := uc.DeleteInventory(ctx, scope, tc.productIDs)
+			if err != nil {
+				require.Equal(t, tc.wantErr, err)
+			} else {
+				require.NoError(t, err)
+			}
+
+		})
+	}
+}

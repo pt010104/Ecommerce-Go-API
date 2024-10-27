@@ -65,3 +65,13 @@ func (uc implUsecase) UpdateInventory(ctx context.Context, sc models.Scope, inpu
 
 	return ni, nil
 }
+
+func (uc implUsecase) DeleteInventory(ctx context.Context, sc models.Scope, productIDs []primitive.ObjectID) error {
+	err := uc.repo.DeleteInventory(ctx, sc, productIDs)
+	if err != nil {
+		uc.l.Errorf(ctx, "shop.usecase.implUseCase.Delete: %v", err)
+		return err
+	}
+
+	return nil
+}
