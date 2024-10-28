@@ -64,9 +64,11 @@ type getShopRequest struct {
 }
 
 func (r getShopRequest) validate() error {
-	for _, id := range r.IDs {
-		if !mongo.IsObjectID(id) {
-			return errWrongBody
+	if len(r.IDs) > 0 {
+		for _, id := range r.IDs {
+			if !mongo.IsObjectID(id) {
+				return errWrongBody
+			}
 		}
 	}
 

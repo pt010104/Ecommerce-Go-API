@@ -89,10 +89,8 @@ func (uc implUsecase) Update(ctx context.Context, sc models.Scope, input shop.Up
 
 	ids = util.RemoveDuplicates(ids)
 
-	ss, err := uc.repo.ListShop(ctx, sc, shop.GetOption{
-		GetShopsFilter: shop.GetShopsFilter{
-			IDs: ids,
-		},
+	ss, err := uc.repo.ListShop(ctx, sc, shop.GetShopsFilter{
+		IDs: ids,
 	})
 	if err != nil {
 		uc.l.Errorf(ctx, "shop.usecase.update.repo.detail:", err)
@@ -142,4 +140,14 @@ func (uc implUsecase) Update(ctx context.Context, sc models.Scope, input shop.Up
 	}
 
 	return shops, nil
+}
+
+func (uc implUsecase) ListShop(ctx context.Context, sc models.Scope, opt shop.GetShopsFilter) ([]models.Shop, error) {
+	s, err := uc.repo.ListShop(ctx, sc, opt)
+	if err != nil {
+		uc.l.Errorf(ctx, "shop.usecase.ListShop: %v", err)
+		return []models.Shop{}, err
+	}
+
+	return s, nil
 }

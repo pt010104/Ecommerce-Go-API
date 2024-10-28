@@ -51,6 +51,7 @@ func (m Middleware) Auth() gin.HandlerFunc {
 		ctx = jwt.SetScopeToContext(ctx, scope)
 
 		c.Request = c.Request.WithContext(ctx)
+
 		c.Next()
 	}
 }

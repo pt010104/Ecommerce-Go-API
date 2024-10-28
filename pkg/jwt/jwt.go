@@ -13,6 +13,7 @@ type Payload struct {
 	SessionID string `json:"session_id"`
 	Type      string `json:"type"`
 	Refresh   bool   `json:"refresh"`
+	Role      int    `json:"role"`
 }
 
 func Verify(token string, key string) (Payload, error) {

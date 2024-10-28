@@ -5,3 +5,8 @@ type Scope struct {
 	SessionID string `json:"session_id"`
 	Role      int
 }
+
+var (
+	RoleUser  = 0
+	RoleAdmin = 1
+)

@@ -5,15 +5,18 @@ import (
 	"github.com/pt010104/api-golang/internal/middleware"
 	shopHTTP "github.com/pt010104/api-golang/internal/shop/delivery/http"
 	userHTTP "github.com/pt010104/api-golang/internal/user/delivery/http"
+	voucherHTTP "github.com/pt010104/api-golang/internal/vouchers/delivery/http"
 
 	adminRepo "github.com/pt010104/api-golang/internal/admins/repository/mongo"
 	shopRepo "github.com/pt010104/api-golang/internal/shop/repository/mongo"
 	userRepo "github.com/pt010104/api-golang/internal/user/repository/mongo"
+	voucherRepo "github.com/pt010104/api-golang/internal/vouchers/repository/mongo"
 
 	adminUC "github.com/pt010104/api-golang/internal/admins/usecase"
 	emailUC "github.com/pt010104/api-golang/internal/email/usecase"
 	shopUC "github.com/pt010104/api-golang/internal/shop/usecase"
 	userUC "github.com/pt010104/api-golang/internal/user/usecase"
+	voucherUC "github.com/pt010104/api-golang/internal/vouchers/usecase"
 
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -30,17 +33,20 @@ func (srv HTTPServer) mapHandlers() error {
 	userRepo := userRepo.New(srv.l, srv.database)
 	shopRepo := shopRepo.New(srv.l, srv.database)
 	adminRepo := adminRepo.New(srv.l, srv.database)
+	voucherRepo := voucherRepo.New(srv.l, srv.database)
 
 	//Usecase
 	emailUC := emailUC.New(srv.l)
 	userUC := userUC.New(srv.l, userRepo, emailUC)
 	shopUC := shopUC.New(srv.l, shopRepo)
 	adminUC := adminUC.New(adminRepo, srv.l, shopUC)
+	voucherUC := voucherUC.New(voucherRepo, srv.l, shopUC)
 
 	// Handlers
 	userH := userHTTP.New(srv.l, userUC)
 	shopH := shopHTTP.New(srv.l, shopUC)
 	adminH := adminHTTP.New(srv.l, adminUC)
+	voucherH := voucherHTTP.New(srv.l, voucherUC)
 
 	mw := middleware.New(srv.l, userRepo)
 
@@ -50,6 +56,7 @@ func (srv HTTPServer) mapHandlers() error {
 	userHTTP.MapRouters(api.Group("/users"), userH, mw)
 	shopHTTP.MapRouters(api.Group("/shops"), shopH, mw)
 	adminHTTP.MapRouters(api.Group("/admin"), adminH, mw)
+	voucherHTTP.MapRouters(api.Group("/vouchers"), voucherH, mw)
 
 	return nil
 }
