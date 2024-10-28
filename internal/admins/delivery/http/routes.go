@@ -6,14 +6,9 @@ import (
 )
 
 func MapRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
-	MapShopRouters(r, h, mw)
-}
 
-func MapShopRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
 	r.Use(mw.Auth())
 
-	r.POST("", h.Create)
-	r.GET("", h.Get)
-	r.DELETE("", h.Delete)
-	r.PATCH("", h.Update)
+	r.POST("/categories", h.CreateCategory)
+	r.POST("/verify-shop", h.VerifyShop)
 }

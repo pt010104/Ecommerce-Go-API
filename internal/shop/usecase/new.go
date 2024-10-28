@@ -8,10 +8,12 @@ import (
 
 type implUsecase struct {
 	l    log.Logger
-	repo shop.Repo
+	repo shop.Repository
 }
 
-func New(l log.Logger, repo shop.Repo) implUsecase {
+var _ shop.UseCase = implUsecase{}
+
+func New(l log.Logger, repo shop.Repository) implUsecase {
 	return implUsecase{
 		l:    l,
 		repo: repo,

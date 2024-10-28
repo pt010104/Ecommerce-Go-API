@@ -2,16 +2,13 @@ package mongo
 
 import (
 	"context"
-	"time"
-
-	"errors"
 	"fmt"
+	"time"
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/pkg/paginator"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -24,7 +21,7 @@ func (repo implRepo) getShopCollection() mongo.Collection {
 	return *repo.database.Collection(shopCollection)
 }
 
-func (repo implRepo) Create(ctx context.Context, sc models.Scope, opt shop.CreateOption) (models.Shop, error) {
+func (repo implRepo) CreateShop(ctx context.Context, sc models.Scope, opt shop.CreateShopOption) (models.Shop, error) {
 	col := repo.getShopCollection()
 
 	s := repo.buildShopModel(ctx, sc, opt)
@@ -38,10 +35,10 @@ func (repo implRepo) Create(ctx context.Context, sc models.Scope, opt shop.Creat
 	return s, nil
 }
 
-func (repo implRepo) Get(ctx context.Context, sc models.Scope, opt shop.GetOption) ([]models.Shop, paginator.Paginator, error) {
+func (repo implRepo) GetShop(ctx context.Context, sc models.Scope, opt shop.GetOption) ([]models.Shop, paginator.Paginator, error) {
 	col := repo.getShopCollection()
 
-	filter, err := repo.buildShopQuery(ctx, sc, opt)
+	filter, err := repo.buildShopQuery(opt)
 	if err != nil {
 		repo.l.Errorf(ctx, "shop.repository.mongo.Get.buildShopQuery: %v", err)
 		return nil, paginator.Paginator{}, err
@@ -82,7 +79,7 @@ func (repo implRepo) Get(ctx context.Context, sc models.Scope, opt shop.GetOptio
 
 }
 
-func (repo implRepo) Detail(ctx context.Context, sc models.Scope, id string) (models.Shop, error) {
+func (repo implRepo) DetailShop(ctx context.Context, sc models.Scope, id string) (models.Shop, error) {
 	col := repo.getShopCollection()
 
 	filter, err := repo.buildShopDetailQuery(ctx, sc, id)
@@ -101,33 +98,8 @@ func (repo implRepo) Detail(ctx context.Context, sc models.Scope, id string) (mo
 
 	return s, nil
 }
-func (repo implRepo) FindByid(ctx context.Context, sc models.Scope, id string) (models.Shop, error) {
-	var shop models.Shop
-	col := repo.getShopCollection()
 
-	objectId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return shop, errors.New("invalid id format")
-	}
-
-	filter := bson.M{
-		"_id":        objectId,
-		"deleted_at": nil,
-	}
-
-	fmt.Printf("filter: %+v\n", filter)
-
-	err = col.FindOne(ctx, filter).Decode(&shop)
-	if err == mongo.ErrNoDocuments {
-		return shop, errors.New("shop not found")
-	} else if err != nil {
-		return shop, err
-	}
-
-	return shop, nil
-}
-
-func (repo implRepo) Delete(ctx context.Context, sc models.Scope) error {
+func (repo implRepo) DeleteShop(ctx context.Context, sc models.Scope) error {
 
 	col := repo.getShopCollection()
 	filter, err := repo.buildShopDetailQuery(ctx, sc, "")
@@ -140,9 +112,9 @@ func (repo implRepo) Delete(ctx context.Context, sc models.Scope) error {
 
 	return nil
 }
-func (repo implRepo) Update(ctx context.Context, sc models.Scope, option shop.UpdateOption) (models.Shop, error) {
+func (repo implRepo) UpdateShop(ctx context.Context, sc models.Scope, option shop.UpdateOption) (models.Shop, error) {
 	col := repo.getShopCollection()
-	filter, err := repo.buildShopDetailQuery(ctx, sc, "")
+	filter, err := repo.buildShopDetailQuery(ctx, sc, option.Model.ID.Hex())
 	if err != nil {
 		repo.l.Errorf(ctx, "shop.repo.Update.buildshopdetailquery,", err)
 		return models.Shop{}, err
@@ -173,7 +145,10 @@ func (repo implRepo) Update(ctx context.Context, sc models.Scope, option shop.Up
 		updateData["phone"] = option.Phone
 		option.Model.Phone = option.Phone
 	}
-
+	if option.IsVerified {
+		updateData["is_verified"] = option.IsVerified
+		option.Model.IsVerified = option.IsVerified
+	}
 	updateData["updated_at"] = time.Now()
 
 	update := bson.M{}
@@ -188,4 +163,35 @@ func (repo implRepo) Update(ctx context.Context, sc models.Scope, option shop.Up
 	}
 
 	return option.Model, nil
+}
+
+func (repo implRepo) ListShop(ctx context.Context, sc models.Scope, opt shop.GetOption) ([]models.Shop, error) {
+	col := repo.getShopCollection()
+
+	filter, err := repo.buildShopQuery(shop.GetOption{
+		GetShopsFilter: opt.GetShopsFilter,
+		PagQuery:       opt.PagQuery,
+	})
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.ListShop.buildShopQuery: %v", err)
+		return nil, err
+	}
+
+	fmt.Println(filter)
+
+	cursor, err := col.Find(ctx, filter)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.ListShop.Find: %v", err)
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var shops []models.Shop
+	err = cursor.All(ctx, &shops)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.ListShop.All: %v", err)
+		return nil, err
+	}
+
+	return shops, nil
 }

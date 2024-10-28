@@ -21,6 +21,7 @@ func (impl implRepo) buildUserModel(context context.Context, opt user.CreateUser
 		CreatedAt:  now,
 		UpdatedAt:  now,
 		IsVerified: false,
+		Role:       0,
 	}
 
 	return u, nil

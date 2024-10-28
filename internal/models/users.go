@@ -14,4 +14,5 @@ type User struct {
 	CreatedAt  time.Time          `bson:"created_at"`
 	UpdatedAt  time.Time          `bson:"updated_at"`
 	IsVerified bool               `bson:"is_verified"`
+	Role       int                `bson:"role"`
 }

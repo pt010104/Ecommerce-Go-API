@@ -20,7 +20,13 @@ func (m Middleware) Auth() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-
+		u, err := m.repo.DetailUser(ctx, userID)
+		if err != nil {
+			response.Unauthorized(c)
+			c.Abort()
+			return
+		}
+		role := u.Role
 		keyString := k.SecretKey
 
 		tokenString := strings.ReplaceAll(c.GetHeader("Authorization"), "Bearer ", "")
@@ -40,6 +46,8 @@ func (m Middleware) Auth() gin.HandlerFunc {
 		ctx = jwt.SetPayloadToContext(ctx, payload)
 
 		scope := jwt.NewScope(payload)
+		scope.Role = role
+
 		ctx = jwt.SetScopeToContext(ctx, scope)
 
 		c.Request = c.Request.WithContext(ctx)

@@ -10,12 +10,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func (repo implRepo) buildShopQuery(ctx context.Context, sc models.Scope, opt shop.GetOption) (bson.M, error) {
-	filter, err := mongo.BuildScopeQuery(ctx, repo.l, sc)
-	if err != nil {
-		repo.l.Errorf(ctx, "recruitment.candidate.repository.mongo.buildCandidateQuery.BuildScopeQuery: %v", err)
-		return nil, err
-	}
+func (repo implRepo) buildShopQuery(opt shop.GetOption) (bson.M, error) {
+	filter := bson.M{}
 
 	filter = mongo.BuildQueryWithSoftDelete(filter)
 
@@ -28,7 +24,11 @@ func (repo implRepo) buildShopQuery(ctx context.Context, sc models.Scope, opt sh
 	}
 
 	if len(opt.IDs) > 0 {
-		filter["_id"] = bson.M{"$in": opt.IDs}
+		filter["_id"] = bson.M{"$in": mongo.ObjectIDsFromHexOrNil(opt.IDs)}
+	}
+
+	if opt.IsVerified != nil {
+		filter["is_verified"] = opt.IsVerified
 	}
 
 	return filter, nil
