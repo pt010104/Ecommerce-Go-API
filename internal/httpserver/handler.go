@@ -1,16 +1,16 @@
 package httpserver
 
 import (
-	adminHTTP "github.com/pt010104/api-golang/internal/admin/delivery/http"
+	adminHTTP "github.com/pt010104/api-golang/internal/admins/delivery/http"
 	"github.com/pt010104/api-golang/internal/middleware"
 	shopHTTP "github.com/pt010104/api-golang/internal/shop/delivery/http"
 	userHTTP "github.com/pt010104/api-golang/internal/user/delivery/http"
 
-	adminRepo "github.com/pt010104/api-golang/internal/admin/repository/mongo"
+	adminRepo "github.com/pt010104/api-golang/internal/admins/repository/mongo"
 	shopRepo "github.com/pt010104/api-golang/internal/shop/repository/mongo"
 	userRepo "github.com/pt010104/api-golang/internal/user/repository/mongo"
 
-	adminUC "github.com/pt010104/api-golang/internal/admin/usecase"
+	adminUC "github.com/pt010104/api-golang/internal/admins/usecase"
 	emailUC "github.com/pt010104/api-golang/internal/email/usecase"
 	shopUC "github.com/pt010104/api-golang/internal/shop/usecase"
 	userUC "github.com/pt010104/api-golang/internal/user/usecase"

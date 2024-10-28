@@ -5,23 +5,23 @@ import (
 	"github.com/pt010104/api-golang/pkg/response"
 )
 
-// @Summary User Sign Up
-// @Schemes http https
-// @Description Create a new user account
-// @Tags User
-// @Accept json
-// @Produce json
+//	@Summary		User Sign Up
+//	@Schemes		http https
+//	@Description	Create a new user account
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
 //
-// @Param Access-Control-Allow-Origin header string false "Access-Control-Allow-Origin" default("*")
-// @Param Name body string true "Name"
-// @Param Email body string true "Email"
-// @Param Password body string true "Password"
+//	@Param			Access-Control-Allow-Origin	header		string	false	"Access-Control-Allow-Origin"	default("*")
+//	@Param			Name						body		string	true	"Name"
+//	@Param			Email						body		string	true	"Email"
+//	@Param			Password					body		string	true	"Password"
 //
-// @Success 200 {object} signUpResponse
-// @Failure 400 {object} response.Resp "Bad Request"
-// @Failure 500 {object} response.Resp "Internal Server Error"
+//	@Success		200							{object}	signUpResponse
+//	@Failure		400							{object}	response.Resp	"Bad Request"
+//	@Failure		500							{object}	response.Resp	"Internal Server Error"
 //
-// @Router /api/v1/users/sign-up [POST]
+//	@Router			/api/v1/users/sign-up [POST]
 func (h handler) SignUp(c *gin.Context) {
 	ctx := c.Request.Context()
 
@@ -43,23 +43,23 @@ func (h handler) SignUp(c *gin.Context) {
 	response.OK(c, h.newSignUpResponse(u))
 }
 
-// @Summary User Sign In
-// @Schemes http https
-// @Description Authenticate user and provide a JWT token
-// @Tags User
-// @Accept json
-// @Produce json
+//	@Summary		User Sign In
+//	@Schemes		http https
+//	@Description	Authenticate user and provide a JWT token
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
 //
-// @Param Access-Control-Allow-Origin header string false "Access-Control-Allow-Origin" default("*")
-// @Param session-id header string false "Session ID" default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
-// @Param email body string true "Email"
-// @Param password body string true "Password"
+//	@Param			Access-Control-Allow-Origin	header		string	false	"Access-Control-Allow-Origin"	default("*")
+//	@Param			session-id					header		string	false	"Session ID"					default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
+//	@Param			email						body		string	true	"Email"
+//	@Param			password					body		string	true	"Password"
 //
-// @Success 200 {object} signInResp
-// @Failure 400 {object} response.Resp "Bad Request"
-// @Failure 500 {object} response.Resp "Internal Server Error"
+//	@Success		200							{object}	signInResp
+//	@Failure		400							{object}	response.Resp	"Bad Request"
+//	@Failure		500							{object}	response.Resp	"Internal Server Error"
 //
-// @Router /api/v1/users/sign-in [POST]
+//	@Router			/api/v1/users/sign-in [POST]
 func (h handler) SignIn(c *gin.Context) {
 	ctx := c.Request.Context()
 	req, err := h.processSignInRequest(c)
@@ -81,21 +81,21 @@ func (h handler) SignIn(c *gin.Context) {
 	response.OK(c, signInResp)
 }
 
-// @Summary Forget Password Request
-// @Schemes http https
-// @Description Initiate a password reset request
-// @Tags User
-// @Accept json
-// @Produce json
+//	@Summary		Forget Password Request
+//	@Schemes		http https
+//	@Description	Initiate a password reset request
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
 //
-// @Param Access-Control-Allow-Origin header string false "Access-Control-Allow-Origin" default("*")
-// @Param email body string true "Email"
+//	@Param			Access-Control-Allow-Origin	header		string	false	"Access-Control-Allow-Origin"	default("*")
+//	@Param			email						body		string	true	"Email"
 //
-// @Success 200 {object} interface{}
-// @Failure 400 {object} response.Resp "Bad Request"
-// @Failure 500 {object} response.Resp "Internal Server Error"
+//	@Success		200							{object}	interface{}
+//	@Failure		400							{object}	response.Resp	"Bad Request"
+//	@Failure		500							{object}	response.Resp	"Internal Server Error"
 //
-// @Router /api/v1/users/forget-password [POST]
+//	@Router			/api/v1/users/forget-password [POST]
 func (h handler) ForgetPasswordRequest(c *gin.Context) {
 	ctx := c.Request.Context()
 
@@ -111,20 +111,20 @@ func (h handler) ForgetPasswordRequest(c *gin.Context) {
 	response.OK(c, nil)
 }
 
-// @Summary User Sign Out
-// @Schemes http https
-// @Description Sign out the current user
-// @Tags User
-// @Accept json
-// @Produce json
+//	@Summary		User Sign Out
+//	@Schemes		http https
+//	@Description	Sign out the current user
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
 //
-// @Param Access-Control-Allow-Origin header string false "Access-Control-Allow-Origin" default("*")
+//	@Param			Access-Control-Allow-Origin	header		string	false	"Access-Control-Allow-Origin"	default("*")
 //
-// @Success 200 {object} interface{}
-// @Failure 400 {object} response.Resp "Bad Request"
-// @Failure 500 {object} response.Resp "Internal Server Error"
+//	@Success		200							{object}	interface{}
+//	@Failure		400							{object}	response.Resp	"Bad Request"
+//	@Failure		500							{object}	response.Resp	"Internal Server Error"
 //
-// @Router /api/v1/users/signout [POST]
+//	@Router			/api/v1/users/signout [POST]
 func (h handler) SignOut(c *gin.Context) {
 	ctx := c.Request.Context()
 	sc, err := h.processLogOutRequest(c)
@@ -143,25 +143,25 @@ func (h handler) SignOut(c *gin.Context) {
 	response.OK(c, nil)
 }
 
-// @Summary Get User Details
-// @Schemes http https
-// @Description Retrieve detailed information about a specific user
-// @Tags User
-// @Accept json
-// @Produce json
+//	@Summary		Get User Details
+//	@Schemes		http https
+//	@Description	Retrieve detailed information about a specific user
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
 //
-// @Param Access-Control-Allow-Origin header string false "Access-Control-Allow-Origin" default("*")
-// @Param Authorization header string true "Bearer JWT token" default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
-// @Param x-client-id header string true "User ID" default(6707825d45804caaf8316957)
-// @Param session-id header string true "Session ID" default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
-// @Param id path string true "User ID"
+//	@Param			Access-Control-Allow-Origin	header		string	false	"Access-Control-Allow-Origin"	default("*")
+//	@Param			Authorization				header		string	true	"Bearer JWT token"				default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
+//	@Param			x-client-id					header		string	true	"User ID"						default(6707825d45804caaf8316957)
+//	@Param			session-id					header		string	true	"Session ID"					default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
+//	@Param			id							path		string	true	"User ID"
 //
-// @Success 200 {object} detailResp
-// @Failure 400 {object} response.Resp "Bad Request"
-// @Failure 404 {object} response.Resp "User Not Found"
-// @Failure 500 {object} response.Resp "Internal Server Error"
+//	@Success		200							{object}	detailResp
+//	@Failure		400							{object}	response.Resp	"Bad Request"
+//	@Failure		404							{object}	response.Resp	"User Not Found"
+//	@Failure		500							{object}	response.Resp	"Internal Server Error"
 //
-// @Router /api/v1/users/{id} [GET]
+//	@Router			/api/v1/users/{id} [GET]
 func (h handler) Detail(c *gin.Context) {
 	ctx := c.Request.Context()
 	id, sc, err := h.processDetailRequest(c)
@@ -181,24 +181,24 @@ func (h handler) Detail(c *gin.Context) {
 	response.OK(c, h.newDetailResp(u))
 }
 
-// @Summary Reset Password
-// @Schemes http https
-// @Description Reset user's password using a valid reset token
-// @Tags User
-// @Accept json
-// @Produce json
+//	@Summary		Reset Password
+//	@Schemes		http https
+//	@Description	Reset user's password using a valid reset token
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
 //
-// @Param Access-Control-Allow-Origin header string false "Access-Control-Allow-Origin" default("*")
-// @Param token query string true "Reset token"
-// @Param x-client-id header string true "User ID" default(6707825d45804caaf8316957)
-// @Param password body string true "New password"
+//	@Param			Access-Control-Allow-Origin	header		string	false	"Access-Control-Allow-Origin"	default("*")
+//	@Param			token						query		string	true	"Reset token"
+//	@Param			x-client-id					header		string	true	"User ID"	default(6707825d45804caaf8316957)
+//	@Param			password					body		string	true	"New password"
 //
-// @Success 200 {object} interface{}
-// @Failure 400 {object} response.Resp "Bad Request"
-// @Failure 401 {object} response.Resp "Unauthorized"
-// @Failure 500 {object} response.Resp "Internal Server Error"
+//	@Success		200							{object}	interface{}
+//	@Failure		400							{object}	response.Resp	"Bad Request"
+//	@Failure		401							{object}	response.Resp	"Unauthorized"
+//	@Failure		500							{object}	response.Resp	"Internal Server Error"
 //
-// @Router /api/v1/users/reset-password [POST]
+//	@Router			/api/v1/users/reset-password [POST]
 func (h handler) ResetPassword(c *gin.Context) {
 	ctx := c.Request.Context()
 	req, err := h.processResetPasswordRequest(c)
@@ -218,22 +218,22 @@ func (h handler) ResetPassword(c *gin.Context) {
 	response.OK(c, nil)
 }
 
-// @Summary Verify Email
-// @Schemes http https
-// @Description Verify the validity of a password reset request
-// @Tags User
-// @Accept json
-// @Produce json
+//	@Summary		Verify Email
+//	@Schemes		http https
+//	@Description	Verify the validity of a password reset request
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
 //
-// @Param Access-Control-Allow-Origin header string false "Access-Control-Allow-Origin" default("*")
-// @Param email body string true "Email"
+//	@Param			Access-Control-Allow-Origin	header		string	false	"Access-Control-Allow-Origin"	default("*")
+//	@Param			email						body		string	true	"Email"
 //
-// @Success 200 {object} interface{}
-// @Failure 400 {object} response.Resp "Bad Request"
-// @Failure 404 {object} response.Resp "Request Not Found"
-// @Failure 500 {object} response.Resp "Internal Server Error"
+//	@Success		200							{object}	interface{}
+//	@Failure		400							{object}	response.Resp	"Bad Request"
+//	@Failure		404							{object}	response.Resp	"Request Not Found"
+//	@Failure		500							{object}	response.Resp	"Internal Server Error"
 //
-// @Router /api/v1/users/verify-request [POST]
+//	@Router			/api/v1/users/verify-request [POST]
 func (h handler) VerifyEmail(c *gin.Context) {
 	ctx := c.Request.Context()
 
@@ -249,23 +249,23 @@ func (h handler) VerifyEmail(c *gin.Context) {
 	response.OK(c, nil)
 }
 
-// @Summary Verify User Account
-// @Schemes http https
-// @Description Complete user account verification
-// @Tags User
-// @Accept json
-// @Produce json
+//	@Summary		Verify User Account
+//	@Schemes		http https
+//	@Description	Complete user account verification
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
 //
-// @Param Access-Control-Allow-Origin header string false "Access-Control-Allow-Origin" default("*")
-// @Param token query string true "Verification token"
-// @Param x-client-id header string true "User ID" default(6707825d45804caaf8316957)
+//	@Param			Access-Control-Allow-Origin	header		string	false	"Access-Control-Allow-Origin"	default("*")
+//	@Param			token						query		string	true	"Verification token"
+//	@Param			x-client-id					header		string	true	"User ID"	default(6707825d45804caaf8316957)
 //
-// @Success 200 {object} interface{}
-// @Failure 400 {object} response.Resp "Bad Request"
-// @Failure 401 {object} response.Resp "Unauthorized"
-// @Failure 500 {object} response.Resp "Internal Server Error"
+//	@Success		200							{object}	interface{}
+//	@Failure		400							{object}	response.Resp	"Bad Request"
+//	@Failure		401							{object}	response.Resp	"Unauthorized"
+//	@Failure		500							{object}	response.Resp	"Internal Server Error"
 //
-// @Router /api/v1/users/verify-user [POST]
+//	@Router			/api/v1/users/verify-user [POST]
 func (h handler) VerifyUser(c *gin.Context) {
 	ctx := c.Request.Context()
 	req, err := h.processVerifyUserRequest(c)
@@ -284,25 +284,25 @@ func (h handler) VerifyUser(c *gin.Context) {
 	response.OK(c, nil)
 }
 
-// @Summary Distribute New Token
-// @Schemes http https
-// @Description Generate and distribute a new JWT token
-// @Tags User
-// @Accept json
-// @Produce json
+//	@Summary		Distribute New Token
+//	@Schemes		http https
+//	@Description	Generate and distribute a new JWT token
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
 //
-// @Param Access-Control-Allow-Origin header string false "Access-Control-Allow-Origin" default("*")
-// @Param Authorization header string true "Bearer JWT token" default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
-// @Param token query string true "Verification token"
-// @Param x-client-id header string true "User ID" default(6707825d45804caaf8316957)
-// @Param session-id header string true "Session ID" default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
+//	@Param			Access-Control-Allow-Origin	header		string	false	"Access-Control-Allow-Origin"	default("*")
+//	@Param			Authorization				header		string	true	"Bearer JWT token"				default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
+//	@Param			token						query		string	true	"Verification token"
+//	@Param			x-client-id					header		string	true	"User ID"		default(6707825d45804caaf8316957)
+//	@Param			session-id					header		string	true	"Session ID"	default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
 //
-// @Success 200 {object} distributeNewTokenResp
-// @Failure 400 {object} response.Resp "Bad Request"
-// @Failure 401 {object} response.Resp "Unauthorized"
-// @Failure 500 {object} response.Resp "Internal Server Error"
+//	@Success		200							{object}	distributeNewTokenResp
+//	@Failure		400							{object}	response.Resp	"Bad Request"
+//	@Failure		401							{object}	response.Resp	"Unauthorized"
+//	@Failure		500							{object}	response.Resp	"Internal Server Error"
 //
-// @Router /api/v1/users/distribute-token [POST]
+//	@Router			/api/v1/users/distribute-token [POST]
 func (h handler) DistributeNewToken(c *gin.Context) {
 	ctx := c.Request.Context()
 	req, err := h.processDistributeNewTokenRequest(c)

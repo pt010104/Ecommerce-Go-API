@@ -7,28 +7,28 @@ import (
 	"github.com/pt010104/api-golang/pkg/response"
 )
 
-// @Summary Create a shop
-// @Schemes http https
-// @Description Create a shop
-// @Tags Shop
-// @Accept json
-// @Produce json
+// @Summary		Create a shop
+// @Schemes		http https
+// @Description	Create a shop
+// @Tags			Shop
+// @Accept			json
+// @Produce		json
 //
-// @Param Access-Control-Allow-Origin header string false "Access-Control-Allow-Origin" default("*")
-// @Param Authorization header string true "Bearer JWT token" default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
-// @Param x-client-id header string true "User ID" default(6707825d45804caaf8316957)
-// @Param session-id header string true "Session ID" default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
-// @Param name body string true "Name"
-// @Param phone body string true "Phone"
-// @Param city body string true "City"
-// @Param street body string true "Street"
-// @Param district body string false "District"
+// @Param			Access-Control-Allow-Origin	header		string	false	"Access-Control-Allow-Origin"	default("*")
+// @Param			Authorization				header		string	true	"Bearer JWT token"				default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
+// @Param			x-client-id					header		string	true	"User ID"						default(6707825d45804caaf8316957)
+// @Param			session-id					header		string	true	"Session ID"					default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
+// @Param			name						body		string	true	"Name"
+// @Param			phone						body		string	true	"Phone"
+// @Param			city						body		string	true	"City"
+// @Param			street						body		string	true	"Street"
+// @Param			district					body		string	false	"District"
 //
-// @Success 200 {object} registerResponse
-// @Failure 400 {object} response.Resp "Bad Request"
-// @Failure 500 {object} response.Resp "Internal Server Error"
+// @Success		200							{object}	registerResponse
+// @Failure		400							{object}	response.Resp	"Bad Request"
+// @Failure		500							{object}	response.Resp	"Internal Server Error"
 //
-// @Router /api/v1/shops [POST]
+// @Router			/api/v1/shops [POST]
 func (h handler) Create(c *gin.Context) {
 	ctx := c.Request.Context()
 
@@ -50,28 +50,28 @@ func (h handler) Create(c *gin.Context) {
 	response.OK(c, h.newCreateResponse(shop))
 }
 
-// @Summary Get shop
-// @Schemes http https
-// @Description Get shop by Search, IDs,...
-// @Tags Shop
-// @Accept json
-// @Produce json
+// @Summary		Get shop
+// @Schemes		http https
+// @Description	Get shop by Search, IDs,...
+// @Tags			Shop
+// @Accept			json
+// @Produce		json
 //
-// @Param Access-Control-Allow-Origin header string false "Access-Control-Allow-Origin" default("*")
-// @Param Authorization header string true "Bearer JWT token" default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
-// @Param x-client-id header string true "User ID" default(6707825d45804caaf8316957)
-// @Param session-id header string true "Session ID" default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
-// @Param search query string false "Search"
-// @Param ids query []string false "IDs"
-// @Param is_verified query bool false "Is Verified"
-// @Param page query int false "Page" default(1)
-// @Param limit query int false "Limit" default(10)
+// @Param			Access-Control-Allow-Origin	header		string		false	"Access-Control-Allow-Origin"	default("*")
+// @Param			Authorization				header		string		true	"Bearer JWT token"				default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
+// @Param			x-client-id					header		string		true	"User ID"						default(6707825d45804caaf8316957)
+// @Param			session-id					header		string		true	"Session ID"					default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
+// @Param			search						query		string		false	"Search"
+// @Param			ids							query		[]string	false	"IDs"
+// @Param			is_verified					query		bool		false	"Is Verified"
+// @Param			page						query		int			false	"Page"	default(1)
+// @Param			limit						query		int			false	"Limit"	default(10)
 //
-// @Success 200 {object} getShopResp
-// @Failure 400 {object} response.Resp "Bad Request"
-// @Failure 500 {object} response.Resp "Internal Server Error"
+// @Success		200							{object}	getShopResp
+// @Failure		400							{object}	response.Resp	"Bad Request"
+// @Failure		500							{object}	response.Resp	"Internal Server Error"
 //
-// @Router /api/v1/shops [GET]
+// @Router			/api/v1/shops [GET]
 func (h handler) Get(c *gin.Context) {
 	ctx := c.Request.Context()
 
@@ -105,24 +105,24 @@ func (h handler) Get(c *gin.Context) {
 	response.OK(c, h.newGetShopsResp(s))
 }
 
-// @Summary Get shop detail
-// @Schemes http https
-// @Description Get shop detail by ID
-// @Tags Shop
-// @Accept json
-// @Produce json
+// @Summary		Get shop detail
+// @Schemes		http https
+// @Description	Get shop detail by ID
+// @Tags			Shop
+// @Accept			json
+// @Produce		json
 //
-// @Param Access-Control-Allow-Origin header string false "Access-Control-Allow-Origin" default("*")
-// @Param Authorization header string true "Bearer JWT token" default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
-// @Param x-client-id header string true "User ID" default(6707825d45804caaf8316957)
-// @Param session-id header string true "Session ID" default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
-// @Param id path string true "Shop ID"
+// @Param			Access-Control-Allow-Origin	header		string	false	"Access-Control-Allow-Origin"	default("*")
+// @Param			Authorization				header		string	true	"Bearer JWT token"				default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
+// @Param			x-client-id					header		string	true	"User ID"						default(6707825d45804caaf8316957)
+// @Param			session-id					header		string	true	"Session ID"					default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
+// @Param			id							path		string	true	"Shop ID"
 //
-// @Success 200 {object} getDetailResp
-// @Failure 400 {object} response.Resp "Bad Request"
-// @Failure 500 {object} response.Resp "Internal Server Error"
+// @Success		200							{object}	getDetailResp
+// @Failure		400							{object}	response.Resp	"Bad Request"
+// @Failure		500							{object}	response.Resp	"Internal Server Error"
 //
-// @Router /api/v1/shops/{id} [GET]
+// @Router			/api/v1/shops/{id} [GET]
 func (h handler) Detail(c *gin.Context) {
 	ctx := c.Request.Context()
 
@@ -144,23 +144,23 @@ func (h handler) Detail(c *gin.Context) {
 	response.OK(c, h.newDetailResponse(shop))
 }
 
-// @Summary Delete a shop
-// @Schemes http https
-// @Description Delete a shop
-// @Tags Shop
-// @Accept json
-// @Produce json
+// @Summary		Delete a shop
+// @Schemes		http https
+// @Description	Delete a shop
+// @Tags			Shop
+// @Accept			json
+// @Produce		json
 //
-// @Param Access-Control-Allow-Origin header string false "Access-Control-Allow-Origin" default("*")
-// @Param Authorization header string true "Bearer JWT token" default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
-// @Param x-client-id header string true "User ID" default(6707825d45804caaf8316957)
-// @Param session-id header string true "Session ID" default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
+// @Param			Access-Control-Allow-Origin	header		string	false	"Access-Control-Allow-Origin"	default("*")
+// @Param			Authorization				header		string	true	"Bearer JWT token"				default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
+// @Param			x-client-id					header		string	true	"User ID"						default(6707825d45804caaf8316957)
+// @Param			session-id					header		string	true	"Session ID"					default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
 //
-// @Success 200 {object} nil
-// @Failure 400 {object} response.Resp "Bad Request"
-// @Failure 500 {object} response.Resp "Internal Server Error"
+// @Success		200							{object}	nil
+// @Failure		400							{object}	response.Resp	"Bad Request"
+// @Failure		500							{object}	response.Resp	"Internal Server Error"
 //
-// @Router /api/v1/shops [DELETE]
+// @Router			/api/v1/shops [DELETE]
 func (h handler) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
 
@@ -183,24 +183,24 @@ func (h handler) Delete(c *gin.Context) {
 
 }
 
-// @Summary Update a shop
-// @Schemes http https
-// @Description Update a shop
-// @Tags Shop
-// @Accept json
-// @Produce json
+// @Summary		Update a shop
+// @Schemes		http https
+// @Description	Update a shop
+// @Tags			Shop
+// @Accept			json
+// @Produce		json
 //
-// @Param Access-Control-Allow-Origin header string false "Access-Control-Allow-Origin" default("*")
-// @Param Authorization header string true "Bearer JWT token" default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
-// @Param x-client-id header string true "User ID" default(6707825d45804caaf8316957)
-// @Param session-id header string true "Session ID" default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
-// @Param ids body []string false "IDs"
+// @Param			Access-Control-Allow-Origin	header		string		false	"Access-Control-Allow-Origin"	default("*")
+// @Param			Authorization				header		string		true	"Bearer JWT token"				default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
+// @Param			x-client-id					header		string		true	"User ID"						default(6707825d45804caaf8316957)
+// @Param			session-id					header		string		true	"Session ID"					default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
+// @Param			ids							body		[]string	false	"IDs"
 //
-// @Success 200 {object} updateResp
-// @Failure 400 {object} response.Resp "Bad Request"
-// @Failure 500 {object} response.Resp "Internal Server Error"
+// @Success		200							{object}	updateResp
+// @Failure		400							{object}	response.Resp	"Bad Request"
+// @Failure		500							{object}	response.Resp	"Internal Server Error"
 //
-// @Router /api/v1/shops [PATCH]
+// @Router			/api/v1/shops [PATCH]
 func (h handler) Update(c *gin.Context) {
 	ctx := c.Request.Context()
 

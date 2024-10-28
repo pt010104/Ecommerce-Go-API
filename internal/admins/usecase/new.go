@@ -3,17 +3,17 @@ package usecase
 import (
 	"github.com/pt010104/api-golang/pkg/log"
 
-	"github.com/pt010104/api-golang/internal/admin"
+	"github.com/pt010104/api-golang/internal/admins"
 	"github.com/pt010104/api-golang/internal/shop"
 )
 
 type implUsecase struct {
-	repo   admin.Repo
+	repo   admins.Repo
 	l      log.Logger
 	shopUc shop.UseCase
 }
 
-func New(repo admin.Repo, l log.Logger, shopUC shop.UseCase) implUsecase {
+func New(repo admins.Repo, l log.Logger, shopUC shop.UseCase) implUsecase {
 	return implUsecase{
 		repo:   repo,
 		l:      l,

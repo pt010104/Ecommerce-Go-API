@@ -1,6 +1,4 @@
-package admin
-
-import ()
+package admins
 
 type CreateCategoryOption struct {
 	Name        string

@@ -2,7 +2,7 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/pt010104/api-golang/internal/admin"
+	"github.com/pt010104/api-golang/internal/admins"
 	"github.com/pt010104/api-golang/pkg/log"
 )
 
@@ -13,10 +13,12 @@ type Handler interface {
 
 type handler struct {
 	l  log.Logger
-	uc admin.UseCase
+	uc admins.UseCase
 }
 
-func New(l log.Logger, uc admin.UseCase) Handler {
+var _ Handler = &handler{}
+
+func New(l log.Logger, uc admins.UseCase) Handler {
 	return &handler{
 		l:  l,
 		uc: uc,

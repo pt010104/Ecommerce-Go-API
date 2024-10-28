@@ -5,6 +5,16 @@ import (
 	"github.com/pt010104/api-golang/pkg/response"
 )
 
+// @Summary Create Category
+// @Tags Admin
+// @Description Create a new category
+// @Accept json
+// @Produce json
+// @Param category body CategoryRequest true "Category data"
+// @Success 200 {object} CategoryResponse
+// @Failure 400 {object} ErrorResponse
+// @Router /api/v1/admin/categories [post]
+
 func (h handler) CreateCategory(c *gin.Context) {
 	ctx := c.Request.Context()
 
