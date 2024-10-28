@@ -61,8 +61,9 @@ func (h handler) Create(c *gin.Context) {
 // @Param Authorization header string true "Bearer JWT token" default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
 // @Param x-client-id header string true "User ID" default(6707825d45804caaf8316957)
 // @Param session-id header string true "Session ID" default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
-// @Param ids body []string false "IDs"
-// @Param search body string false "Search"
+// @Param search query string false "Search"
+// @Param ids query []string false "IDs"
+// @Param is_verified query bool false "Is Verified"
 // @Param page query int false "Page" default(1)
 // @Param limit query int false "Limit" default(10)
 //
@@ -193,6 +194,7 @@ func (h handler) Delete(c *gin.Context) {
 // @Param Authorization header string true "Bearer JWT token" default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
 // @Param x-client-id header string true "User ID" default(6707825d45804caaf8316957)
 // @Param session-id header string true "Session ID" default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
+// @Param ids body []string false "IDs"
 //
 // @Success 200 {object} updateResp
 // @Failure 400 {object} response.Resp "Bad Request"

@@ -3,6 +3,7 @@ package http
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/pt010104/api-golang/pkg/response"
+	"github.com/pt010104/api-golang/pkg/util"
 )
 
 // VerifyShop godoc
@@ -39,9 +40,9 @@ func (h handler) VerifyShop(c *gin.Context) {
 		response.Error(c, err)
 		return
 	}
-	var verifyShopRes VerifyShopResp
-	res := verifyShopRes.toResList(s)
+	res := h.toResList(s)
 
-	h.l.Debugf(ctx, "role:", sc.Role)
+	util.PrintJson(res)
+
 	response.OK(c, res)
 }

@@ -29,6 +29,7 @@ type GetShopInput struct {
 }
 type UpdateInput struct {
 	ShopID     string
+	ShopIDs    []string
 	Name       string
 	City       string
 	Street     string

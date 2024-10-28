@@ -58,9 +58,9 @@ func (h handler) newCreateResponse(s models.Shop) registerResponse {
 }
 
 type getShopRequest struct {
-	IDs        []string `json:"ids"`
-	Search     string   `json:"search"`
-	IsVerified *bool    `json:"is_verified"`
+	IDs        []string `form:"ids"`
+	Search     string   `form:"search"`
+	IsVerified *bool    `form:"is_verified"`
 }
 
 func (r getShopRequest) validate() error {
@@ -166,16 +166,17 @@ type updateResp struct {
 	AvgRate float64 `json:"avg_rate"`
 }
 type updateShopRequest struct {
-	Name     string `json:"name"`
-	Phone    string `json:"phone"`
-	City     string `json:"city"`
-	Street   string `json:"street"`
-	District string `json:"district"`
+	IDs      []string `json:"ids" binding:"required"`
+	Name     string   `json:"name"`
+	Phone    string   `json:"phone"`
+	City     string   `json:"city"`
+	Street   string   `json:"street"`
+	District string   `json:"district"`
 }
 
 func (r updateShopRequest) toInput() shop.UpdateInput {
 	return shop.UpdateInput{
-
+		ShopIDs:  r.IDs,
 		Name:     r.Name,
 		Phone:    r.Phone,
 		City:     r.City,
@@ -183,16 +184,21 @@ func (r updateShopRequest) toInput() shop.UpdateInput {
 		District: r.District,
 	}
 }
-func (h handler) newUpdateShopResp(s models.Shop) updateResp {
-	return updateResp{
-		ID:    s.ID.Hex(),
-		Name:  s.Name,
-		Phone: s.Phone,
-		Address: address{
-			City:     s.City,
-			Street:   s.Street,
-			District: s.District,
-		},
-		AvgRate: s.AvgRate,
+func (h handler) newUpdateShopResp(shops []models.Shop) []updateResp {
+	var res []updateResp
+	for _, s := range shops {
+		res = append(res, updateResp{
+			ID:    s.ID.Hex(),
+			Name:  s.Name,
+			Phone: s.Phone,
+			Address: address{
+				City:     s.City,
+				Street:   s.Street,
+				District: s.District,
+			},
+			AvgRate: s.AvgRate,
+		})
 	}
+
+	return res
 }

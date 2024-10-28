@@ -12,6 +12,7 @@ import (
 type Repository interface {
 	CreateShop(ctx context.Context, sc models.Scope, opt CreateShopOption) (models.Shop, error)
 	GetShop(ctx context.Context, sc models.Scope, opt GetOption) ([]models.Shop, paginator.Paginator, error)
+	ListShop(ctx context.Context, sc models.Scope, opt GetOption) ([]models.Shop, error)
 	DetailShop(ctx context.Context, sc models.Scope, id string) (models.Shop, error)
 	DeleteShop(ctx context.Context, sc models.Scope) error
 	UpdateShop(ctx context.Context, sc models.Scope, option UpdateOption) (models.Shop, error)

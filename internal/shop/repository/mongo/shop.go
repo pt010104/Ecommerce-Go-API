@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/pt010104/api-golang/internal/models"
@@ -37,7 +38,7 @@ func (repo implRepo) CreateShop(ctx context.Context, sc models.Scope, opt shop.C
 func (repo implRepo) GetShop(ctx context.Context, sc models.Scope, opt shop.GetOption) ([]models.Shop, paginator.Paginator, error) {
 	col := repo.getShopCollection()
 
-	filter, err := repo.buildShopQuery(ctx, models.Scope{}, opt)
+	filter, err := repo.buildShopQuery(opt)
 	if err != nil {
 		repo.l.Errorf(ctx, "shop.repository.mongo.Get.buildShopQuery: %v", err)
 		return nil, paginator.Paginator{}, err
@@ -162,4 +163,35 @@ func (repo implRepo) UpdateShop(ctx context.Context, sc models.Scope, option sho
 	}
 
 	return option.Model, nil
+}
+
+func (repo implRepo) ListShop(ctx context.Context, sc models.Scope, opt shop.GetOption) ([]models.Shop, error) {
+	col := repo.getShopCollection()
+
+	filter, err := repo.buildShopQuery(shop.GetOption{
+		GetShopsFilter: opt.GetShopsFilter,
+		PagQuery:       opt.PagQuery,
+	})
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.ListShop.buildShopQuery: %v", err)
+		return nil, err
+	}
+
+	fmt.Println(filter)
+
+	cursor, err := col.Find(ctx, filter)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.ListShop.Find: %v", err)
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var shops []models.Shop
+	err = cursor.All(ctx, &shops)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.ListShop.All: %v", err)
+		return nil, err
+	}
+
+	return shops, nil
 }

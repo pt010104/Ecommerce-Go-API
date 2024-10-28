@@ -43,9 +43,9 @@ func (h handler) processGetRequest(c *gin.Context) (models.Scope, getShopRequest
 	}
 
 	var req getShopRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBindQuery(&req); err != nil {
 		h.l.Errorf(ctx, "shop.delivery.http.handler.processGetRequest: invalid request")
-		return models.Scope{}, req, errWrongBody
+		return models.Scope{}, req, errWrongQuery
 	}
 
 	if err := req.validate(); err != nil {

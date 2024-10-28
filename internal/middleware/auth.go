@@ -1,11 +1,11 @@
 package middleware
 
 import (
-	"fmt"
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	"github.com/pt010104/api-golang/pkg/jwt"
 	"github.com/pt010104/api-golang/pkg/response"
-	"strings"
 )
 
 func (m Middleware) Auth() gin.HandlerFunc {
@@ -47,9 +47,7 @@ func (m Middleware) Auth() gin.HandlerFunc {
 
 		scope := jwt.NewScope(payload)
 		scope.Role = role
-		fmt.Print(scope.Role)
-		m.l.Debugf(ctx, "role", scope.Role)
-		c.Set("role", scope.Role)
+
 		ctx = jwt.SetScopeToContext(ctx, scope)
 
 		c.Request = c.Request.WithContext(ctx)
