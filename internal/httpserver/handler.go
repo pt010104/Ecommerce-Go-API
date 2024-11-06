@@ -48,7 +48,7 @@ func (srv HTTPServer) mapHandlers() error {
 	adminH := adminHTTP.New(srv.l, adminUC)
 	voucherH := voucherHTTP.New(srv.l, voucherUC)
 
-	mw := middleware.New(srv.l, userRepo)
+	mw := middleware.New(srv.l, userRepo, shopUC)
 
 	//Routes
 	api := srv.gin.Group("/api/v1")

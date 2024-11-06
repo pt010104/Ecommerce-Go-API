@@ -15,7 +15,6 @@ func (impl implRepo) buildInventoryModel(context context.Context, opt shop.Creat
 
 	i := models.Inventory{
 		ID:         primitive.NewObjectID(),
-		ProductID:  opt.ProductID,
 		StockLevel: opt.StockLevel,
 		CreatedAt:  now,
 		UpdatedAt:  now,

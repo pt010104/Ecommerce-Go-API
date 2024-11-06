@@ -36,10 +36,10 @@ func (repo implRepo) CreateInventory(ctx context.Context, sc models.Scope, opt s
 	return u, nil
 }
 
-func (repo implRepo) DetailInventory(ctx context.Context, sc models.Scope, productID primitive.ObjectID) (models.Inventory, error) {
+func (repo implRepo) DetailInventory(ctx context.Context, sc models.Scope, id primitive.ObjectID) (models.Inventory, error) {
 	col := repo.getInventoryCollection()
 
-	filter, err := repo.buildInventoryDetailQuery(ctx, sc, productID)
+	filter, err := repo.buildInventoryDetailQuery(ctx, sc, id)
 	if err != nil {
 		repo.l.Errorf(ctx, "shop.repository.mongo.DetailInventory.buildInventoryDetailQuery: %v", err)
 		return models.Inventory{}, err
@@ -54,10 +54,10 @@ func (repo implRepo) DetailInventory(ctx context.Context, sc models.Scope, produ
 	return u, nil
 }
 
-func (repo implRepo) ListInventory(ctx context.Context, sc models.Scope, productIDs []primitive.ObjectID) ([]models.Inventory, error) {
+func (repo implRepo) ListInventory(ctx context.Context, sc models.Scope, ids []primitive.ObjectID) ([]models.Inventory, error) {
 	col := repo.getInventoryCollection()
 
-	filter, err := repo.buildInventoryQuery(ctx, sc, productIDs)
+	filter, err := repo.buildInventoryQuery(ctx, sc, ids)
 	if err != nil {
 		repo.l.Errorf(ctx, "shop.repository.mongo.ListInventory.buildInventoryQuery: %v", err)
 		return []models.Inventory{}, err
@@ -83,7 +83,7 @@ func (repo implRepo) ListInventory(ctx context.Context, sc models.Scope, product
 func (repo implRepo) UpdateInventory(ctx context.Context, sc models.Scope, opt shop.UpdateInventoryOption) (models.Inventory, error) {
 	col := repo.getInventoryCollection()
 
-	filter, err := repo.buildInventoryDetailQuery(ctx, sc, opt.Model.ProductID)
+	filter, err := repo.buildInventoryDetailQuery(ctx, sc, opt.Model.ID)
 	if err != nil {
 		repo.l.Errorf(ctx, "shop.repository.mongo.UpdateInventory.buildInventoryDetailQuery: %v", err)
 		return models.Inventory{}, err
@@ -105,10 +105,10 @@ func (repo implRepo) UpdateInventory(ctx context.Context, sc models.Scope, opt s
 	return nm, nil
 }
 
-func (repo implRepo) DeleteInventory(ctx context.Context, sc models.Scope, productIDs []primitive.ObjectID) error {
+func (repo implRepo) DeleteInventory(ctx context.Context, sc models.Scope, ids []primitive.ObjectID) error {
 	col := repo.getInventoryCollection()
 
-	filter, err := repo.buildInventoryQuery(ctx, sc, productIDs)
+	filter, err := repo.buildInventoryQuery(ctx, sc, ids)
 	if err != nil {
 		repo.l.Errorf(ctx, "shop.repository.mongo.DeleteInventory.buildInventoryQuery: %v", err)
 		return err

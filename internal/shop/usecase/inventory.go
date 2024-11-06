@@ -10,7 +10,6 @@ import (
 
 func (uc implUsecase) CreateInventory(ctx context.Context, sc models.Scope, input shop.CreateInventoryInput) (models.Inventory, error) {
 	opt := shop.CreateInventoryOption{
-		ProductID:       input.ProductID,
 		StockLevel:      input.StockLevel,
 		ReorderLevel:    input.ReorderLevel,
 		ReorderQuantity: input.ReorderQuantity,
@@ -45,7 +44,7 @@ func (uc implUsecase) ListInventory(ctx context.Context, sc models.Scope, produc
 }
 
 func (uc implUsecase) UpdateInventory(ctx context.Context, sc models.Scope, input shop.UpdateInventoryInput) (models.Inventory, error) {
-	i, err := uc.repo.DetailInventory(ctx, sc, input.ProductID)
+	i, err := uc.repo.DetailInventory(ctx, sc, input.ID)
 	if err != nil {
 		uc.l.Errorf(ctx, "shop.usecase.implUseCase.Update: %v", err)
 		return models.Inventory{}, err

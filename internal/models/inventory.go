@@ -8,7 +8,6 @@ import (
 
 type Inventory struct {
 	ID              primitive.ObjectID `bson:"_id"`
-	ProductID       primitive.ObjectID `bson:"product_id"`
 	StockLevel      uint               `bson:"stock_level"`
 	ReservedLevel   uint               `bson:"reserved_level"`
 	ReorderLevel    *uint              `bson:"reorder_level,omitempty"`

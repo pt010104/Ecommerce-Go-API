@@ -7,6 +7,7 @@ import (
 
 func MapRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
 	MapShopRouters(r, h, mw)
+	MapProductRouters(r.Group("/products"), h, mw)
 }
 
 func MapShopRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
@@ -16,5 +17,10 @@ func MapShopRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
 	r.GET("", h.Get)
 	r.DELETE("", h.Delete)
 	r.PATCH("", h.Update)
-	r.POST("/create-product", h.CreateProduct)
+}
+
+func MapProductRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
+	r.Use(mw.Auth(), mw.AuthShop())
+
+	r.POST("", h.CreateProduct)
 }

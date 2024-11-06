@@ -14,13 +14,13 @@ func (m Middleware) Auth() gin.HandlerFunc {
 		sessionID := c.GetHeader("session-id")
 
 		ctx := c.Request.Context()
-		k, err := m.repo.DetailKeyToken(ctx, userID, sessionID)
+		k, err := m.userRepo.DetailKeyToken(ctx, userID, sessionID)
 		if err != nil {
 			response.Unauthorized(c)
 			c.Abort()
 			return
 		}
-		u, err := m.repo.DetailUser(ctx, userID)
+		u, err := m.userRepo.DetailUser(ctx, userID)
 		if err != nil {
 			response.Unauthorized(c)
 			c.Abort()
