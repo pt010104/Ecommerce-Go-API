@@ -11,6 +11,7 @@ type Handler interface {
 	Get(c *gin.Context)
 	Delete(c *gin.Context)
 	Update(c *gin.Context)
+	CreateProduct(c *gin.Context)
 }
 
 type handler struct {

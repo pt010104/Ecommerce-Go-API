@@ -16,4 +16,5 @@ func MapShopRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
 	r.GET("", h.Get)
 	r.DELETE("", h.Delete)
 	r.PATCH("", h.Update)
+	r.POST("/create-product", h.CreateProduct)
 }

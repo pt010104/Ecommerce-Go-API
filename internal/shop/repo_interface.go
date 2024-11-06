@@ -23,4 +23,7 @@ type Repository interface {
 	ListInventory(ctx context.Context, sc models.Scope, productIDs []primitive.ObjectID) ([]models.Inventory, error)
 	UpdateInventory(ctx context.Context, sc models.Scope, opt UpdateInventoryOption) (models.Inventory, error)
 	DeleteInventory(ctx context.Context, sc models.Scope, productIDs []primitive.ObjectID) error
+
+	//product
+	CreateProduct(ctx context.Context, sc models.Scope, opt CreateProductOption) (models.Product, error)
 }
