@@ -5,11 +5,9 @@ import (
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
-	"github.com/pt010104/api-golang/pkg/util"
 )
 
 func (uc implUsecase) CreateProduct(ctx context.Context, sc models.Scope, input shop.CreateProductInput) (models.Product, models.Inventory, error) {
-	util.PrintJson(sc)
 	inven, err1 := uc.repo.CreateInventory(ctx, sc, shop.CreateInventoryOption{
 		StockLevel:      input.StockLevel,
 		ReorderLevel:    input.ReorderLevel,
