@@ -7,4 +7,5 @@ type CreateProductOption struct {
 	Price       float32
 	InventoryID primitive.ObjectID
 	ShopID      primitive.ObjectID
+	CategoryID  primitive.ObjectID
 }

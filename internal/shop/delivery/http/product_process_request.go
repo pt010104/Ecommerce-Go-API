@@ -12,7 +12,7 @@ func (h handler) processCreateProductRequest(c *gin.Context) (models.Scope, crea
 
 	sc, ok := jwt.GetScopeFromContext(ctx)
 	if !ok {
-		h.l.Errorf(ctx, "admin.http.delivery.hhtp.handler.processRequest: unauthorized")
+		h.l.Errorf(ctx, "shop.http.delivery.hhtp.handler.processRequest: unauthorized")
 		return models.Scope{}, createProductReq{}, pkgErrors.NewUnauthorizedHTTPError()
 	}
 
@@ -20,6 +20,24 @@ func (h handler) processCreateProductRequest(c *gin.Context) (models.Scope, crea
 	if err := c.ShouldBindJSON(&req); err != nil {
 		h.l.Errorf(ctx, "shop.delivery.http.handler.processCreateRequest: invalid request")
 		return models.Scope{}, req, errWrongBody
+	}
+
+	return sc, req, nil
+}
+
+func (h handler) processDetailProductRequest(c *gin.Context) (models.Scope, detailProductReq, error) {
+	ctx := c.Request.Context()
+
+	sc, ok := jwt.GetScopeFromContext(ctx)
+	if !ok {
+		h.l.Errorf(ctx, "shop.http.delivery.hhtp.handler.processRequest: unauthorized")
+		return models.Scope{}, detailProductReq{}, pkgErrors.NewUnauthorizedHTTPError()
+	}
+
+	var req detailProductReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.handler.processCreateRequest: invalid request")
+		return models.Scope{}, detailProductReq{}, errWrongBody
 	}
 
 	return sc, req, nil

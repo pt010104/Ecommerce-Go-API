@@ -23,4 +23,5 @@ func MapProductRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) 
 	r.Use(mw.Auth(), mw.AuthShop())
 
 	r.POST("", h.CreateProduct)
+	r.GET("", h.DetailProduct)
 }

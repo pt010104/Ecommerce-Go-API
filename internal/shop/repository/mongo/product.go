@@ -5,6 +5,7 @@ import (
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -32,4 +33,22 @@ func (repo implRepo) CreateProduct(ctx context.Context, sc models.Scope, opt sho
 	}
 
 	return p, nil
+}
+func (repo implRepo) Detailproduct(ctx context.Context, id primitive.ObjectID) (models.Product, error) {
+	col := repo.getProductCollection()
+
+	filter, err := repo.buildProductDetailQuery(ctx, id)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.DetailProduct.buildProductDetailQuery: %v", err)
+		return models.Product{}, err
+	}
+	repo.l.Infof(ctx, "Product filter: %v", filter)
+	var u models.Product
+	err = col.FindOne(ctx, filter).Decode(&u)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.DetailProduct.FindOne: %v", err)
+		return models.Product{}, err
+	}
+
+	return u, nil
 }

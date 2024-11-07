@@ -20,6 +20,7 @@ func (repo implRepo) buildProductModel(opt shop.CreateProductOption, ctx context
 		CreatedAt:   now,
 		UpdatedAt:   now,
 		ShopID:      opt.ShopID,
+		CategoryID:  opt.CategoryID,
 	}
 
 	return p, nil

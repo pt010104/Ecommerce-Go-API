@@ -18,11 +18,12 @@ type UseCase interface {
 
 	//Inventory
 	CreateInventory(ctx context.Context, sc models.Scope, input CreateInventoryInput) (models.Inventory, error)
-	DetailInventory(ctx context.Context, sc models.Scope, id primitive.ObjectID) (models.Inventory, error)
+	DetailInventory(ctx context.Context, id primitive.ObjectID) (models.Inventory, error)
 	ListInventory(ctx context.Context, sc models.Scope, ids []primitive.ObjectID) ([]models.Inventory, error)
 	UpdateInventory(ctx context.Context, sc models.Scope, input UpdateInventoryInput) (models.Inventory, error)
 	DeleteInventory(ctx context.Context, sc models.Scope, productIDs []primitive.ObjectID) error
 
 	//Product
 	CreateProduct(ctx context.Context, sc models.Scope, input CreateProductInput) (models.Product, models.Inventory, error)
+	DetailProduct(ctx context.Context, sc models.Scope, productID primitive.ObjectID) (models.Product, models.Inventory, error)
 }

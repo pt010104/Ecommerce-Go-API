@@ -9,12 +9,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func (repo implRepo) buildInventoryDetailQuery(ctx context.Context, sc models.Scope, ID primitive.ObjectID) (bson.M, error) {
-	filter, err := mongo.BuildScopeQuery(ctx, repo.l, sc)
-	if err != nil {
-		repo.l.Errorf(ctx, "shop.repository.mongo.buildInventoryDetailQuery.BuildScopeQuery: %v", err)
-		return bson.M{}, err
-	}
+func (repo implRepo) buildInventoryDetailQuery(ctx context.Context, ID primitive.ObjectID) (bson.M, error) {
+	filter := bson.M{}
 
 	filter["_id"] = ID
 

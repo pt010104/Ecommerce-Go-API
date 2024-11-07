@@ -36,10 +36,10 @@ func (repo implRepo) CreateInventory(ctx context.Context, sc models.Scope, opt s
 	return u, nil
 }
 
-func (repo implRepo) DetailInventory(ctx context.Context, sc models.Scope, id primitive.ObjectID) (models.Inventory, error) {
+func (repo implRepo) DetailInventory(ctx context.Context, id primitive.ObjectID) (models.Inventory, error) {
 	col := repo.getInventoryCollection()
 
-	filter, err := repo.buildInventoryDetailQuery(ctx, sc, id)
+	filter, err := repo.buildInventoryDetailQuery(ctx, id)
 	if err != nil {
 		repo.l.Errorf(ctx, "shop.repository.mongo.DetailInventory.buildInventoryDetailQuery: %v", err)
 		return models.Inventory{}, err
@@ -83,7 +83,7 @@ func (repo implRepo) ListInventory(ctx context.Context, sc models.Scope, ids []p
 func (repo implRepo) UpdateInventory(ctx context.Context, sc models.Scope, opt shop.UpdateInventoryOption) (models.Inventory, error) {
 	col := repo.getInventoryCollection()
 
-	filter, err := repo.buildInventoryDetailQuery(ctx, sc, opt.Model.ID)
+	filter, err := repo.buildInventoryDetailQuery(ctx, opt.Model.ID)
 	if err != nil {
 		repo.l.Errorf(ctx, "shop.repository.mongo.UpdateInventory.buildInventoryDetailQuery: %v", err)
 		return models.Inventory{}, err
