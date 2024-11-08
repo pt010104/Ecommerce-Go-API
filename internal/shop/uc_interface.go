@@ -26,4 +26,5 @@ type UseCase interface {
 	//Product
 	CreateProduct(ctx context.Context, sc models.Scope, input CreateProductInput) (models.Product, models.Inventory, error)
 	DetailProduct(ctx context.Context, sc models.Scope, productID primitive.ObjectID) (models.Product, models.Inventory, error)
+	ListProduct(ctx context.Context, sc models.Scope, opt GetProductFilter) ([]models.Product, error)
 }

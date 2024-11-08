@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
+
 	"github.com/pt010104/api-golang/pkg/response"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -53,4 +54,24 @@ func (h handler) DetailProduct(c *gin.Context) {
 	}
 
 	response.OK(c, h.newDetailProductResponse(product, inven))
+}
+func (h handler) ListProduct(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	sc, req, err := h.processListProductRequest(c)
+	if err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.listproduct: %v", err)
+		response.Error(c, err)
+		return
+	}
+
+	list, err2 := h.uc.ListProduct(ctx, sc, req.toInput())
+	if err2 != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.detauk: %v", err)
+		err := h.mapErrors(err)
+		response.Error(c, err)
+		return
+	}
+	response.OK(c, list)
+
 }

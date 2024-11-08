@@ -24,4 +24,5 @@ func MapProductRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) 
 
 	r.POST("", h.CreateProduct)
 	r.GET("", h.DetailProduct)
+	r.GET("list-product", h.ListProduct)
 }

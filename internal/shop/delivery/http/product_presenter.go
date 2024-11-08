@@ -3,6 +3,7 @@ package http
 import (
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
+	"github.com/pt010104/api-golang/pkg/mongo"
 )
 
 type createProductReq struct {
@@ -42,4 +43,28 @@ func (h handler) newDetailProductResponse(p models.Product, i models.Inventory) 
 		Price:       p.Price,
 	}
 
+}
+
+type listProductRequest struct {
+	IDs    []string `form:"ids"`
+	Search string   `json:"search"`
+}
+
+func (r listProductRequest) validate() error {
+	if len(r.IDs) > 0 {
+		for _, id := range r.IDs {
+			if !mongo.IsObjectID(id) {
+				return errWrongBody
+			}
+		}
+	}
+
+	return nil
+}
+
+func (r listProductRequest) toInput() shop.GetProductFilter {
+	return shop.GetProductFilter{
+		IDs:    r.IDs,
+		Search: r.Search,
+	}
 }

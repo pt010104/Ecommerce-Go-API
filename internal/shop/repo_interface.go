@@ -27,4 +27,5 @@ type Repository interface {
 	//product
 	CreateProduct(ctx context.Context, sc models.Scope, opt CreateProductOption) (models.Product, error)
 	Detailproduct(ctx context.Context, id primitive.ObjectID) (models.Product, error)
+	ListProduct(ctx context.Context, sc models.Scope, opt GetProductFilter) ([]models.Product, error)
 }

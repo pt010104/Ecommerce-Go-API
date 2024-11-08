@@ -51,3 +51,12 @@ func (uc implUsecase) DetailProduct(ctx context.Context, sc models.Scope, produc
 	}
 	return u, i, nil
 }
+func (uc implUsecase) ListProduct(ctx context.Context, sc models.Scope, opt shop.GetProductFilter) ([]models.Product, error) {
+	s, err := uc.repo.ListProduct(ctx, sc, opt)
+	if err != nil {
+		uc.l.Errorf(ctx, "shop.usecase.ListProduct: %v", err)
+		return []models.Product{}, err
+	}
+
+	return s, nil
+}

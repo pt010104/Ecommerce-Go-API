@@ -42,3 +42,28 @@ func (h handler) processDetailProductRequest(c *gin.Context) (models.Scope, deta
 
 	return sc, req, nil
 }
+func (h handler) processListProductRequest(c *gin.Context) (models.Scope, listProductRequest, error) {
+	ctx := c.Request.Context()
+
+	payload, ok := jwt.GetPayloadFromContext(ctx)
+	if !ok {
+		h.l.Errorf(ctx, "survey.delivery.http.handler.processDetailRequest: unauthorized")
+		return models.Scope{}, listProductRequest{}, pkgErrors.NewUnauthorizedHTTPError()
+	}
+
+	var req listProductRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.handler.processGetRequest: invalid request")
+		return models.Scope{}, req, errWrongQuery
+	}
+
+	if err := req.validate(); err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.handler.processGetRequest: invalid request")
+		return models.Scope{}, req, err
+	}
+
+	sc := jwt.NewScope(payload)
+
+	return sc, req, nil
+
+}

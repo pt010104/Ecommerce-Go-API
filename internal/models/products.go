@@ -13,6 +13,7 @@ type Product struct {
 	InventoryID primitive.ObjectID `bson:"inventory_id"`
 	CategoryID  primitive.ObjectID `bson:category_id`
 	Name        string             `bson:"name"`
+	Alias       string             `bson:"alias"`
 	CreatedAt   time.Time          `bson:"created_at"`
 	UpdatedAt   time.Time          `bson:"updated_at"`
 }

@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
@@ -51,4 +52,32 @@ func (repo implRepo) Detailproduct(ctx context.Context, id primitive.ObjectID) (
 	}
 
 	return u, nil
+}
+
+func (repo implRepo) ListProduct(ctx context.Context, sc models.Scope, opt shop.GetProductFilter) ([]models.Product, error) {
+	col := repo.getProductCollection()
+
+	filter, err := repo.buildProductQuery(opt)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.ListProduct.buildProductQuery: %v", err)
+		return nil, err
+	}
+
+	fmt.Println(filter)
+
+	cursor, err := col.Find(ctx, filter)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.ListProduct.Find: %v", err)
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var products []models.Product
+	err = cursor.All(ctx, &products)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.ListProduct.All: %v", err)
+		return nil, err
+	}
+
+	return products, nil
 }

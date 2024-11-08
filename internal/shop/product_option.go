@@ -8,4 +8,9 @@ type CreateProductOption struct {
 	InventoryID primitive.ObjectID
 	ShopID      primitive.ObjectID
 	CategoryID  primitive.ObjectID
+	Alias       string
+}
+type GetProductFilter struct {
+	IDs    []string
+	Search string
 }
