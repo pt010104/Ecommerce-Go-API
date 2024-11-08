@@ -46,7 +46,7 @@ func (h handler) newDetailProductResponse(p models.Product, i models.Inventory) 
 }
 
 type listProductRequest struct {
-	IDs    []string `form:"ids"`
+	IDs    []string `json:"ids"`
 	Search string   `json:"search"`
 }
 
