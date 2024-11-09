@@ -70,3 +70,33 @@ func (r listProductRequest) toInput() shop.GetProductFilter {
 		ShopID: r.ShopID,
 	}
 }
+
+type listProductItem struct {
+	ID          string  `json:"id"`
+	Name        string  `json:"name"`
+	ShopID      string  `json:"shop_id"`
+	InventoryID string  `json:"inventory_id"`
+	Price       float32 `json:"price"`
+}
+
+type listProductResp struct {
+	Item []listProductItem
+}
+
+func (h handler) listProductResp(p []models.Product) listProductResp {
+	var list []listProductItem
+	for _, s := range p {
+		item := listProductItem{
+			ID:          s.ID.Hex(),
+			Name:        s.Name,
+			ShopID:      s.ShopID.Hex(),
+			InventoryID: s.InventoryID.Hex(),
+			Price:       s.Price,
+		}
+		list = append(list, item)
+	}
+	return listProductResp{
+		Item: list,
+	}
+
+}

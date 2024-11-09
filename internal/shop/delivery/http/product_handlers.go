@@ -72,6 +72,6 @@ func (h handler) ListProduct(c *gin.Context) {
 		response.Error(c, err)
 		return
 	}
-	response.OK(c, list)
+	response.OK(c, h.listProductResp(list))
 
 }
