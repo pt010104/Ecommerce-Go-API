@@ -11,3 +11,11 @@ type CreateProductInput struct {
 	ReorderQuantity *uint
 	CategoryID      []string
 }
+type DetailProductOutput struct {
+	ID            string
+	Name          string
+	CategoryName  []string
+	ShopName      string
+	InventoryName string
+	Price         float32
+}
