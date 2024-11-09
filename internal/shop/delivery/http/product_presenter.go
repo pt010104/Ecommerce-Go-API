@@ -4,14 +4,16 @@ import (
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/pkg/mongo"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type createProductReq struct {
-	Name            string  `json:"name" binding:"required"`
-	Price           float32 `json:"price" binding:"required"`
-	StockLevel      uint    `json:"stock_level" binding:"required"`
-	ReorderLevel    *uint   `json:"reorder_level" binding:"required"`
-	ReorderQuantity *uint   `json:"reorder_quantity" binding:"required"`
+	Name            string   `json:"name" binding:"required"`
+	Price           float32  `json:"price" binding:"required"`
+	StockLevel      uint     `json:"stock_level" binding:"required"`
+	ReorderLevel    *uint    `json:"reorder_level" binding:"required"`
+	ReorderQuantity *uint    `json:"reorder_quantity" binding:"required"`
+	CategoryIDs     []string `json:"category_ids" binding:"required"`
 }
 
 func (r createProductReq) toInput() shop.CreateProductInput {
@@ -22,7 +24,38 @@ func (r createProductReq) toInput() shop.CreateProductInput {
 		StockLevel:      r.StockLevel,
 		ReorderLevel:    r.ReorderLevel,
 		ReorderQuantity: r.ReorderQuantity,
+		CategoryID:      r.CategoryIDs,
 	}
+}
+func (r createProductReq) validate() error {
+
+	if r.Name == "" {
+		return errWrongBody
+	}
+
+	if r.Price <= 0 {
+		return errWrongBody
+	}
+
+	if r.StockLevel == 0 {
+		return errWrongBody
+	}
+
+	if r.ReorderLevel == nil || *r.ReorderLevel == 0 {
+		return errWrongBody
+	}
+
+	if r.ReorderQuantity == nil || *r.ReorderQuantity == 0 {
+		return errWrongBody
+	}
+
+	for _, id := range r.CategoryIDs {
+		if _, err := primitive.ObjectIDFromHex(id); err != nil {
+			return errWrongBody
+		}
+	}
+
+	return nil
 }
 
 type detailProductReq struct {

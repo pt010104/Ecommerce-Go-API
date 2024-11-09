@@ -7,7 +7,7 @@ type CreateProductOption struct {
 	Price       float32
 	InventoryID primitive.ObjectID
 	ShopID      primitive.ObjectID
-	CategoryID  primitive.ObjectID
+	CategoryID  []primitive.ObjectID
 	Alias       string
 }
 type GetProductFilter struct {

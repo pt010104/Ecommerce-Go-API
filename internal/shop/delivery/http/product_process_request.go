@@ -21,6 +21,10 @@ func (h handler) processCreateProductRequest(c *gin.Context) (models.Scope, crea
 		h.l.Errorf(ctx, "shop.delivery.http.handler.processCreateRequest: invalid request")
 		return models.Scope{}, req, errWrongBody
 	}
+	if err := req.validate(); err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.handler.validCreateRequest: invalid request")
+		return models.Scope{}, req, err
+	}
 
 	return sc, req, nil
 }
