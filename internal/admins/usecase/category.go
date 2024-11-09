@@ -24,3 +24,12 @@ func (uc implUsecase) CreateCategory(ctx context.Context, sc models.Scope, input
 	}
 	return cate, nil
 }
+
+func (uc implUsecase) ListCategories(ctx context.Context, sc models.Scope, filter admins.GetCategoriesFilter) ([]models.Category, error) {
+	cates, err := uc.repo.ListCategories(ctx, sc, filter)
+	if err != nil {
+		uc.l.Errorf(ctx, "admins.usecae.ListCategories.repo.ListCategories", err)
+		return nil, err
+	}
+	return cates, nil
+}
