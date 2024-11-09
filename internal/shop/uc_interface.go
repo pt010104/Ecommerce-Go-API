@@ -3,6 +3,7 @@ package shop
 import (
 	"context"
 
+	"github.com/pt010104/api-golang/internal/admins"
 	"github.com/pt010104/api-golang/internal/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -25,6 +26,8 @@ type UseCase interface {
 
 	//Product
 	CreateProduct(ctx context.Context, sc models.Scope, input CreateProductInput) (models.Product, models.Inventory, error)
-	DetailProduct(ctx context.Context, sc models.Scope, productID primitive.ObjectID) (models.Product, models.Inventory, error)
+	DetailProduct(ctx context.Context, sc models.Scope, productID primitive.ObjectID) (DetailProductOutput, error)
 	ListProduct(ctx context.Context, sc models.Scope, opt GetProductFilter) ([]models.Product, error)
+
+	SetAdminUC(adminUC admins.UseCase)
 }

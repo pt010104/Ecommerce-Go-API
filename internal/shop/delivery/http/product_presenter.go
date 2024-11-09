@@ -62,18 +62,22 @@ type detailProductReq struct {
 	ID string `json:"id" binding:"required"`
 }
 type detailProductResp struct {
-	ID          string  `json:"id" binding:"required"`
-	Name        string  `json:"name" binding:"required"`
-	InventoryID string  `json:"inventory_id" binding:"required"`
-	Price       float32 `json:"price" binding:"required"`
+	ID            string   `json:"id" binding:"required"`
+	Name          string   `json:"name" binding:"required"`
+	CategoryName  []string `json:"category_name" binding:"required"`
+	ShopName      string   `json:"shop_name" binding:"required"`
+	InventoryName string   `json:"inventory_name" binding:"required"`
+	Price         float32  `json:"price" binding:"required"`
 }
 
-func (h handler) newDetailProductResponse(p models.Product, i models.Inventory) detailProductResp {
+func (h handler) newDetailProductResponse(p shop.DetailProductOutput) detailProductResp {
 	return detailProductResp{
-		ID:          p.ID.Hex(),
-		Name:        p.Name,
-		InventoryID: i.ID.Hex(),
-		Price:       p.Price,
+		ID:            p.ID,
+		Name:          p.Name,
+		CategoryName:  p.CategoryName,
+		ShopName:      p.ShopName,
+		InventoryName: p.InventoryName,
+		Price:         p.Price,
 	}
 
 }

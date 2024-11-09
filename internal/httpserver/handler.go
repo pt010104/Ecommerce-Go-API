@@ -38,8 +38,10 @@ func (srv HTTPServer) mapHandlers() error {
 	//Usecase
 	emailUC := emailUC.New(srv.l)
 	userUC := userUC.New(srv.l, userRepo, emailUC)
-	shopUC := shopUC.New(srv.l, shopRepo)
+	shopUC := shopUC.New(srv.l, shopRepo, nil)
 	adminUC := adminUC.New(adminRepo, srv.l, shopUC)
+	shopUC.SetAdminUC(adminUC)
+
 	voucherUC := voucherUC.New(voucherRepo, srv.l, shopUC)
 
 	// Handlers

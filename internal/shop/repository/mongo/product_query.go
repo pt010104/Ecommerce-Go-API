@@ -12,6 +12,7 @@ import (
 
 func (repo implRepo) buildProductDetailQuery(ctx context.Context, ID primitive.ObjectID) (bson.M, error) {
 	filter := bson.M{}
+	filter = mongo.BuildQueryWithSoftDelete(filter)
 	filter["_id"] = ID
 
 	return filter, nil

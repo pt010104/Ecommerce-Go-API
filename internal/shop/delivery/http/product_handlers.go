@@ -45,15 +45,15 @@ func (h handler) DetailProduct(c *gin.Context) {
 		return
 	}
 	fmt.Println("ID:", req.ID)
-	product, inven, err := h.uc.DetailProduct(ctx, sc, productID)
-	if err != nil {
+	product, err2 := h.uc.DetailProduct(ctx, sc, productID)
+	if err2 != nil {
 		h.l.Errorf(ctx, "shop.delivery.http.detauk: %v", err)
-		err := h.mapErrors(err)
-		response.Error(c, err)
+		err2 := h.mapErrors(err2)
+		response.Error(c, err2)
 		return
 	}
 
-	response.OK(c, h.newDetailProductResponse(product, inven))
+	response.OK(c, h.newDetailProductResponse(product))
 }
 func (h handler) ListProduct(c *gin.Context) {
 	ctx := c.Request.Context()

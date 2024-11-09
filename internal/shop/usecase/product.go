@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 
+	"github.com/pt010104/api-golang/internal/admins"
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -48,19 +49,55 @@ func (uc implUsecase) CreateProduct(ctx context.Context, sc models.Scope, input 
 
 	return p, inven, nil
 }
-func (uc implUsecase) DetailProduct(ctx context.Context, sc models.Scope, productID primitive.ObjectID) (models.Product, models.Inventory, error) {
+func (uc implUsecase) DetailProduct(ctx context.Context, sc models.Scope, productID primitive.ObjectID) (shop.DetailProductOutput, error) {
 	u, err := uc.repo.Detailproduct(ctx, productID)
 	if err != nil {
 		uc.l.Errorf(ctx, "shop.product.usecase.detail.product", err)
-		return models.Product{}, models.Inventory{}, err
+		return shop.DetailProductOutput{}, err
 	}
-	i, err2 := uc.repo.DetailInventory(ctx, u.InventoryID)
-	if err2 != nil {
+
+	inventory, err := uc.repo.DetailInventory(ctx, u.InventoryID)
+	if err != nil {
 		uc.l.Errorf(ctx, "shop.product.usecase.detail.inven", err)
-		return models.Product{}, models.Inventory{}, err
+		return shop.DetailProductOutput{}, err
 	}
-	return u, i, nil
+
+	categoryIDs := make([]string, len(u.CategoryID))
+	for idx, id := range u.CategoryID {
+		categoryIDs[idx] = id.Hex()
+	}
+
+	shopDetail, err := uc.repo.DetailShop(ctx, sc, u.ShopID.Hex())
+	if err != nil {
+		uc.l.Errorf(ctx, "shop.product.usecase.detail.shop", err)
+		return shop.DetailProductOutput{}, err
+	}
+
+	category, err := uc.adminUC.ListCategories(ctx, sc, admins.GetCategoriesFilter{
+		IDs: categoryIDs,
+	})
+	if err != nil {
+		uc.l.Errorf(ctx, "shop.product.usecase.detail.categories", err)
+		return shop.DetailProductOutput{}, err
+	}
+
+	var categoryNames []string
+	for _, cat := range category {
+		categoryNames = append(categoryNames, cat.Name)
+	}
+
+	output := shop.DetailProductOutput{
+		ID:            u.ID.Hex(),
+		Name:          u.Name,
+		CategoryName:  categoryNames,
+		ShopName:      shopDetail.Name,
+		InventoryName: inventory.ID.Hex(),
+		Price:         u.Price,
+	}
+
+	return output, nil
 }
+
 func (uc implUsecase) ListProduct(ctx context.Context, sc models.Scope, opt shop.GetProductFilter) ([]models.Product, error) {
 	s, err := uc.repo.ListProduct(ctx, sc, opt)
 	if err != nil {
