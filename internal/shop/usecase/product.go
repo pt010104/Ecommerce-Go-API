@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"sync"
 
 	"github.com/pt010104/api-golang/internal/admins"
 	"github.com/pt010104/api-golang/internal/models"
@@ -49,39 +50,81 @@ func (uc implUsecase) CreateProduct(ctx context.Context, sc models.Scope, input 
 
 	return p, inven, nil
 }
-func (uc implUsecase) DetailProduct(ctx context.Context, sc models.Scope, productID primitive.ObjectID) (shop.DetailProductOutput, error) {
-	u, err := uc.repo.Detailproduct(ctx, productID)
+func (uc *implUsecase) DetailProduct(ctx context.Context, sc models.Scope, productID primitive.ObjectID) (shop.DetailProductOutput, error) {
+	var (
+		u             models.Product
+		inventory     models.Inventory
+		shopDetail    models.Shop
+		category      []models.Category
+		categoryIDs   []string
+		categoryNames []string
+		err           error
+		mu            sync.Mutex
+		wg            sync.WaitGroup
+	)
+
+	u, err = uc.repo.Detailproduct(ctx, productID)
 	if err != nil {
 		uc.l.Errorf(ctx, "shop.product.usecase.detail.product", err)
 		return shop.DetailProductOutput{}, err
 	}
 
-	inventory, err := uc.repo.DetailInventory(ctx, u.InventoryID)
-	if err != nil {
-		uc.l.Errorf(ctx, "shop.product.usecase.detail.inven", err)
-		return shop.DetailProductOutput{}, err
+	for _, id := range u.CategoryID {
+		categoryIDs = append(categoryIDs, id.Hex())
 	}
 
-	categoryIDs := make([]string, len(u.CategoryID))
-	for idx, id := range u.CategoryID {
-		categoryIDs[idx] = id.Hex()
+	errCh := make(chan error, 3)
+
+	wg.Add(3)
+
+	go func() {
+		defer wg.Done()
+		inv, err := uc.repo.DetailInventory(ctx, u.InventoryID)
+		if err != nil {
+			errCh <- err
+			return
+		}
+		mu.Lock()
+		inventory = inv
+		mu.Unlock()
+	}()
+
+	go func() {
+		defer wg.Done()
+		shop, err := uc.repo.DetailShop(ctx, sc, u.ShopID.Hex())
+		if err != nil {
+			errCh <- err
+			return
+		}
+		mu.Lock()
+		shopDetail = shop
+		mu.Unlock()
+	}()
+
+	go func() {
+		defer wg.Done()
+		categories, err := uc.adminUC.ListCategories(ctx, sc, admins.GetCategoriesFilter{IDs: categoryIDs})
+		if err != nil {
+			errCh <- err
+			return
+		}
+		mu.Lock()
+		category = categories
+		mu.Unlock()
+	}()
+
+	go func() {
+		wg.Wait()
+		close(errCh)
+	}()
+
+	for err := range errCh {
+		if err != nil {
+			uc.l.Errorf(ctx, "shop.product.usecase.detail", err)
+			return shop.DetailProductOutput{}, err
+		}
 	}
 
-	shopDetail, err := uc.repo.DetailShop(ctx, sc, u.ShopID.Hex())
-	if err != nil {
-		uc.l.Errorf(ctx, "shop.product.usecase.detail.shop", err)
-		return shop.DetailProductOutput{}, err
-	}
-
-	category, err := uc.adminUC.ListCategories(ctx, sc, admins.GetCategoriesFilter{
-		IDs: categoryIDs,
-	})
-	if err != nil {
-		uc.l.Errorf(ctx, "shop.product.usecase.detail.categories", err)
-		return shop.DetailProductOutput{}, err
-	}
-
-	var categoryNames []string
 	for _, cat := range category {
 		categoryNames = append(categoryNames, cat.Name)
 	}
