@@ -1,7 +1,6 @@
 package http
 
 import (
-	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/pkg/mongo"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -109,31 +108,32 @@ func (r listProductRequest) toInput() shop.GetProductFilter {
 }
 
 type listProductItem struct {
-	ID          string  `json:"id"`
-	Name        string  `json:"name"`
-	ShopID      string  `json:"shop_id"`
-	InventoryID string  `json:"inventory_id"`
-	Price       float32 `json:"price"`
+	ID            string   `json:"id"`
+	Name          string   `json:"name"`
+	ShopName      string   `json:"shop_name"`
+	InventoryID   string   `json:"inventory_id"`
+	Price         float32  `json:"price"`
+	CategoryNames []string `json:"category_names"`
 }
 
 type listProductResp struct {
-	Item []listProductItem
+	Items []listProductItem `json:"items"`
 }
 
-func (h handler) listProductResp(p []models.Product) listProductResp {
+func (h handler) listProductResp(p []shop.DetailProductOutput) listProductResp {
 	var list []listProductItem
 	for _, s := range p {
 		item := listProductItem{
-			ID:          s.ID.Hex(),
-			Name:        s.Name,
-			ShopID:      s.ShopID.Hex(),
-			InventoryID: s.InventoryID.Hex(),
-			Price:       s.Price,
+			ID:            s.ID,
+			Name:          s.Name,
+			ShopName:      s.ShopName,
+			InventoryID:   s.InventoryName,
+			Price:         s.Price,
+			CategoryNames: s.CategoryName,
 		}
 		list = append(list, item)
 	}
 	return listProductResp{
-		Item: list,
+		Items: list,
 	}
-
 }

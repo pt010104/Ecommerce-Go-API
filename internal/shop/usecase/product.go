@@ -140,13 +140,60 @@ func (uc *implUsecase) DetailProduct(ctx context.Context, sc models.Scope, produ
 
 	return output, nil
 }
+func (uc implUsecase) ListProduct(ctx context.Context, sc models.Scope, opt shop.GetProductFilter) (shop.ListProductOutput, error) {
 
-func (uc implUsecase) ListProduct(ctx context.Context, sc models.Scope, opt shop.GetProductFilter) ([]models.Product, error) {
-	s, err := uc.repo.ListProduct(ctx, sc, opt)
+	products, err := uc.repo.ListProduct(ctx, sc, opt)
 	if err != nil {
 		uc.l.Errorf(ctx, "shop.usecase.ListProduct: %v", err)
-		return []models.Product{}, err
+		return shop.ListProductOutput{}, err
 	}
 
-	return s, nil
+	var output shop.ListProductOutput
+	var list []shop.DetailProductOutput
+
+	for _, p := range products {
+
+		inventory, err := uc.repo.DetailInventory(ctx, p.InventoryID)
+		if err != nil {
+			uc.l.Errorf(ctx, "shop.usecase.ListProduct.DetailInventory: %v", err)
+			return shop.ListProductOutput{}, err
+		}
+
+		shopDetail, err := uc.repo.DetailShop(ctx, sc, p.ShopID.Hex())
+		if err != nil {
+			uc.l.Errorf(ctx, "shop.usecase.ListProduct.DetailShop: %v", err)
+			return shop.ListProductOutput{}, err
+		}
+
+		categoryIDs := make([]string, len(p.CategoryID))
+		for idx, id := range p.CategoryID {
+			categoryIDs[idx] = id.Hex()
+		}
+
+		categories, err := uc.adminUC.ListCategories(ctx, sc, admins.GetCategoriesFilter{IDs: categoryIDs})
+		if err != nil {
+			uc.l.Errorf(ctx, "shop.usecase.ListProduct.ListCategories: %v", err)
+			return shop.ListProductOutput{}, err
+		}
+
+		var categoryNames []string
+		for _, cat := range categories {
+			categoryNames = append(categoryNames, cat.Name)
+		}
+
+		item := shop.DetailProductOutput{
+			ID:            p.ID.Hex(),
+			Name:          p.Name,
+			CategoryName:  categoryNames,
+			ShopName:      shopDetail.Name,
+			InventoryName: inventory.ID.Hex(),
+			Price:         p.Price,
+		}
+
+		list = append(list, item)
+	}
+
+	output.List = list
+
+	return output, nil
 }

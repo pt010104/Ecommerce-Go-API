@@ -24,6 +24,7 @@ func (repo implRepo) buildProductQuery(opt shop.GetProductFilter) (bson.M, error
 	if opt.Search != "" {
 		filter["$or"] = []bson.M{
 			{"name": bson.M{"$regex": opt.Search, "$options": "i"}},
+			{"shop_name": bson.M{"$regex": opt.Search, "$options": "i"}},
 		}
 	}
 

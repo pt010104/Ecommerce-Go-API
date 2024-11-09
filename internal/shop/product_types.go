@@ -19,3 +19,7 @@ type DetailProductOutput struct {
 	InventoryName string
 	Price         float32
 }
+
+type ListProductOutput struct {
+	List []DetailProductOutput
+}
