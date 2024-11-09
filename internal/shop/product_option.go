@@ -13,4 +13,5 @@ type CreateProductOption struct {
 type GetProductFilter struct {
 	IDs    []string
 	Search string
+	ShopID []string
 }

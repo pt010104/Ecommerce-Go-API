@@ -29,5 +29,8 @@ func (repo implRepo) buildProductQuery(opt shop.GetProductFilter) (bson.M, error
 	if len(opt.IDs) > 0 {
 		filter["_id"] = bson.M{"$in": mongo.ObjectIDsFromHexOrNil(opt.IDs)}
 	}
+	if len(opt.ShopID) > 0 {
+		filter["shop_id"] = bson.M{"$in": mongo.ObjectIDsFromHexOrNil(opt.ShopID)}
+	}
 	return filter, nil
 }

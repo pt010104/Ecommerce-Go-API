@@ -21,6 +21,7 @@ func (repo implRepo) buildProductModel(opt shop.CreateProductOption, ctx context
 		UpdatedAt:   now,
 		ShopID:      opt.ShopID,
 		CategoryID:  opt.CategoryID,
+		Alias:       opt.Alias,
 	}
 
 	return p, nil
