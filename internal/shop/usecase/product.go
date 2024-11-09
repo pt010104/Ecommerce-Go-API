@@ -25,11 +25,21 @@ func (uc implUsecase) CreateProduct(ctx context.Context, sc models.Scope, input 
 		uc.l.Errorf(ctx, "invalid ShopID format: %v", err)
 		return models.Product{}, models.Inventory{}, err
 	}
+	categoryIDs := make([]primitive.ObjectID, len(input.CategoryID))
+	for i, id := range input.CategoryID {
+		categoryID, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			uc.l.Errorf(ctx, "invalid CategoryID format: %v", err)
+			return models.Product{}, models.Inventory{}, err
+		}
+		categoryIDs[i] = categoryID
+	}
 	p, err := uc.repo.CreateProduct(ctx, sc, shop.CreateProductOption{
 		Name:        input.Name,
 		Price:       input.Price,
 		InventoryID: inven.ID,
 		ShopID:      shopID,
+		CategoryID:  categoryIDs,
 	})
 	if err != nil {
 		uc.l.Errorf(ctx, "shop.usecase.product.createproduct: ", err)

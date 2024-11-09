@@ -9,4 +9,5 @@ type CreateProductInput struct {
 	StockLevel      uint
 	ReorderLevel    *uint
 	ReorderQuantity *uint
+	CategoryID      []string
 }
