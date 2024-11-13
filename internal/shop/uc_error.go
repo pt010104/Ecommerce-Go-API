@@ -9,4 +9,5 @@ var (
 	ErrShopExist            = errors.New("shop exist")
 	ErrShopDoesNotExist     = errors.New("shop doesnot exist")
 	ErrNoPermissionToUpdate = errors.New("no permission to update")
+	ErrNonExistCategory     = errors.New("category doesnt exist")
 )

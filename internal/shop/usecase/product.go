@@ -27,6 +27,7 @@ func (uc implUsecase) CreateProduct(ctx context.Context, sc models.Scope, input 
 		uc.l.Errorf(ctx, "invalid ShopID format: %v", err)
 		return models.Product{}, models.Inventory{}, err
 	}
+
 	categoryIDs := make([]primitive.ObjectID, len(input.CategoryID))
 	for i, id := range input.CategoryID {
 		categoryID, err := primitive.ObjectIDFromHex(id)

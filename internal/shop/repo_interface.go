@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/pt010104/api-golang/internal/models"
+
 	"github.com/pt010104/api-golang/pkg/paginator"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -28,4 +29,6 @@ type Repository interface {
 	CreateProduct(ctx context.Context, sc models.Scope, opt CreateProductOption) (models.Product, error)
 	Detailproduct(ctx context.Context, id primitive.ObjectID) (models.Product, error)
 	ListProduct(ctx context.Context, sc models.Scope, opt GetProductFilter) ([]models.Product, error)
+
+	ValidateCategoryIDs(ctx context.Context, categoryIDs []primitive.ObjectID) error
 }
