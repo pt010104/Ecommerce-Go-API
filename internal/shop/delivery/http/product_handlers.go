@@ -88,7 +88,7 @@ func (h handler) DeleteProduct(c *gin.Context) {
 	err2 := h.uc.DeleteProduct(ctx, sc, req.IDs)
 	if err2 != nil {
 		h.l.Errorf(ctx, "shop.delivery.http.delete: %v", err2)
-		err := h.mapErrors(err)
+		err := h.mapErrors(err2)
 		response.Error(c, err)
 		return
 	}
