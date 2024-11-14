@@ -92,7 +92,7 @@ func (uc *implUsecase) DetailProduct(ctx context.Context, sc models.Scope, produ
 
 	go func() {
 		defer wg.Done()
-		shop, err := uc.repo.DetailShop(ctx, sc, u.ShopID.Hex())
+		shop, err := uc.repo.DetailShop(ctx, models.Scope{}, u.ShopID.Hex())
 		if err != nil {
 			errCh <- err
 			return
