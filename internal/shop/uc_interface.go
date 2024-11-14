@@ -28,6 +28,6 @@ type UseCase interface {
 	CreateProduct(ctx context.Context, sc models.Scope, input CreateProductInput) (models.Product, models.Inventory, error)
 	DetailProduct(ctx context.Context, sc models.Scope, productID primitive.ObjectID) (DetailProductOutput, error)
 	ListProduct(ctx context.Context, sc models.Scope, opt GetProductFilter) (ListProductOutput, error)
-
+	DeleteProduct(ctx context.Context, sc models.Scope, ud []string) error
 	SetAdminUC(adminUC admins.UseCase)
 }

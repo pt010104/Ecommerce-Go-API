@@ -81,6 +81,9 @@ func (h handler) newDetailProductResponse(p shop.DetailProductOutput) detailProd
 
 }
 
+type deleteProductRequest struct {
+	IDs []string `json:"ids"`
+}
 type listProductRequest struct {
 	IDs    []string `json:"ids"`
 	Search string   `json:"search"`

@@ -75,3 +75,23 @@ func (h handler) ListProduct(c *gin.Context) {
 	response.OK(c, h.listProductResp(list.List))
 
 }
+func (h handler) DeleteProduct(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	sc, req, err := h.processDeleteProductRequest(c)
+	if err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.DeleteProduct: %v", err)
+		response.Error(c, err)
+		return
+	}
+
+	err2 := h.uc.DeleteProduct(ctx, sc, req.IDs)
+	if err2 != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.delete: %v", err2)
+		err := h.mapErrors(err)
+		response.Error(c, err)
+		return
+	}
+	response.OK(c, " delete success")
+
+}

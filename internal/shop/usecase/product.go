@@ -183,3 +183,105 @@ func (uc implUsecase) ListProduct(ctx context.Context, sc models.Scope, opt shop
 	output.List = list
 	return output, nil
 }
+func (uc implUsecase) DeleteOneProduct(ctx context.Context, sc models.Scope, ud primitive.ObjectID) error {
+	id, err := primitive.ObjectIDFromHex(sc.ShopID)
+	if err != nil {
+		uc.l.Errorf(ctx, "shop.usecase.DeleteProduct.ObjectIDfromhex", err)
+		return err
+	}
+	if id != ud {
+		return shop.ErrNoPermissionToDeleteProduct
+
+	}
+	p, err1 := uc.repo.Detailproduct(ctx, ud)
+	if err1 != nil {
+		uc.l.Errorf(ctx, "shop.usecase.DeleteProduct.DetailProduct", err)
+		return err
+	}
+	var wg sync.WaitGroup
+	var invenList []primitive.ObjectID
+	invenList = append(invenList, p.InventoryID)
+	errCh := make(chan error, 2)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		err := uc.repo.Delete(ctx, sc, ud)
+		if err != nil {
+			errCh <- err
+			return
+		}
+	}()
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		err := uc.repo.DeleteInventory(ctx, sc, invenList)
+		if err != nil {
+			errCh <- err
+			return
+		}
+	}()
+	wg.Wait()
+	close(errCh)
+
+	for err := range errCh {
+		if err != nil {
+			uc.l.Errorf(ctx, "shop.usecase.DeleteProduct: %v", err)
+			return err
+		}
+	}
+	return nil
+
+}
+func (uc implUsecase) DeleteProduct(ctx context.Context, sc models.Scope, udList []string) error {
+	var wg sync.WaitGroup
+	errCh := make(chan error, len(udList))
+
+	for _, ud := range udList {
+		wg.Add(1)
+		go func(ud string) {
+			defer wg.Done()
+
+			shpopidstring, err := primitive.ObjectIDFromHex(ud)
+			if err != nil {
+				uc.l.Errorf(ctx, "shop.usecase.DeleteProduct.ObjectIDFromHex", err)
+				errCh <- err
+				return
+			}
+			p, err := uc.repo.Detailproduct(ctx, shpopidstring)
+			if err != nil {
+				uc.l.Errorf(ctx, "shop.usecase.DeleteProduct.DetailProduct", err)
+				errCh <- err
+				return
+			}
+			if sc.ShopID != p.ShopID.Hex() {
+				errCh <- shop.ErrNoPermissionToDeleteProduct
+				return
+			}
+
+			if err := uc.repo.Delete(ctx, sc, shpopidstring); err != nil {
+				uc.l.Errorf(ctx, "shop.usecase.DeleteProduct.Delete", err)
+				errCh <- err
+				return
+			}
+
+			invenList := []primitive.ObjectID{p.InventoryID}
+			if err := uc.repo.DeleteInventory(ctx, sc, invenList); err != nil {
+				uc.l.Errorf(ctx, "shop.usecase.DeleteProduct.DeleteInventory", err)
+				errCh <- err
+				return
+			}
+		}(ud)
+	}
+
+	wg.Wait()
+	close(errCh)
+
+	for err := range errCh {
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}

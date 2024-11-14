@@ -11,10 +11,11 @@ var (
 	errWrongBody            = pkgErrors.NewHTTPError(130003, "Wrong body")
 	errWrongHeader          = pkgErrors.NewHTTPError(130004, "Wrong header")
 
-	ErrInvalidPhone         = pkgErrors.NewHTTPError(130005, "Invalid phone")
-	errShopDoesNotExist     = pkgErrors.NewHTTPError(130006, "we cant find this shop")
-	ErrNoPermissionToDelete = pkgErrors.NewHTTPError(130005, "No permission to delete")
-	ErrNonExistCategory     = pkgErrors.NewHTTPError(130005, "wrong category ID")
+	ErrInvalidPhone                = pkgErrors.NewHTTPError(130005, "Invalid phone")
+	errShopDoesNotExist            = pkgErrors.NewHTTPError(130006, "we cant find this shop")
+	ErrNoPermissionToDelete        = pkgErrors.NewHTTPError(130005, "No permission to delete")
+	ErrNonExistCategory            = pkgErrors.NewHTTPError(130005, "wrong category ID")
+	ErrNoPermissionToDeleteProduct = pkgErrors.NewHTTPError(130005, "No permission to delete product")
 )
 
 func (h handler) mapErrors(e error) error {
@@ -27,6 +28,8 @@ func (h handler) mapErrors(e error) error {
 		return errShopDoesNotExist
 	case shop.ErrNoPermissionToDelete:
 		return ErrNoPermissionToDelete
+	case shop.ErrNoPermissionToDeleteProduct:
+		return ErrNoPermissionToDeleteProduct
 	}
 
 	return e

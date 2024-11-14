@@ -108,3 +108,20 @@ func (repo implRepo) ListProduct(ctx context.Context, sc models.Scope, opt shop.
 
 	return products, nil
 }
+func (repo implRepo) Delete(ctx context.Context, sc models.Scope, id primitive.ObjectID) (err error) {
+
+	col := repo.getProductCollection()
+	filter, err := repo.buildProductDetailQuery(ctx, id)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.buildProductDetailQuery: %v", err)
+		return err
+	}
+
+	_, err = col.DeleteOne(ctx, filter)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.Delete.DeleteOne: %v", err)
+		return err
+	}
+	return nil
+
+}
