@@ -140,7 +140,6 @@ func (uc *implUsecase) DetailProduct(ctx context.Context, sc models.Scope, produ
 	return output, nil
 }
 func (uc implUsecase) ListProduct(ctx context.Context, sc models.Scope, opt shop.GetProductFilter) (shop.ListProductOutput, error) {
-
 	products, err := uc.repo.ListProduct(ctx, sc, opt)
 	if err != nil {
 		uc.l.Errorf(ctx, "shop.usecase.ListProduct: %v", err)
@@ -149,50 +148,38 @@ func (uc implUsecase) ListProduct(ctx context.Context, sc models.Scope, opt shop
 
 	var output shop.ListProductOutput
 	var list []shop.DetailProductOutput
+	var mu sync.Mutex
+	var wg sync.WaitGroup
+	errCh := make(chan error, len(products))
 
 	for _, p := range products {
+		wg.Add(1)
 
-		inventory, err := uc.repo.DetailInventory(ctx, p.InventoryID)
+		go func(product models.Product) {
+			defer wg.Done()
+
+			detail, err := uc.DetailProduct(ctx, sc, product.ID)
+			if err != nil {
+				errCh <- err
+				return
+			}
+
+			mu.Lock()
+			list = append(list, detail)
+			mu.Unlock()
+		}(p)
+	}
+
+	wg.Wait()
+	close(errCh)
+
+	for err := range errCh {
 		if err != nil {
-			uc.l.Errorf(ctx, "shop.usecase.ListProduct.DetailInventory: %v", err)
+			uc.l.Errorf(ctx, "shop.usecase.ListProduct: %v", err)
 			return shop.ListProductOutput{}, err
 		}
-
-		shopDetail, err := uc.repo.DetailShop(ctx, sc, p.ShopID.Hex())
-		if err != nil {
-			uc.l.Errorf(ctx, "shop.usecase.ListProduct.DetailShop: %v", err)
-			return shop.ListProductOutput{}, err
-		}
-
-		categoryIDs := make([]string, len(p.CategoryID))
-		for idx, id := range p.CategoryID {
-			categoryIDs[idx] = id.Hex()
-		}
-
-		categories, err := uc.adminUC.ListCategories(ctx, sc, admins.GetCategoriesFilter{IDs: categoryIDs})
-		if err != nil {
-			uc.l.Errorf(ctx, "shop.usecase.ListProduct.ListCategories: %v", err)
-			return shop.ListProductOutput{}, err
-		}
-
-		var categoryNames []string
-		for _, cat := range categories {
-			categoryNames = append(categoryNames, cat.Name)
-		}
-
-		item := shop.DetailProductOutput{
-			ID:            p.ID.Hex(),
-			Name:          p.Name,
-			CategoryName:  categoryNames,
-			ShopName:      shopDetail.Name,
-			InventoryName: inventory.ID.Hex(),
-			Price:         p.Price,
-		}
-
-		list = append(list, item)
 	}
 
 	output.List = list
-
 	return output, nil
 }
