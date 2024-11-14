@@ -114,10 +114,8 @@ func (uc *implUsecase) DetailProduct(ctx context.Context, sc models.Scope, produ
 		mu.Unlock()
 	}()
 
-	go func() {
-		wg.Wait()
-		close(errCh)
-	}()
+	wg.Wait()
+	close(errCh)
 
 	for err := range errCh {
 		if err != nil {
