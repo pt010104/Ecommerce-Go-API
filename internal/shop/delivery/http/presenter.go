@@ -133,13 +133,14 @@ func (h handler) newGetShopsResp(ucOutput shop.GetShopOutput) getShopResp {
 }
 
 type getDetailResp struct {
-	ID        string    `json:"id"`
-	Name      string    `json:"name"`
-	Phone     string    `json:"phone"`
-	Address   address   `json:"address"`
-	Followers []string  `json:"followers,omitempty"`
-	AvgRate   float64   `json:"avg_rate"`
-	CreatedAt time.Time `json:"created_at"`
+	ID         string    `json:"id"`
+	Name       string    `json:"name"`
+	Phone      string    `json:"phone"`
+	Address    address   `json:"address"`
+	Followers  []string  `json:"followers,omitempty"`
+	AvgRate    float64   `json:"avg_rate"`
+	IsVerified bool      `json:"is_verified"`
+	CreatedAt  time.Time `json:"created_at"`
 }
 
 func (h handler) newDetailResponse(s models.Shop) getDetailResp {
@@ -152,9 +153,10 @@ func (h handler) newDetailResponse(s models.Shop) getDetailResp {
 			Street:   s.Street,
 			District: s.District,
 		},
-		AvgRate:   s.AvgRate,
-		Followers: mongo.HexFromObjectIDsOrNil(s.Followers),
-		CreatedAt: s.CreatedAt,
+		AvgRate:    s.AvgRate,
+		Followers:  mongo.HexFromObjectIDsOrNil(s.Followers),
+		IsVerified: s.IsVerified,
+		CreatedAt:  s.CreatedAt,
 	}
 }
 
