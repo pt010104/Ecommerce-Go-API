@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/pt010104/api-golang/config"
 	"github.com/pt010104/api-golang/internal/appconfig/mongo"
+	"github.com/pt010104/api-golang/internal/appconfig/redis"
 	httpServer "github.com/pt010104/api-golang/internal/httpserver"
 	pkgLog "github.com/pt010104/api-golang/pkg/log"
 
@@ -30,12 +31,19 @@ func main() {
 		Encoding: cfg.Logger.Encoding,
 	})
 
+	redisClient, err := redis.Connect(cfg.RedisConfig)
+	if err != nil {
+		panic(err)
+	}
+	defer redisClient.Disconnect()
+
 	log.Println("Sending verification email...")
 	srv := httpServer.New(l, httpServer.Config{
 		Port:         cfg.HTTPServer.Port,
 		JWTSecretKey: cfg.JWT.SecretKey,
 		Mode:         cfg.HTTPServer.Mode,
 		Database:     *db,
+		Redis:        redisClient,
 	})
 
 	if err := srv.Run(); err != nil {

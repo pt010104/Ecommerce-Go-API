@@ -21,13 +21,25 @@ type LoggerConfig struct {
 }
 
 type Config struct {
-	HTTPServer HTTPServerConfig
-	Logger     LoggerConfig
-	Mongo      MongoConfig
-	JWT        JWTConfig
+	HTTPServer  HTTPServerConfig
+	Logger      LoggerConfig
+	Mongo       MongoConfig
+	JWT         JWTConfig
+	RedisConfig RedisConfig
 }
 type JWTConfig struct {
 	SecretKey string `env:"JWT_SECRET"`
+}
+
+type RedisConfig struct {
+	RedisAddr     string `env:"REDIS_HOST"`
+	RedisPassword string `env:"REDIS_PASSWORD"`
+	RedisDB       string `env:"REDIS_DATABASE"`
+	MinIdleConns  int    `env:"REDIS_MIN_IDLE_CONNS"`
+	PoolSize      int    `env:"REDIS_POOL_SIZE"`
+	PoolTimeout   int    `env:"REDIS_POOL_TIMEOUT"`
+	Password      string `env:"REDIS_PASSWORD"`
+	DB            int    `env:"REDIS_DATABASE"`
 }
 
 func Load() (*Config, error) {
