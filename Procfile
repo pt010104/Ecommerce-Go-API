@@ -1,1 +1,1 @@
-web: make swagger && go run cmd/api/main.go
+web: go run cmd/api/main.go
