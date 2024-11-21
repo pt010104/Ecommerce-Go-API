@@ -1,0 +1,917 @@
+definitions:
+  http.address:
+    properties:
+      city:
+        type: string
+      district:
+        type: string
+      street:
+        type: string
+    type: object
+  http.detailResp:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  http.distributeNewTokenResp:
+    properties:
+      new_access_token:
+        type: string
+      new_refresh_token:
+        type: string
+    type: object
+  http.getDetailResp:
+    properties:
+      address:
+        $ref: '#/definitions/http.address'
+      avg_rate:
+        type: number
+      created_at:
+        type: string
+      followers:
+        items:
+          type: string
+        type: array
+      id:
+        type: string
+      is_verified:
+        type: boolean
+      name:
+        type: string
+      phone:
+        type: string
+    type: object
+  http.getShopResp:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/http.getShopRespItem'
+        type: array
+      meta:
+        $ref: '#/definitions/http.listMetaResponse'
+    type: object
+  http.getShopRespItem:
+    properties:
+      address:
+        $ref: '#/definitions/http.address'
+      avg_rate:
+        type: number
+      created_at:
+        type: string
+      followers:
+        items:
+          type: string
+        type: array
+      id:
+        type: string
+      is_verified:
+        type: boolean
+      name:
+        type: string
+      phone:
+        type: string
+      user_id:
+        type: string
+    type: object
+  http.listMetaResponse:
+    properties:
+      count:
+        type: integer
+      current_page:
+        type: integer
+      per_page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  http.registerResponse:
+    properties:
+      address:
+        $ref: '#/definitions/http.address'
+      id:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+    type: object
+  http.signInResp:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      session_id:
+        type: string
+      token:
+        $ref: '#/definitions/user.Token'
+      username:
+        type: string
+    type: object
+  http.signUpResponse:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  http.updateResp:
+    properties:
+      address:
+        $ref: '#/definitions/http.address'
+      avg_rate:
+        type: number
+      id:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+    type: object
+  http.verifyShopResp:
+    properties:
+      is_verified:
+        type: boolean
+      name:
+        type: string
+      shop_id:
+        type: string
+    type: object
+  response.Resp:
+    properties:
+      data: {}
+      error_code:
+        type: integer
+      errors: {}
+      message:
+        type: string
+    type: object
+  user.Token:
+    properties:
+      accessToken:
+        type: string
+      refreshToken:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/admin/verify-shop:
+    post:
+      consumes:
+      - application/json
+      description: Verify a shop by ID list
+      parameters:
+      - default: '"*"'
+        description: Access-Control-Allow-Origin
+        in: header
+        name: Access-Control-Allow-Origin
+        type: string
+      - default: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU
+        description: Bearer JWT token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - default: 6707825d45804caaf8316957
+        description: User ID
+        in: header
+        name: x-client-id
+        required: true
+        type: string
+      - default: zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=
+        description: Session ID
+        in: header
+        name: session-id
+        required: true
+        type: string
+      - description: List of Shop IDs to verify
+        in: body
+        name: ids
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Verification successful
+          schema:
+            items:
+              $ref: '#/definitions/http.verifyShopResp'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Resp'
+      summary: Verify shop
+      tags:
+      - Admin
+  /api/v1/shops:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a shop
+      parameters:
+      - default: '"*"'
+        description: Access-Control-Allow-Origin
+        in: header
+        name: Access-Control-Allow-Origin
+        type: string
+      - default: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU
+        description: Bearer JWT token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - default: 6707825d45804caaf8316957
+        description: User ID
+        in: header
+        name: x-client-id
+        required: true
+        type: string
+      - default: zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=
+        description: Session ID
+        in: header
+        name: session-id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Resp'
+      summary: Delete a shop
+      tags:
+      - Shop
+    get:
+      consumes:
+      - application/json
+      description: Get shop by Search, IDs,...
+      parameters:
+      - default: '"*"'
+        description: Access-Control-Allow-Origin
+        in: header
+        name: Access-Control-Allow-Origin
+        type: string
+      - default: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU
+        description: Bearer JWT token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - default: 6707825d45804caaf8316957
+        description: User ID
+        in: header
+        name: x-client-id
+        required: true
+        type: string
+      - default: zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=
+        description: Session ID
+        in: header
+        name: session-id
+        required: true
+        type: string
+      - description: Search
+        in: query
+        name: search
+        type: string
+      - collectionFormat: csv
+        description: IDs
+        in: query
+        items:
+          type: string
+        name: ids
+        type: array
+      - description: Is Verified
+        in: query
+        name: is_verified
+        type: boolean
+      - default: 1
+        description: Page
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.getShopResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Resp'
+      summary: Get shop
+      tags:
+      - Shop
+    patch:
+      consumes:
+      - application/json
+      description: Update a shop
+      parameters:
+      - default: '"*"'
+        description: Access-Control-Allow-Origin
+        in: header
+        name: Access-Control-Allow-Origin
+        type: string
+      - default: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU
+        description: Bearer JWT token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - default: 6707825d45804caaf8316957
+        description: User ID
+        in: header
+        name: x-client-id
+        required: true
+        type: string
+      - default: zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=
+        description: Session ID
+        in: header
+        name: session-id
+        required: true
+        type: string
+      - description: IDs
+        in: body
+        name: ids
+        schema:
+          items:
+            type: string
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.updateResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Resp'
+      summary: Update a shop
+      tags:
+      - Shop
+    post:
+      consumes:
+      - application/json
+      description: Create a shop
+      parameters:
+      - default: '"*"'
+        description: Access-Control-Allow-Origin
+        in: header
+        name: Access-Control-Allow-Origin
+        type: string
+      - default: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU
+        description: Bearer JWT token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - default: 6707825d45804caaf8316957
+        description: User ID
+        in: header
+        name: x-client-id
+        required: true
+        type: string
+      - default: zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=
+        description: Session ID
+        in: header
+        name: session-id
+        required: true
+        type: string
+      - description: Name
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: Phone
+        in: body
+        name: phone
+        required: true
+        schema:
+          type: string
+      - description: City
+        in: body
+        name: city
+        required: true
+        schema:
+          type: string
+      - description: Street
+        in: body
+        name: street
+        required: true
+        schema:
+          type: string
+      - description: District
+        in: body
+        name: district
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.registerResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Resp'
+      summary: Create a shop
+      tags:
+      - Shop
+  /api/v1/shops/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get shop detail by ID
+      parameters:
+      - default: '"*"'
+        description: Access-Control-Allow-Origin
+        in: header
+        name: Access-Control-Allow-Origin
+        type: string
+      - default: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU
+        description: Bearer JWT token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - default: 6707825d45804caaf8316957
+        description: User ID
+        in: header
+        name: x-client-id
+        required: true
+        type: string
+      - default: zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=
+        description: Session ID
+        in: header
+        name: session-id
+        required: true
+        type: string
+      - description: Shop ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.getDetailResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Resp'
+      summary: Get shop detail
+      tags:
+      - Shop
+  /api/v1/users/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve detailed information about a specific user
+      parameters:
+      - default: '"*"'
+        description: Access-Control-Allow-Origin
+        in: header
+        name: Access-Control-Allow-Origin
+        type: string
+      - default: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU
+        description: Bearer JWT token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - default: 6707825d45804caaf8316957
+        description: User ID
+        in: header
+        name: x-client-id
+        required: true
+        type: string
+      - default: zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=
+        description: Session ID
+        in: header
+        name: session-id
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.detailResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "404":
+          description: User Not Found
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Resp'
+      summary: Get User Details
+      tags:
+      - User
+  /api/v1/users/distribute-token:
+    post:
+      consumes:
+      - application/json
+      description: Generate and distribute a new JWT token
+      parameters:
+      - default: '"*"'
+        description: Access-Control-Allow-Origin
+        in: header
+        name: Access-Control-Allow-Origin
+        type: string
+      - default: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU
+        description: Bearer JWT token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Verification token
+        in: query
+        name: token
+        required: true
+        type: string
+      - default: 6707825d45804caaf8316957
+        description: User ID
+        in: header
+        name: x-client-id
+        required: true
+        type: string
+      - default: zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=
+        description: Session ID
+        in: header
+        name: session-id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.distributeNewTokenResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Resp'
+      summary: Distribute New Token
+      tags:
+      - User
+  /api/v1/users/forget-password:
+    post:
+      consumes:
+      - application/json
+      description: Initiate a password reset request
+      parameters:
+      - default: '"*"'
+        description: Access-Control-Allow-Origin
+        in: header
+        name: Access-Control-Allow-Origin
+        type: string
+      - description: Email
+        in: body
+        name: email
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema: {}
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Resp'
+      summary: Forget Password Request
+      tags:
+      - User
+  /api/v1/users/reset-password:
+    post:
+      consumes:
+      - application/json
+      description: Reset user's password using a valid reset token
+      parameters:
+      - default: '"*"'
+        description: Access-Control-Allow-Origin
+        in: header
+        name: Access-Control-Allow-Origin
+        type: string
+      - description: Reset token
+        in: query
+        name: token
+        required: true
+        type: string
+      - default: 6707825d45804caaf8316957
+        description: User ID
+        in: header
+        name: x-client-id
+        required: true
+        type: string
+      - description: New password
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema: {}
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Resp'
+      summary: Reset Password
+      tags:
+      - User
+  /api/v1/users/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and provide a JWT token
+      parameters:
+      - default: '"*"'
+        description: Access-Control-Allow-Origin
+        in: header
+        name: Access-Control-Allow-Origin
+        type: string
+      - default: zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=
+        description: Session ID
+        in: header
+        name: session-id
+        type: string
+      - description: Email
+        in: body
+        name: email
+        required: true
+        schema:
+          type: string
+      - description: Password
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.signInResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Resp'
+      summary: User Sign In
+      tags:
+      - User
+  /api/v1/users/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account
+      parameters:
+      - default: '"*"'
+        description: Access-Control-Allow-Origin
+        in: header
+        name: Access-Control-Allow-Origin
+        type: string
+      - description: Name
+        in: body
+        name: Name
+        required: true
+        schema:
+          type: string
+      - description: Email
+        in: body
+        name: Email
+        required: true
+        schema:
+          type: string
+      - description: Password
+        in: body
+        name: Password
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.signUpResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Resp'
+      summary: User Sign Up
+      tags:
+      - User
+  /api/v1/users/signout:
+    post:
+      consumes:
+      - application/json
+      description: Sign out the current user
+      parameters:
+      - default: '"*"'
+        description: Access-Control-Allow-Origin
+        in: header
+        name: Access-Control-Allow-Origin
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema: {}
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Resp'
+      summary: User Sign Out
+      tags:
+      - User
+  /api/v1/users/verify-request:
+    post:
+      consumes:
+      - application/json
+      description: Verify the validity of a password reset request
+      parameters:
+      - default: '"*"'
+        description: Access-Control-Allow-Origin
+        in: header
+        name: Access-Control-Allow-Origin
+        type: string
+      - description: Email
+        in: body
+        name: email
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema: {}
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "404":
+          description: Request Not Found
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Resp'
+      summary: Verify Email
+      tags:
+      - User
+  /api/v1/users/verify-user:
+    post:
+      consumes:
+      - application/json
+      description: Complete user account verification
+      parameters:
+      - default: '"*"'
+        description: Access-Control-Allow-Origin
+        in: header
+        name: Access-Control-Allow-Origin
+        type: string
+      - description: Verification token
+        in: query
+        name: token
+        required: true
+        type: string
+      - default: 6707825d45804caaf8316957
+        description: User ID
+        in: header
+        name: x-client-id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema: {}
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Resp'
+      summary: Verify User Account
+      tags:
+      - User
+swagger: "2.0"
