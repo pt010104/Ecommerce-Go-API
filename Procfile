@@ -1,1 +1,1 @@
-web: api-golang
+web: bin/api
