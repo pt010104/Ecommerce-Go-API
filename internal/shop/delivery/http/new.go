@@ -8,9 +8,11 @@ import (
 
 type Handler interface {
 	Create(c *gin.Context)
+	Detail(c *gin.Context)
 	Get(c *gin.Context)
 	Delete(c *gin.Context)
 	Update(c *gin.Context)
+
 	CreateProduct(c *gin.Context)
 	DetailProduct(c *gin.Context)
 	ListProduct(c *gin.Context)
