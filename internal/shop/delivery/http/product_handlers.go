@@ -93,5 +93,5 @@ func (h handler) DeleteProduct(c *gin.Context) {
 		return
 	}
 	response.OK(c, " delete success")
-
+	sssssssss
 }
