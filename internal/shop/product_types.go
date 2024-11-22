@@ -1,6 +1,6 @@
 package shop
 
-import ()
+import "github.com/pt010104/api-golang/internal/models"
 
 type CreateProductInput struct {
 	Name            string
@@ -15,8 +15,11 @@ type DetailProductOutput struct {
 	ID            string
 	Name          string
 	CategoryName  []string
+	Category      []models.Category
 	ShopName      string
+	Shop          models.Shop
 	InventoryName string
+	Inventory     models.Inventory
 	Price         float32
 }
 

@@ -132,7 +132,10 @@ func (uc *implUsecase) DetailProduct(ctx context.Context, sc models.Scope, produ
 		ID:            u.ID.Hex(),
 		Name:          u.Name,
 		CategoryName:  categoryNames,
+		Category:      category,
+		Inventory:     inventory,
 		ShopName:      shopDetail.Name,
+		Shop:          shopDetail,
 		InventoryName: inventory.ID.Hex(),
 		Price:         u.Price,
 	}

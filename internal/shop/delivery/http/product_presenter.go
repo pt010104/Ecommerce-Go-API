@@ -64,17 +64,25 @@ type detailProductResp struct {
 	ID            string   `json:"id" binding:"required"`
 	Name          string   `json:"name" binding:"required"`
 	CategoryName  []string `json:"category_name" binding:"required"`
+	CategoryID    []string `json:"category_id" binding:"required"`
 	ShopName      string   `json:"shop_name" binding:"required"`
+	ShopID        string   `json:"shop_id" binding:"required"`
 	InventoryName string   `json:"inventory_name" binding:"required"`
 	Price         float32  `json:"price" binding:"required"`
 }
 
 func (h handler) newDetailProductResponse(p shop.DetailProductOutput) detailProductResp {
+	categoryIDs := make([]string, len(p.Category))
+	for i, category := range p.Category {
+		categoryIDs[i] = category.ID.Hex()
+	}
 	return detailProductResp{
 		ID:            p.ID,
 		Name:          p.Name,
 		CategoryName:  p.CategoryName,
+		CategoryID:    categoryIDs,
 		ShopName:      p.ShopName,
+		ShopID:        p.Shop.ID.Hex(),
 		InventoryName: p.InventoryName,
 		Price:         p.Price,
 	}
