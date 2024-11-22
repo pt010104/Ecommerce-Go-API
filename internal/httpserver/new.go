@@ -18,6 +18,7 @@ type HTTPServer struct {
 	database     mongo.Database
 	jwtSecretKey string
 	mode         string
+	redis        redis.Client
 }
 
 type Config struct {
@@ -42,6 +43,7 @@ func New(l pkgLog.Logger, cfg Config) *HTTPServer {
 		jwtSecretKey: cfg.JWTSecretKey,
 		port:         cfg.Port,
 		mode:         cfg.Mode,
+		redis:        cfg.Redis,
 	}
 
 }

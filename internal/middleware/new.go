@@ -10,12 +10,14 @@ type Middleware struct {
 	l        log.Logger
 	userRepo user.Repo
 	shopUC   shop.UseCase
+	userUC   user.UseCase
 }
 
-func New(l log.Logger, userRepo user.Repo, shopUC shop.UseCase) Middleware {
+func New(l log.Logger, userRepo user.Repo, shopUC shop.UseCase, userUC user.UseCase) Middleware {
 	return Middleware{
 		l:        l,
 		userRepo: userRepo,
 		shopUC:   shopUC,
+		userUC:   userUC,
 	}
 }

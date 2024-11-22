@@ -10,6 +10,7 @@ import (
 	adminRepo "github.com/pt010104/api-golang/internal/admins/repository/mongo"
 	shopRepo "github.com/pt010104/api-golang/internal/shop/repository/mongo"
 	userRepo "github.com/pt010104/api-golang/internal/user/repository/mongo"
+	"github.com/pt010104/api-golang/internal/user/repository/mongo/redis"
 	voucherRepo "github.com/pt010104/api-golang/internal/vouchers/repository/mongo"
 
 	adminUC "github.com/pt010104/api-golang/internal/admins/usecase"
@@ -34,10 +35,10 @@ func (srv HTTPServer) mapHandlers() error {
 	shopRepo := shopRepo.New(srv.l, srv.database)
 	adminRepo := adminRepo.New(srv.l, srv.database)
 	voucherRepo := voucherRepo.New(srv.l, srv.database)
-
+	redisRepo := redis.New(srv.l, srv.redis)
 	//Usecase
 	emailUC := emailUC.New(srv.l)
-	userUC := userUC.New(srv.l, userRepo, emailUC)
+	userUC := userUC.New(srv.l, userRepo, emailUC, redisRepo)
 	shopUC := shopUC.New(srv.l, shopRepo, nil)
 	adminUC := adminUC.New(adminRepo, srv.l, shopUC)
 	shopUC.SetAdminUC(adminUC)
@@ -50,7 +51,7 @@ func (srv HTTPServer) mapHandlers() error {
 	adminH := adminHTTP.New(srv.l, adminUC)
 	voucherH := voucherHTTP.New(srv.l, voucherUC)
 
-	mw := middleware.New(srv.l, userRepo, shopUC)
+	mw := middleware.New(srv.l, userRepo, shopUC, userUC)
 
 	//Routes
 	api := srv.gin.Group("/api/v1")

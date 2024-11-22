@@ -11,6 +11,7 @@ import (
 	"github.com/pt010104/api-golang/internal/user"
 	"github.com/pt010104/api-golang/pkg/jwt"
 	"github.com/pt010104/api-golang/pkg/mongo"
+
 	"github.com/pt010104/api-golang/pkg/util"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
@@ -436,4 +437,34 @@ func (uc implUsecase) DistributeNewToken(ctx context.Context, input user.Distrib
 		Token: token,
 	}, nil
 
+}
+func (uc implUsecase) DetailKeyToken(ctx context.Context, userID string, sessionID string) (models.KeyToken, error) {
+
+	key, err := uc.redisRepo.GetSecretKey(ctx, sessionID)
+	if err != nil {
+		if err.Error() == "redis: nil" { // Cache miss
+			uc.l.Infof(ctx, "Cache miss for sessionID: %s", sessionID)
+		} else { // Handle actual Redis errors
+			uc.l.Errorf(ctx, "user.usecase.DetailKeyToken.Redis", err)
+			return models.KeyToken{}, err
+		}
+	}
+
+	if len(key) > 0 {
+
+		return models.KeyToken{SecretKey: string(key)}, nil
+	}
+
+	k, err := uc.repo.DetailKeyToken(ctx, userID, sessionID)
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.DetailKeyToken.Repo", err)
+		return models.KeyToken{}, err
+	}
+
+	cacheErr := uc.redisRepo.StoreSecretKey(models.Scope{SessionID: sessionID}, k.SecretKey, ctx)
+	if cacheErr != nil {
+		uc.l.Warnf(ctx, "user.usecase.DetailKeyToken.CacheUpdate", cacheErr)
+	}
+
+	return k, nil
 }
