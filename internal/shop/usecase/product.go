@@ -230,56 +230,6 @@ func (uc implUsecase) ListProduct(ctx context.Context, sc models.Scope, opt shop
 	}, nil
 }
 
-func (uc implUsecase) DeleteOneProduct(ctx context.Context, sc models.Scope, ud primitive.ObjectID) error {
-	id, err := primitive.ObjectIDFromHex(sc.ShopID)
-	if err != nil {
-		uc.l.Errorf(ctx, "shop.usecase.DeleteProduct.ObjectIDfromhex", err)
-		return err
-	}
-	if id != ud {
-		return shop.ErrNoPermissionToDeleteProduct
-
-	}
-	p, err1 := uc.repo.Detailproduct(ctx, ud)
-	if err1 != nil {
-		uc.l.Errorf(ctx, "shop.usecase.DeleteProduct.DetailProduct", err)
-		return err
-	}
-	var wg sync.WaitGroup
-	var invenList []primitive.ObjectID
-	invenList = append(invenList, p.InventoryID)
-	errCh := make(chan error, 2)
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		err := uc.repo.Delete(ctx, sc, ud)
-		if err != nil {
-			errCh <- err
-			return
-		}
-	}()
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		err := uc.repo.DeleteInventory(ctx, sc, invenList)
-		if err != nil {
-			errCh <- err
-			return
-		}
-	}()
-	wg.Wait()
-	close(errCh)
-
-	for err := range errCh {
-		if err != nil {
-			uc.l.Errorf(ctx, "shop.usecase.DeleteProduct: %v", err)
-			return err
-		}
-	}
-	return nil
-
-}
 func (uc implUsecase) DeleteProduct(ctx context.Context, sc models.Scope, udList []string) error {
 	var wg sync.WaitGroup
 	errCh := make(chan error, len(udList))
