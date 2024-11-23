@@ -3,6 +3,7 @@ package mongo
 import (
 	"context"
 
+	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/pkg/mongo"
 
@@ -18,7 +19,7 @@ func (repo implRepo) buildProductDetailQuery(ctx context.Context, ID primitive.O
 	return filter, nil
 }
 
-func (repo implRepo) buildProductQuery(opt shop.GetProductFilter) (bson.M, error) {
+func (repo implRepo) buildProductQuery(sc models.Scope, opt shop.GetProductFilter) (bson.M, error) {
 	filter := bson.M{}
 
 	if opt.Search != "" {
@@ -31,8 +32,14 @@ func (repo implRepo) buildProductQuery(opt shop.GetProductFilter) (bson.M, error
 	if len(opt.IDs) > 0 {
 		filter["_id"] = bson.M{"$in": mongo.ObjectIDsFromHexOrNil(opt.IDs)}
 	}
-	if len(opt.ShopID) > 0 {
-		filter["shop_id"] = bson.M{"$in": mongo.ObjectIDsFromHexOrNil(opt.ShopID)}
+	if opt.ShopID != "" {
+		filter["shop_id"] = bson.M{"$eq": mongo.ObjectIDFromHexOrNil(opt.ShopID)}
+	}
+	if opt.ShopID == "" {
+		filter["shop_id"] = bson.M{"$eq": mongo.ObjectIDFromHexOrNil(sc.ShopID)}
+	}
+	if len(opt.CateIDs) > 0 {
+		filter["categoryid"] = bson.M{"$in": mongo.ObjectIDsFromHexOrNil(opt.CateIDs)}
 	}
 	return filter, nil
 }

@@ -11,4 +11,5 @@ var (
 	ErrNoPermissionToUpdate        = errors.New("no permission to update")
 	ErrNonExistCategory            = errors.New("category doesnt exist")
 	ErrNoPermissionToDeleteProduct = errors.New("no permission to delete product")
+	ErrProductNotFound             = errors.New("can find product in this shop")
 )

@@ -84,18 +84,15 @@ func (repo implRepo) Detailproduct(ctx context.Context, id primitive.ObjectID) (
 func (repo implRepo) ListProduct(ctx context.Context, sc models.Scope, opt shop.GetProductFilter) ([]models.Product, error) {
 	col := repo.getProductCollection()
 
-	filter, err := repo.buildProductQuery(opt)
+	filter, err := repo.buildProductQuery(sc, opt)
 	if err != nil {
-		repo.l.Errorf(ctx, "shop.repository.mongo.ListProduct.buildProductQuery: %v", err)
-		return nil, err
+		repo.l.Errorf(ctx, "shop.repository.mongo.buildProductQuery: %v", err)
+		return []models.Product{}, err
 	}
-
-	fmt.Println(filter)
-
 	cursor, err := col.Find(ctx, filter)
 	if err != nil {
 		repo.l.Errorf(ctx, "shop.repository.mongo.ListProduct.Find: %v", err)
-		return nil, err
+		return []models.Product{}, err
 	}
 	defer cursor.Close(ctx)
 
@@ -103,11 +100,13 @@ func (repo implRepo) ListProduct(ctx context.Context, sc models.Scope, opt shop.
 	err = cursor.All(ctx, &products)
 	if err != nil {
 		repo.l.Errorf(ctx, "shop.repository.mongo.ListProduct.All: %v", err)
-		return nil, err
+		return []models.Product{}, err
 	}
 
 	return products, nil
+
 }
+
 func (repo implRepo) Delete(ctx context.Context, sc models.Scope, id primitive.ObjectID) (err error) {
 
 	col := repo.getProductCollection()

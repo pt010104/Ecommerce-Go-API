@@ -67,7 +67,7 @@ func (h handler) ListProduct(c *gin.Context) {
 
 	list, err2 := h.uc.ListProduct(ctx, sc, req.toInput())
 	if err2 != nil {
-		h.l.Errorf(ctx, "shop.delivery.http.detauk: %v", err)
+		h.l.Errorf(ctx, "shop.delivery.http.listProduct: %v", err)
 		err := h.mapErrors(err)
 		response.Error(c, err)
 		return

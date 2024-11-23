@@ -12,17 +12,27 @@ type CreateProductInput struct {
 	CategoryID      []string
 }
 type DetailProductOutput struct {
-	ID            string
-	Name          string
-	CategoryName  []string
-	Category      []models.Category
-	ShopName      string
-	Shop          models.Shop
-	InventoryName string
-	Inventory     models.Inventory
-	Price         float32
-}
+	ID           string
+	Name         string
+	CategoryName []string
+	Category     []models.Category
 
+	Shop models.Shop
+
+	Inventory models.Inventory
+	Price     float32
+}
+type ListProductInput struct {
+	CateIDs    []string
+	ProductIDs []string
+	ShopID     string
+}
+type ProductOutPutItem struct {
+	P     models.Product
+	Inven string
+	Shop  models.Shop
+	Cate  []models.Category
+}
 type ListProductOutput struct {
-	List []DetailProductOutput
+	List []ProductOutPutItem
 }

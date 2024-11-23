@@ -11,7 +11,8 @@ type CreateProductOption struct {
 	Alias       string
 }
 type GetProductFilter struct {
-	IDs    []string
-	Search string
-	ShopID []string
+	CateIDs []string
+	IDs     []string
+	Search  string
+	ShopID  string
 }

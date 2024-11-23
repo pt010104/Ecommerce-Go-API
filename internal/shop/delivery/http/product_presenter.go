@@ -77,13 +77,13 @@ func (h handler) newDetailProductResponse(p shop.DetailProductOutput) detailProd
 		categoryIDs[i] = category.ID.Hex()
 	}
 	return detailProductResp{
-		ID:            p.ID,
-		Name:          p.Name,
-		CategoryName:  p.CategoryName,
-		CategoryID:    categoryIDs,
-		ShopName:      p.ShopName,
+		ID:           p.ID,
+		Name:         p.Name,
+		CategoryName: p.CategoryName,
+		CategoryID:   categoryIDs,
+
 		ShopID:        p.Shop.ID.Hex(),
-		InventoryName: p.InventoryName,
+		InventoryName: p.Inventory.ID.Hex(),
 		Price:         p.Price,
 	}
 
@@ -95,7 +95,7 @@ type deleteProductRequest struct {
 type listProductRequest struct {
 	IDs    []string `json:"ids"`
 	Search string   `json:"search"`
-	ShopID []string `json:"shop_id"`
+	ShopID string   `json:"shop_id"`
 }
 
 func (r listProductRequest) validate() error {
@@ -122,6 +122,7 @@ type listProductItem struct {
 	ID            string   `json:"id"`
 	Name          string   `json:"name"`
 	ShopName      string   `json:"shop_name"`
+	ShopID        string   `json:"shop_id"`
 	InventoryID   string   `json:"inventory_id"`
 	Price         float32  `json:"price"`
 	CategoryNames []string `json:"category_names"`
@@ -131,19 +132,28 @@ type listProductResp struct {
 	Items []listProductItem `json:"items"`
 }
 
-func (h handler) listProductResp(p []shop.DetailProductOutput) listProductResp {
+func (h handler) listProductResp(p []shop.ProductOutPutItem) listProductResp {
 	var list []listProductItem
+
 	for _, s := range p {
+
+		var categoryNames []string
+		for _, category := range s.Cate {
+			categoryNames = append(categoryNames, category.Name)
+		}
+
 		item := listProductItem{
-			ID:            s.ID,
-			Name:          s.Name,
-			ShopName:      s.ShopName,
-			InventoryID:   s.InventoryName,
-			Price:         s.Price,
-			CategoryNames: s.CategoryName,
+			ID:            s.P.ID.Hex(),
+			Name:          s.P.Name,
+			ShopName:      s.Shop.Name,
+			ShopID:        s.Shop.ID.Hex(),
+			InventoryID:   s.Inven,
+			Price:         s.P.Price,
+			CategoryNames: categoryNames,
 		}
 		list = append(list, item)
 	}
+
 	return listProductResp{
 		Items: list,
 	}
