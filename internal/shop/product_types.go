@@ -30,9 +30,9 @@ type ListProductInput struct {
 type ProductOutPutItem struct {
 	P     models.Product
 	Inven string
-	Shop  models.Shop
 	Cate  []models.Category
 }
 type ListProductOutput struct {
-	List []ProductOutPutItem
+	Products []ProductOutPutItem
+	Shop     models.Shop
 }

@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
@@ -14,7 +13,6 @@ func (uc implUsecase) CreateVoucher(ctx context.Context, sc models.Scope, input 
 	role := sc.Role
 
 	util.PrintJson(input)
-	fmt.Println("role: ", role)
 
 	if err := uc.validateCreateVoucher(ctx, input); err != nil {
 		uc.l.Errorf(ctx, "vouchers.usecase.CreateVoucher.validateCreateVoucher: %v", err)
@@ -49,7 +47,6 @@ func (uc implUsecase) CreateVoucher(ctx context.Context, sc models.Scope, input 
 					IsVerified: &isVerified,
 				},
 			)
-			fmt.Println("s: ", s)
 			if err != nil {
 				uc.l.Errorf(ctx, "vouchers.usecase.CreateVoucher.ListShop: %v", vouchers.ErrShopNotFound)
 				return models.Voucher{}, vouchers.ErrShopNotFound

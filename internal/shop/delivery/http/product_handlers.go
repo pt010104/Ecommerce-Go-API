@@ -1,8 +1,6 @@
 package http
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
 
 	"github.com/pt010104/api-golang/pkg/response"
@@ -44,7 +42,6 @@ func (h handler) DetailProduct(c *gin.Context) {
 		response.Error(c, err)
 		return
 	}
-	fmt.Println("ID:", req.ID)
 	product, err2 := h.uc.DetailProduct(ctx, sc, productID)
 	if err2 != nil {
 		h.l.Errorf(ctx, "shop.delivery.http.detauk: %v", err)
@@ -65,14 +62,14 @@ func (h handler) ListProduct(c *gin.Context) {
 		return
 	}
 
-	list, err2 := h.uc.ListProduct(ctx, sc, req.toInput())
+	o, err2 := h.uc.ListProduct(ctx, sc, req.toInput())
 	if err2 != nil {
 		h.l.Errorf(ctx, "shop.delivery.http.listProduct: %v", err)
 		err := h.mapErrors(err)
 		response.Error(c, err)
 		return
 	}
-	response.OK(c, h.listProductResp(list.List))
+	response.OK(c, h.listProductResp(o))
 
 }
 func (h handler) DeleteProduct(c *gin.Context) {

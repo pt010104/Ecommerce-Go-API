@@ -142,72 +142,92 @@ func (uc *implUsecase) DetailProduct(ctx context.Context, sc models.Scope, produ
 
 	return output, nil
 }
+
 func (uc implUsecase) ListProduct(ctx context.Context, sc models.Scope, opt shop.GetProductFilter) (shop.ListProductOutput, error) {
-	products, err := uc.repo.ListProduct(ctx, sc, opt)
-	if err != nil {
-		uc.l.Errorf(ctx, "shop.usecase.Listproduct.repo.list", err)
-		return shop.ListProductOutput{}, err
-	}
-
-	var s models.Shop
-	s, err = uc.repo.DetailShop(ctx, models.Scope{}, opt.ShopID)
-	if err != nil {
-		uc.l.Errorf(ctx, "shop.usecase.Listproduct.repo.detailshop", err)
-		return shop.ListProductOutput{}, err
-	}
-
 	var (
-		output shop.ListProductOutput
-		mu     sync.Mutex // To protect shared resources
-		wg     sync.WaitGroup
-		errCh  = make(chan error, len(products))
+		products []models.Product
+		s        models.Shop
 	)
 
-	for _, p := range products {
-		wg.Add(1)
-		go func(p models.Product) {
-			defer wg.Done()
+	var wg sync.WaitGroup
+	var wgErr error
+	wg.Add(2)
 
-			cate, err := uc.adminUC.ListCategories(ctx, models.Scope{}, admins.GetCategoriesFilter{
-				IDs: extractCategoryIDs(p.CategoryID),
-			})
-			if err != nil {
-				errCh <- err
-				return
-			}
+	go func() {
+		defer wg.Done()
+		var err error
+		products, err = uc.repo.ListProduct(ctx, sc, opt)
+		if err != nil {
+			uc.l.Errorf(ctx, "shop.usecase.ListProduct.repo.ListProduct: %v", err)
+			wgErr = err
+			return
+		}
+	}()
 
-			item := shop.ProductOutPutItem{
-				P:     p,
-				Inven: p.InventoryID.Hex(),
-				Cate:  cate,
-				Shop:  s,
-			}
-
-			mu.Lock()
-			output.List = append(output.List, item)
-			mu.Unlock()
-		}(p)
-	}
+	go func() {
+		defer wg.Done()
+		var err error
+		s, err = uc.repo.DetailShop(ctx, models.Scope{}, opt.ShopID)
+		if err != nil {
+			uc.l.Errorf(ctx, "shop.usecase.ListProduct.repo.DetailShop: %v", err)
+			wgErr = err
+			return
+		}
+	}()
 
 	wg.Wait()
-	close(errCh)
 
-	for err := range errCh {
-		if err != nil {
-			uc.l.Errorf(ctx, "shop.usecase.Listproduct.parallel.error", err)
-			return shop.ListProductOutput{}, err
+	if wgErr != nil {
+		return shop.ListProductOutput{}, wgErr
+	}
+
+	categoryIDSet := make(map[string]struct{})
+	for _, p := range products {
+		for _, catID := range p.CategoryID {
+			categoryIDSet[catID.Hex()] = struct{}{}
 		}
 	}
 
-	return output, nil
-}
-
-func extractCategoryIDs(categories []primitive.ObjectID) []string {
-	ids := make([]string, len(categories))
-	for i, category := range categories {
-		ids[i] = category.Hex() // Assuming `ID` is an ObjectID
+	var categoryIDs []string
+	for id := range categoryIDSet {
+		categoryIDs = append(categoryIDs, id)
 	}
-	return ids
+
+	categories, err := uc.adminUC.ListCategories(ctx, models.Scope{}, admins.GetCategoriesFilter{
+		IDs: categoryIDs,
+	})
+	if err != nil {
+		uc.l.Errorf(ctx, "shop.usecase.ListProduct.adminUC.ListCategories: %v", err)
+		return shop.ListProductOutput{}, err
+	}
+
+	categoryMap := make(map[string]models.Category)
+	for _, cate := range categories {
+		categoryMap[cate.ID.Hex()] = cate
+	}
+
+	var productsOutPut []shop.ProductOutPutItem
+	for _, p := range products {
+		var cates []models.Category
+		for _, catID := range p.CategoryID {
+			if cate, ok := categoryMap[catID.Hex()]; ok {
+				cates = append(cates, cate)
+			}
+		}
+
+		item := shop.ProductOutPutItem{
+			P:     p,
+			Inven: p.InventoryID.Hex(),
+			Cate:  cates,
+		}
+
+		productsOutPut = append(productsOutPut, item)
+	}
+
+	return shop.ListProductOutput{
+		Products: productsOutPut,
+		Shop:     s,
+	}, nil
 }
 
 func (uc implUsecase) DeleteOneProduct(ctx context.Context, sc models.Scope, ud primitive.ObjectID) error {

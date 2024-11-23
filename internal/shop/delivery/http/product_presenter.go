@@ -92,6 +92,7 @@ func (h handler) newDetailProductResponse(p shop.DetailProductOutput) detailProd
 type deleteProductRequest struct {
 	IDs []string `json:"ids"`
 }
+
 type listProductRequest struct {
 	IDs    []string `json:"ids"`
 	Search string   `json:"search"`
@@ -118,43 +119,60 @@ func (r listProductRequest) toInput() shop.GetProductFilter {
 	}
 }
 
+type categoryObject struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
 type listProductItem struct {
-	ID            string   `json:"id"`
-	Name          string   `json:"name"`
-	ShopName      string   `json:"shop_name"`
-	ShopID        string   `json:"shop_id"`
-	InventoryID   string   `json:"inventory_id"`
-	Price         float32  `json:"price"`
-	CategoryNames []string `json:"category_names"`
+	ID              string           `json:"id"`
+	Name            string           `json:"name"`
+	ShopID          string           `json:"shop_id"`
+	InventoryID     string           `json:"inventory_id"`
+	Price           float32          `json:"price"`
+	CategoryObjects []categoryObject `json:"category_objects"`
+}
+
+type shopObject struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 type listProductResp struct {
-	Items []listProductItem `json:"items"`
+	Products   []listProductItem `json:"products"`
+	ShopObject shopObject        `json:"shop_object"`
 }
 
-func (h handler) listProductResp(p []shop.ProductOutPutItem) listProductResp {
+func (h handler) listProductResp(output shop.ListProductOutput) listProductResp {
 	var list []listProductItem
 
-	for _, s := range p {
-
-		var categoryNames []string
+	for _, s := range output.Products {
+		var categories []categoryObject
 		for _, category := range s.Cate {
-			categoryNames = append(categoryNames, category.Name)
+			categories = append(categories, categoryObject{
+				ID:   category.ID.Hex(),
+				Name: category.Name,
+			})
 		}
 
 		item := listProductItem{
-			ID:            s.P.ID.Hex(),
-			Name:          s.P.Name,
-			ShopName:      s.Shop.Name,
-			ShopID:        s.Shop.ID.Hex(),
-			InventoryID:   s.Inven,
-			Price:         s.P.Price,
-			CategoryNames: categoryNames,
+			ID:              s.P.ID.Hex(),
+			Name:            s.P.Name,
+			InventoryID:     s.Inven,
+			Price:           s.P.Price,
+			CategoryObjects: categories,
+			ShopID:          s.P.ShopID.Hex(),
 		}
 		list = append(list, item)
 	}
 
+	shopObject := shopObject{
+		ID:   output.Shop.ID.Hex(),
+		Name: output.Shop.Name,
+	}
+
 	return listProductResp{
-		Items: list,
+		Products:   list,
+		ShopObject: shopObject,
 	}
 }

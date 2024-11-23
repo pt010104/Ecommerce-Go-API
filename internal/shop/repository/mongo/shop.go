@@ -2,7 +2,6 @@ package mongo
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/pt010104/api-golang/internal/models"
@@ -173,8 +172,6 @@ func (repo implRepo) ListShop(ctx context.Context, sc models.Scope, opt shop.Get
 		repo.l.Errorf(ctx, "shop.repository.mongo.ListShop.buildShopQuery: %v", err)
 		return nil, err
 	}
-
-	fmt.Println(filter)
 
 	cursor, err := col.Find(ctx, filter)
 	if err != nil {
