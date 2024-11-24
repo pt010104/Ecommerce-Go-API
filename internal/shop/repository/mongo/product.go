@@ -110,7 +110,7 @@ func (repo implRepo) ListProduct(ctx context.Context, sc models.Scope, opt shop.
 func (repo implRepo) Delete(ctx context.Context, sc models.Scope, ids []string) (err error) {
 
 	col := repo.getProductCollection()
-	filter, err := repo.buildProductDeleteQuery(ctx, ids)
+	filter, err := repo.buildProductDeleteQuery(sc, ctx, ids)
 	if err != nil {
 		repo.l.Errorf(ctx, "shop.repository.mongo.buildProductDeleteQuery: %v", err)
 		return err

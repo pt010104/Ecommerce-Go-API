@@ -7,7 +7,7 @@ import (
 	"github.com/pt010104/api-golang/internal/admins"
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
-	"github.com/pt010104/api-golang/pkg/mongo"
+
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -232,16 +232,6 @@ func (uc implUsecase) ListProduct(ctx context.Context, sc models.Scope, opt shop
 }
 
 func (uc implUsecase) DeleteProduct(ctx context.Context, sc models.Scope, udList []string) error {
-	if len(udList) > 0 {
-		s, err1 := uc.repo.Detailproduct(ctx, mongo.ObjectIDFromHexOrNil(udList[0]))
-		if err1 != nil {
-			uc.l.Errorf(ctx, "shop.usecase. DeleteProduct.repoDetailProduct: %v", err1)
-			return err1
-		}
-		if s.ShopID.Hex() != sc.ShopID {
-			return admins.ErrNoPermission
-		}
-	}
 
 	err := uc.repo.Delete(ctx, sc, udList)
 	if err != nil {
