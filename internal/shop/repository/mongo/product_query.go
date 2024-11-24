@@ -43,3 +43,12 @@ func (repo implRepo) buildProductQuery(sc models.Scope, opt shop.GetProductFilte
 	}
 	return filter, nil
 }
+func (repo implRepo) buildProductDeleteQuery(ctx context.Context, ids []string) (bson.M, error) {
+	filter := bson.M{}
+
+	if len(ids) > 0 {
+		filter["_id"] = bson.M{"$in": mongo.ObjectIDsFromHexOrNil(ids)}
+	}
+
+	return filter, nil
+}

@@ -2,6 +2,8 @@ package redis
 
 import (
 	"context"
+	"fmt"
+
 	"github.com/pt010104/api-golang/internal/models"
 )
 
@@ -16,5 +18,8 @@ func (r implRedis) GetSecretKey(ctx context.Context, sessionID string) ([]byte, 
 	return []byte(result), nil
 }
 func (redis implRedis) StoreSecretKey(sc models.Scope, secretKey string, ctx context.Context) error {
-	return redis.SetSecretKey(ctx, sc.SessionID, secretKey)
+
+	key := fmt.Sprintf("user:%s:session:%s:secretkey", sc.UserID, sc.SessionID)
+
+	return redis.SetSecretKey(ctx, key, secretKey)
 }

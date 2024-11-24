@@ -7,6 +7,7 @@ import (
 	"github.com/pt010104/api-golang/internal/admins"
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
+	"github.com/pt010104/api-golang/pkg/mongo"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -231,54 +232,21 @@ func (uc implUsecase) ListProduct(ctx context.Context, sc models.Scope, opt shop
 }
 
 func (uc implUsecase) DeleteProduct(ctx context.Context, sc models.Scope, udList []string) error {
-	var wg sync.WaitGroup
-	errCh := make(chan error, len(udList))
-
-	for _, ud := range udList {
-		wg.Add(1)
-		go func(ud string) {
-			defer wg.Done()
-
-			shpopidstring, err := primitive.ObjectIDFromHex(ud)
-			if err != nil {
-				uc.l.Errorf(ctx, "shop.usecase.DeleteProduct.ObjectIDFromHex", err)
-				errCh <- err
-				return
-			}
-			p, err := uc.repo.Detailproduct(ctx, shpopidstring)
-			if err != nil {
-				uc.l.Errorf(ctx, "shop.usecase.DeleteProduct.DetailProduct", err)
-				errCh <- err
-				return
-			}
-			if sc.ShopID != p.ShopID.Hex() {
-				errCh <- shop.ErrNoPermissionToDeleteProduct
-				return
-			}
-
-			if err := uc.repo.Delete(ctx, sc, shpopidstring); err != nil {
-				uc.l.Errorf(ctx, "shop.usecase.DeleteProduct.Delete", err)
-				errCh <- err
-				return
-			}
-
-			invenList := []primitive.ObjectID{p.InventoryID}
-			if err := uc.repo.DeleteInventory(ctx, sc, invenList); err != nil {
-				uc.l.Errorf(ctx, "shop.usecase.DeleteProduct.DeleteInventory", err)
-				errCh <- err
-				return
-			}
-		}(ud)
-	}
-
-	wg.Wait()
-	close(errCh)
-
-	for err := range errCh {
-		if err != nil {
-			return err
+	if len(udList) > 0 {
+		s, err1 := uc.repo.Detailproduct(ctx, mongo.ObjectIDFromHexOrNil(udList[0]))
+		if err1 != nil {
+			uc.l.Errorf(ctx, "shop.usecase. DeleteProduct.repoDetailProduct: %v", err1)
+			return err1
+		}
+		if s.ShopID.Hex() != sc.ShopID {
+			return admins.ErrNoPermission
 		}
 	}
 
+	err := uc.repo.Delete(ctx, sc, udList)
+	if err != nil {
+		uc.l.Errorf(ctx, "shop.usecase. DeleteProduct.repoDelete: %v", err)
+		return err
+	}
 	return nil
 }

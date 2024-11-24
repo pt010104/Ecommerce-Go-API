@@ -29,6 +29,6 @@ type Repository interface {
 	CreateProduct(ctx context.Context, sc models.Scope, opt CreateProductOption) (models.Product, error)
 	Detailproduct(ctx context.Context, id primitive.ObjectID) (models.Product, error)
 	ListProduct(ctx context.Context, sc models.Scope, opt GetProductFilter) ([]models.Product, error)
-	Delete(ctx context.Context, sc models.Scope, ud primitive.ObjectID) (err error)
+	Delete(ctx context.Context, sc models.Scope, ud []string) (err error)
 	ValidateCategoryIDs(ctx context.Context, categoryIDs []primitive.ObjectID) error
 }

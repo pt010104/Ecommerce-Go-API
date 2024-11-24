@@ -107,18 +107,18 @@ func (repo implRepo) ListProduct(ctx context.Context, sc models.Scope, opt shop.
 
 }
 
-func (repo implRepo) Delete(ctx context.Context, sc models.Scope, id primitive.ObjectID) (err error) {
+func (repo implRepo) Delete(ctx context.Context, sc models.Scope, ids []string) (err error) {
 
 	col := repo.getProductCollection()
-	filter, err := repo.buildProductDetailQuery(ctx, id)
+	filter, err := repo.buildProductDeleteQuery(ctx, ids)
 	if err != nil {
-		repo.l.Errorf(ctx, "shop.repository.mongo.buildProductDetailQuery: %v", err)
+		repo.l.Errorf(ctx, "shop.repository.mongo.buildProductDeleteQuery: %v", err)
 		return err
 	}
 
-	_, err = col.DeleteOne(ctx, filter)
+	_, err = col.DeleteMany(ctx, filter)
 	if err != nil {
-		repo.l.Errorf(ctx, "shop.repository.mongo.Delete.DeleteOne: %v", err)
+		repo.l.Errorf(ctx, "shop.repository.mongo.Delete.Deletemany: %v", err)
 		return err
 	}
 	return nil

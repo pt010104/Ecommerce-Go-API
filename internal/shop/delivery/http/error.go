@@ -1,6 +1,7 @@
 package http
 
 import (
+	"github.com/pt010104/api-golang/internal/admins"
 	"github.com/pt010104/api-golang/internal/shop"
 	pkgErrors "github.com/pt010104/api-golang/pkg/errors"
 )
@@ -29,6 +30,8 @@ func (h handler) mapErrors(e error) error {
 	case shop.ErrNoPermissionToDelete:
 		return ErrNoPermissionToDelete
 	case shop.ErrNoPermissionToDeleteProduct:
+		return ErrNoPermissionToDeleteProduct
+	case admins.ErrNoPermission:
 		return ErrNoPermissionToDeleteProduct
 	}
 
