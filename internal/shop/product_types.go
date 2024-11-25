@@ -1,6 +1,9 @@
 package shop
 
-import "github.com/pt010104/api-golang/internal/models"
+import (
+	"github.com/pt010104/api-golang/internal/models"
+	"github.com/pt010104/api-golang/pkg/paginator"
+)
 
 type CreateProductInput struct {
 	Name            string
@@ -22,6 +25,10 @@ type DetailProductOutput struct {
 	Inventory models.Inventory
 	Price     float32
 }
+type GetProductOption struct {
+	GetProductFilter
+	PagQuery paginator.PaginatorQuery
+}
 type ListProductInput struct {
 	CateIDs    []string
 	ProductIDs []string
@@ -34,5 +41,10 @@ type ProductOutPutItem struct {
 }
 type ListProductOutput struct {
 	Products []ProductOutPutItem
+	Shop     models.Shop
+}
+type GetProductOutput struct {
+	Products []ProductOutPutItem
+	Pag      paginator.Paginator
 	Shop     models.Shop
 }

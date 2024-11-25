@@ -3,6 +3,8 @@ package http
 import (
 	"github.com/gin-gonic/gin"
 
+	"github.com/pt010104/api-golang/internal/shop"
+	"github.com/pt010104/api-golang/pkg/paginator"
 	"github.com/pt010104/api-golang/pkg/response"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -90,5 +92,34 @@ func (h handler) DeleteProduct(c *gin.Context) {
 		return
 	}
 	response.OK(c, " delete success")
+
+}
+func (h handler) GetProduct(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	sc, req, err := h.processGetProductRequest(c)
+	if err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.getproduct: %v", err)
+		response.Error(c, err)
+		return
+	}
+	var pagQuery paginator.PaginatorQuery
+	if err := c.ShouldBindQuery(&pagQuery); err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.Get.ShouldBindQuery: %v", err)
+		response.Error(c, errWrongPaginationQuery)
+		return
+	}
+
+	o, err2 := h.uc.GetProduct(ctx, sc, shop.GetProductOption{
+		GetProductFilter: req.toInput(),
+		PagQuery:         pagQuery,
+	})
+	if err2 != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.getProduct: %v", err)
+		err := h.mapErrors(err)
+		response.Error(c, err)
+		return
+	}
+	response.OK(c, h.getProductResp(o))
 
 }

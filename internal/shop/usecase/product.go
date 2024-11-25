@@ -240,3 +240,63 @@ func (uc implUsecase) DeleteProduct(ctx context.Context, sc models.Scope, udList
 	}
 	return nil
 }
+func (uc implUsecase) GetProduct(ctx context.Context, sc models.Scope, input shop.GetProductOption) (shop.GetProductOutput, error) {
+	opt := shop.GetProductOption{
+		GetProductFilter: input.GetProductFilter,
+		PagQuery:         input.PagQuery,
+	}
+
+	s, pag, err := uc.repo.GetProduct(ctx, sc, opt)
+	if err != nil {
+		uc.l.Errorf(ctx, "shop.usecase.GetProduct: %v", err)
+		return shop.GetProductOutput{}, err
+	}
+	categoryIDSet := make(map[string]struct{})
+	for _, p := range s {
+		for _, catID := range p.CategoryID {
+			categoryIDSet[catID.Hex()] = struct{}{}
+		}
+	}
+
+	var categoryIDs []string
+	for id := range categoryIDSet {
+		categoryIDs = append(categoryIDs, id)
+	}
+
+	categories, err := uc.adminUC.ListCategories(ctx, models.Scope{}, admins.GetCategoriesFilter{
+		IDs: categoryIDs,
+	})
+
+	categoryMap := make(map[string]models.Category)
+	for _, cate := range categories {
+		categoryMap[cate.ID.Hex()] = cate
+	}
+	var list []shop.ProductOutPutItem
+	for _, p := range s {
+		var cates []models.Category
+		for _, catID := range p.CategoryID {
+			if cate, ok := categoryMap[catID.Hex()]; ok {
+				cates = append(cates, cate)
+			}
+		}
+
+		item := shop.ProductOutPutItem{
+			P:     p,
+			Inven: (p.InventoryID).Hex(),
+			Cate:  cates,
+		}
+		list = append(list, item)
+	}
+	var shop1 models.Shop
+	shop1, err1 := uc.repo.DetailShop(ctx, models.Scope{}, opt.ShopID)
+	if err1 != nil {
+		uc.l.Errorf(ctx, "shop.usecase.ListProduct.repo.DetailShop: %v", err1)
+
+		return shop.GetProductOutput{}, err1
+	}
+	return shop.GetProductOutput{
+		Products: list,
+		Pag:      pag,
+		Shop:     shop1,
+	}, nil
+}

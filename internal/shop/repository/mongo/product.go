@@ -6,9 +6,11 @@ import (
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
+	"github.com/pt010104/api-golang/pkg/paginator"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const (
@@ -123,4 +125,46 @@ func (repo implRepo) Delete(ctx context.Context, sc models.Scope, ids []string) 
 	}
 	return nil
 
+}
+func (repo implRepo) GetProduct(ctx context.Context, sc models.Scope, opt shop.GetProductOption) ([]models.Product, paginator.Paginator, error) {
+	col := repo.getProductCollection()
+
+	filter, err := repo.buildProductQuery(sc, opt.GetProductFilter)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.Get.buildProductQuery: %v", err)
+		return nil, paginator.Paginator{}, err
+	}
+
+	cursor, err := col.Find(ctx, filter, options.Find().
+		SetSkip(opt.PagQuery.Offset()).
+		SetLimit(opt.PagQuery.Limit).
+		SetSort(bson.D{
+			{Key: "created_at", Value: -1},
+			{Key: "_id", Value: -1},
+		}),
+	)
+	if err != nil {
+		repo.l.Errorf(ctx, "recruitment.candidate.repository.mongo.GetCandidates.Find: %v", err)
+		return nil, paginator.Paginator{}, err
+	}
+
+	var products []models.Product
+	err = cursor.All(ctx, &products)
+	if err != nil {
+		repo.l.Errorf(ctx, "recruitment.candidate.repository.mongo.GetCandidates.All: %v", err)
+		return nil, paginator.Paginator{}, err
+	}
+
+	total, err := col.CountDocuments(ctx, filter)
+	if err != nil {
+		repo.l.Errorf(ctx, "recruitment.candidate.repository.mongo.GetCandidates.CountDocuments: %v", err)
+		return nil, paginator.Paginator{}, err
+	}
+
+	return products, paginator.Paginator{
+		Total:       total,
+		Count:       int64(len(products)),
+		PerPage:     opt.PagQuery.Limit,
+		CurrentPage: opt.PagQuery.Page,
+	}, nil
 }

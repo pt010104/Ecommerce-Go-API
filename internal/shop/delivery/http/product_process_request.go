@@ -88,3 +88,26 @@ func (h handler) processDeleteProductRequest(c *gin.Context) (models.Scope, dele
 	return sc, req, nil
 
 }
+func (h handler) processGetProductRequest(c *gin.Context) (models.Scope, getProductRequest, error) {
+	ctx := c.Request.Context()
+
+	sc, ok := jwt.GetScopeFromContext(ctx)
+	if !ok {
+		h.l.Errorf(ctx, "survey.delivery.http.handler.processGetRequest: unauthorized")
+		return models.Scope{}, getProductRequest{}, pkgErrors.NewUnauthorizedHTTPError()
+	}
+
+	var req getProductRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.handler.processGetRequest: invalid request")
+		return models.Scope{}, req, errWrongQuery
+	}
+
+	if err := req.validate(); err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.handler.processGetRequest: invalid request")
+		return models.Scope{}, req, err
+	}
+
+	return sc, req, nil
+
+}

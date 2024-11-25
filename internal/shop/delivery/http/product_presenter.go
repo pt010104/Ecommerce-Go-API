@@ -3,6 +3,7 @@ package http
 import (
 	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/pkg/mongo"
+	"github.com/pt010104/api-golang/pkg/paginator"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -98,8 +99,25 @@ type listProductRequest struct {
 	Search string   `json:"search"`
 	ShopID string   `json:"shop_id"`
 }
+type getProductRequest struct {
+	IDs     []string `json:"ids"`
+	Search  string   `json:"search"`
+	ShopID  string   `json:"shop_id"`
+	CateIDs []string `json:"category_ids"`
+}
 
 func (r listProductRequest) validate() error {
+	if len(r.IDs) > 0 {
+		for _, id := range r.IDs {
+			if !mongo.IsObjectID(id) {
+				return errWrongBody
+			}
+		}
+	}
+
+	return nil
+}
+func (r getProductRequest) validate() error {
 	if len(r.IDs) > 0 {
 		for _, id := range r.IDs {
 			if !mongo.IsObjectID(id) {
@@ -118,7 +136,23 @@ func (r listProductRequest) toInput() shop.GetProductFilter {
 		ShopID: r.ShopID,
 	}
 }
+func (r getProductRequest) toInput() shop.GetProductFilter {
+	return shop.GetProductFilter{
+		IDs:     r.IDs,
+		Search:  r.Search,
+		ShopID:  r.ShopID,
+		CateIDs: r.CateIDs,
+	}
+}
 
+type listProductMetaResponse struct {
+	paginator.PaginatorResponse
+}
+type getProductResp struct {
+	meta       listMetaResponse
+	Items      []listProductItem `json:"products"`
+	ShopObject shopObject        `json:"shop_object"`
+}
 type categoryObject struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
@@ -172,7 +206,44 @@ func (h handler) listProductResp(output shop.ListProductOutput) listProductResp 
 	}
 
 	return listProductResp{
+
 		Products:   list,
+		ShopObject: shopObject,
+	}
+}
+func (h handler) getProductResp(output shop.GetProductOutput) getProductResp {
+	var list []listProductItem
+
+	for _, s := range output.Products {
+		var categories []categoryObject
+		for _, category := range s.Cate {
+			categories = append(categories, categoryObject{
+				ID:   category.ID.Hex(),
+				Name: category.Name,
+			})
+		}
+
+		item := listProductItem{
+			ID:              s.P.ID.Hex(),
+			Name:            s.P.Name,
+			InventoryID:     s.Inven,
+			Price:           s.P.Price,
+			CategoryObjects: categories,
+			ShopID:          s.P.ShopID.Hex(),
+		}
+		list = append(list, item)
+	}
+
+	shopObject := shopObject{
+		ID:   output.Shop.ID.Hex(),
+		Name: output.Shop.Name,
+	}
+
+	return getProductResp{
+		meta: listMetaResponse{
+			PaginatorResponse: output.Pag.ToResponse(),
+		},
+		Items:      list,
 		ShopObject: shopObject,
 	}
 }
