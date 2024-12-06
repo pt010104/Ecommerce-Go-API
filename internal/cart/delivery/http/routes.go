@@ -6,6 +6,7 @@ import (
 )
 
 func MapRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
+	r.Use(mw.Auth())
 	r.POST("/create-cart", h.Create)
 
 }
