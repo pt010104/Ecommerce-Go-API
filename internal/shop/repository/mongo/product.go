@@ -168,3 +168,10 @@ func (repo implRepo) GetProduct(ctx context.Context, sc models.Scope, opt shop.G
 		CurrentPage: opt.PagQuery.Page,
 	}, nil
 }
+func (repo implRepo) IsValidProductID(ctx context.Context, productID primitive.ObjectID) bool {
+	col := repo.getProductCollection()
+	filter := bson.M{"_id": productID}
+	var product models.Product
+	err := col.FindOne(ctx, filter).Decode(&product)
+	return err == nil
+}

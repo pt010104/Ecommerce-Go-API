@@ -25,6 +25,7 @@ type UseCase interface {
 	DeleteInventory(ctx context.Context, sc models.Scope, productIDs []primitive.ObjectID) error
 
 	//Product
+	IsValidProductID(ctx context.Context, productID primitive.ObjectID) bool
 	CreateProduct(ctx context.Context, sc models.Scope, input CreateProductInput) (models.Product, models.Inventory, error)
 	DetailProduct(ctx context.Context, sc models.Scope, productID primitive.ObjectID) (DetailProductOutput, error)
 	ListProduct(ctx context.Context, sc models.Scope, opt GetProductFilter) (ListProductOutput, error)

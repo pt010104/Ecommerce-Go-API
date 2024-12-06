@@ -300,3 +300,6 @@ func (uc implUsecase) GetProduct(ctx context.Context, sc models.Scope, input sho
 		Shop:     shop1,
 	}, nil
 }
+func (uc implUsecase) IsValidProductID(ctx context.Context, productID primitive.ObjectID) bool {
+	return uc.repo.IsValidProductID(ctx, productID)
+}

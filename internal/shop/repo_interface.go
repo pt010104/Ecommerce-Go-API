@@ -31,6 +31,6 @@ type Repository interface {
 	ListProduct(ctx context.Context, sc models.Scope, opt GetProductFilter) ([]models.Product, error)
 	Delete(ctx context.Context, sc models.Scope, ud []string) (err error)
 	ValidateCategoryIDs(ctx context.Context, categoryIDs []primitive.ObjectID) error
-
+	IsValidProductID(ctx context.Context, productID primitive.ObjectID) bool
 	GetProduct(ctx context.Context, sc models.Scope, opt GetProductOption) ([]models.Product, paginator.Paginator, error)
 }
