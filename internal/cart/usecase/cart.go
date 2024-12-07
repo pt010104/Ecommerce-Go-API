@@ -83,6 +83,7 @@ func (uc implUseCase) Update(ctx context.Context, opt cart.UpdateCartOption) (mo
 		}
 	}
 	existingCart, err := uc.repo.Get(ctx, opt.ID)
+	uc.l.Debugf(ctx, "existingCart", opt.ID)
 	if err != nil {
 		if err.Error() == "mongo: no documents in result" {
 			return models.Cart{}, cart.ErrCartNotFound
@@ -98,13 +99,35 @@ func (uc implUseCase) Update(ctx context.Context, opt cart.UpdateCartOption) (mo
 	if err != nil {
 		return models.Cart{}, err
 	}
+	uc.l.Debugf(ctx, "updatedCart", updatedCart)
 	return updatedCart, nil
 }
 func (uc implUseCase) ListCart(sc models.Scope, ctx context.Context, opt cart.GetCartFilter) ([]models.Cart, error) {
 	carts, err := uc.repo.ListCart(sc, ctx, opt)
+	uc.l.Debugf(ctx, "carts", carts)
+	uc.l.Debugf(ctx, "opt", opt)
 	if err != nil {
 		uc.l.Errorf(ctx, "cart.Usecase.ListCart", err)
 		return nil, err
 	}
 	return carts, nil
+}
+func (uc implUseCase) GetCart(sc models.Scope, ctx context.Context, id string) (models.Cart, error) {
+	mongoid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		uc.l.Errorf(ctx, "cart.Usecase.GetCart.ObjectIDFromHex", err)
+		return models.Cart{}, err
+	}
+
+	cart1, err := uc.repo.Get(ctx, mongoid)
+	if err != nil {
+		uc.l.Errorf(ctx, "cart.Usecase.GetCart", err)
+		return models.Cart{}, err
+	}
+	if cart1.UserID.Hex() != sc.UserID {
+
+		return models.Cart{}, cart.ErrUserMismatch
+	}
+
+	return cart1, nil
 }

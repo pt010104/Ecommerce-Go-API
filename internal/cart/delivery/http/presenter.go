@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/pt010104/api-golang/internal/cart"
+	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/pkg/mongo"
 )
 
@@ -9,12 +10,12 @@ type CreateCartRequest struct {
 	ProductID string `json:"product_id"`
 	Quantity  int    `json:"quantity"`
 	ShopID    string `json:"shop_id"`
-	UserID    string `json:"user_id"`
+	UserID    string
 }
 
 func (r CreateCartRequest) validate() error {
 
-	for _, id := range []string{r.ProductID, r.ShopID, r.UserID} {
+	for _, id := range []string{r.ProductID, r.ShopID} {
 
 		if !mongo.IsObjectID(id) {
 			return errWrongBody
@@ -61,4 +62,144 @@ func (r CreateCartResponse) toOutput() cart.CreateCartOutput {
 		ShopID: r.ShopID,
 		Item:   []cart.CreateCartItemOutput{},
 	}
+}
+func (h handler) CreateResponse(c models.Cart) CreateCartResponse {
+	var items []CreateCartItemResponse
+	for _, item := range c.Items {
+		items = append(items, CreateCartItemResponse{
+			ProductID: item.ProductID.Hex(),
+			Quantity:  item.Quantity,
+		})
+	}
+	return CreateCartResponse{
+		ID:     c.ID.Hex(),
+		UserID: c.UserID.Hex(),
+		ShopID: c.ShopID.Hex(),
+		Item:   items,
+	}
+}
+
+type UpdateCartItemRequest struct {
+	ProductID string `json:"product_id"`
+	Quantity  int    `json:"quantity"`
+}
+type UpdateCartRequest struct {
+	ID     string `json:"id"`
+	UserID string
+	ShopID string                  `json:"shop_id"`
+	Item   []UpdateCartItemRequest `json:"item"`
+}
+
+func (r UpdateCartRequest) validate() error {
+	if !mongo.IsObjectID(r.ID) {
+		return errWrongBody
+	}
+	if !mongo.IsObjectID(r.ShopID) {
+		return errWrongBody
+	}
+	for _, item := range r.Item {
+		if !mongo.IsObjectID(item.ProductID) {
+			return errWrongBody
+		}
+	}
+	return nil
+}
+
+type UpdateCartItemResponse struct {
+	ProductID string `json:"product_id"`
+	Quantity  int    `json:"quantity"`
+}
+type UpdateCartResponse struct {
+	ID     string                   `json:"id"`
+	UserID string                   `json:"user_id"`
+	ShopID string                   `json:"shop_id"`
+	Item   []UpdateCartItemResponse `json:"item"`
+}
+
+func (r UpdateCartResponse) toOutput() UpdateCartResponse {
+	return UpdateCartResponse{
+		ID:     r.ID,
+		UserID: r.UserID,
+		ShopID: r.ShopID,
+		Item:   []UpdateCartItemResponse{},
+	}
+}
+func (h handler) UpdateResponse(c models.Cart) UpdateCartResponse {
+
+	var items []UpdateCartItemResponse
+	for _, item := range c.Items {
+		items = append(items, UpdateCartItemResponse{
+			ProductID: item.ProductID.Hex(),
+			Quantity:  item.Quantity,
+		})
+	}
+	return UpdateCartResponse{
+		ID:     c.ID.Hex(),
+		UserID: c.UserID.Hex(),
+		ShopID: c.ShopID.Hex(),
+		Item:   items,
+	}
+}
+func (r UpdateCartRequest) toInput() cart.UpdateCartOption {
+	var items []models.CartItem
+	for _, item := range r.Item {
+		items = append(items, models.CartItem{
+			ProductID: mongo.ObjectIDFromHexOrNil(item.ProductID),
+			Quantity:  item.Quantity,
+		})
+	}
+	return cart.UpdateCartOption{
+		ID:          mongo.ObjectIDFromHexOrNil(r.ID),
+		UserID:      mongo.ObjectIDFromHexOrNil(r.UserID),
+		ShopID:      mongo.ObjectIDFromHexOrNil(r.ShopID),
+		NewItemList: items,
+	}
+
+}
+
+type ListCartRequest struct {
+	UserID  string
+	IDs     []string `json:"ids"`
+	ShopIDs []string `json:"shop_ids"`
+}
+
+func (r ListCartRequest) toInput() cart.GetCartFilter {
+	return cart.GetCartFilter{
+		UserID:  r.UserID,
+		IDs:     r.IDs,
+		ShopIDs: r.ShopIDs,
+	}
+}
+func (r ListCartRequest) validate() error {
+	if !mongo.IsObjectID(r.UserID) {
+		return errWrongBody
+	}
+	if len(r.IDs) > 0 {
+		for _, id := range r.IDs {
+			if !mongo.IsObjectID(id) {
+				return errWrongBody
+			}
+		}
+	}
+	if len(r.ShopIDs) > 0 {
+		for _, id := range r.ShopIDs {
+			if !mongo.IsObjectID(id) {
+				return errWrongBody
+			}
+		}
+	}
+	return nil
+
+}
+
+type GetCartRequest struct {
+	ID     string `json:"id"`
+	UserID string
+}
+
+func (r GetCartRequest) validate() error {
+	if !mongo.IsObjectID(r.ID) {
+		return errWrongBody
+	}
+	return nil
 }

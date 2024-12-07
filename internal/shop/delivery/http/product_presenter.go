@@ -1,6 +1,8 @@
 package http
 
 import (
+	"fmt"
+
 	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/pkg/mongo"
 	"github.com/pt010104/api-golang/pkg/paginator"
@@ -11,7 +13,7 @@ type createProductReq struct {
 	Name            string   `json:"name" binding:"required"`
 	Price           float32  `json:"price" binding:"required"`
 	StockLevel      uint     `json:"stock_level" binding:"required"`
-	ReorderLevel    *uint    `json:"reorder_level" binding:"required"`
+	ReorderLevel    *uint    `json:"reorder_level" binding:"required" `
 	ReorderQuantity *uint    `json:"reorder_quantity" binding:"required"`
 	CategoryIDs     []string `json:"category_ids" binding:"required"`
 }
@@ -30,27 +32,33 @@ func (r createProductReq) toInput() shop.CreateProductInput {
 func (r createProductReq) validate() error {
 
 	if r.Name == "" {
+		fmt.Errorf("wrong name")
 		return errWrongBody
 	}
 
 	if r.Price <= 0 {
+		fmt.Errorf("wrong price")
 		return errWrongBody
 	}
 
 	if r.StockLevel == 0 {
+		fmt.Errorf("wrong stock level")
 		return errWrongBody
 	}
 
 	if r.ReorderLevel == nil || *r.ReorderLevel == 0 {
+		fmt.Errorf("wrong reorder level")
 		return errWrongBody
 	}
 
 	if r.ReorderQuantity == nil || *r.ReorderQuantity == 0 {
+		fmt.Errorf("wrong reorder quantity")
 		return errWrongBody
 	}
 
 	for _, id := range r.CategoryIDs {
 		if _, err := primitive.ObjectIDFromHex(id); err != nil {
+			fmt.Errorf("wrong ids")
 			return errWrongBody
 		}
 	}

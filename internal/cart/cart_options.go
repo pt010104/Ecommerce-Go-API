@@ -21,7 +21,7 @@ type UpdateCartOption struct {
 	NewItemList []models.CartItem
 }
 type UpdateCartItemOption struct {
-	Quantity *int
+	Quantity int
 }
 type GetCartFilter struct {
 	UserID  string

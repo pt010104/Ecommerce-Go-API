@@ -62,16 +62,25 @@ func (repo implRepo) Get(ctx context.Context, ID primitive.ObjectID) (models.Car
 }
 func (repo implRepo) Update(ctx context.Context, opt cart.UpdateCartOption) (models.Cart, error) {
 	col := repo.getCartCollection()
-	filter, err := repo.buildCartDetailQuery(ctx, opt.Model.ID)
+	filter, err := repo.buildCartDetailQuery(ctx, opt.ID)
+	//print filter
+	repo.l.Debugf(ctx, "filter", filter)
 	if err != nil {
 		repo.l.Errorf(ctx, "Cart.Repo.Update.buildCartDetailQuery", err)
 		return models.Cart{}, err
 	}
+	//print opt.NewItemList
+
+	repo.l.Debugf(ctx, "opt.NewItemList", opt.NewItemList)
 	update := bson.M{
 		"$set": bson.M{
 			"items": opt.NewItemList,
 		},
 	}
+	opt.Model.ID = opt.ID
+	opt.Model.UpdatedAt = time.Now()
+	opt.Model.ShopID = opt.ShopID
+	opt.Model.UserID = opt.UserID
 	opt.Model.Items = opt.NewItemList
 
 	_, err = col.UpdateOne(ctx, filter, update)
@@ -90,6 +99,7 @@ func (repo implRepo) ListCart(sc models.Scope, ctx context.Context, opt cart.Get
 	col := repo.getCartCollection()
 
 	filter, err := repo.buildCartQuery(sc, opt, ctx)
+	repo.l.Debugf(ctx, "filter", filter)
 	if err != nil {
 		repo.l.Errorf(ctx, "cart.repository.mongo.buildCartQuery: %v", err)
 		return []models.Cart{}, err
@@ -100,13 +110,16 @@ func (repo implRepo) ListCart(sc models.Scope, ctx context.Context, opt cart.Get
 		return []models.Cart{}, err
 	}
 	defer cursor.Close(ctx)
-
 	var carts []models.Cart
-	err = cursor.All(ctx, &carts)
-	if err != nil {
-		repo.l.Errorf(ctx, "cart.repository.mongo.ListCart.All: %v", err)
-		return []models.Cart{}, err
+	for cursor.Next(ctx) {
+		var cart models.Cart
+		if err := cursor.Decode(&cart); err != nil {
+			repo.l.Errorf(ctx, "Failed to decode cart: %v", err)
+			continue
+		}
+		carts = append(carts, cart)
 	}
 
+	repo.l.Debugf(ctx, "carts", carts)
 	return carts, nil
 }

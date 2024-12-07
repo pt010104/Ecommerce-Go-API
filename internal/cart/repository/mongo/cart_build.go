@@ -16,7 +16,7 @@ func (repo implRepo) buildCartModel(opt cart.CreateCartOption, ctx context.Conte
 	p := models.Cart{
 		ID:        primitive.NewObjectID(),
 		UserID:    opt.UserID,
-		ShopID:    opt.UserID,
+		ShopID:    opt.ShopID,
 		UpdatedAt: now,
 		CreatedAt: now,
 	}

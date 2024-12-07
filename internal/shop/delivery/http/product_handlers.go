@@ -9,6 +9,16 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// @Summary      Create a product
+// @Description  Create a new product in the shop
+// @Tags         Shop
+// @Accept       json
+// @Produce      json
+// @Param        request body createProductReq true "Request Body"
+// @Success      200 {object} response.Resp "Success Response"
+// @Failure      400 {object} response.Resp "Bad Request"
+// @Failure      500 {object} response.Resp "Internal Server Error"
+// @Router       /api/v1/shops/create-product [post]
 func (h handler) CreateProduct(c *gin.Context) {
 	ctx := c.Request.Context()
 
