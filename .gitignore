@@ -11,9 +11,6 @@ test.go
 
 __debug_bin*
 
-docs
-docs/*
-
 .scannerwork
 
 mock_*
