@@ -12,7 +12,7 @@ import (
 
 func (repo implRepo) buildCartQuery(sc models.Scope, opt cart.GetCartFilter, ctx context.Context) (bson.M, error) {
 	filter := bson.M{}
-	filter["user_id"] = bson.M{"eq": mongo.ObjectIDFromHexOrNil(sc.UserID)}
+	filter["user_id"] = mongo.ObjectIDFromHexOrNil(sc.UserID)
 	if len(opt.IDs) > 0 {
 		filter["_id"] = bson.M{"$in": mongo.ObjectIDsFromHexOrNil(opt.IDs)}
 	}

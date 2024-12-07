@@ -99,27 +99,21 @@ func (repo implRepo) ListCart(sc models.Scope, ctx context.Context, opt cart.Get
 	col := repo.getCartCollection()
 
 	filter, err := repo.buildCartQuery(sc, opt, ctx)
-	repo.l.Debugf(ctx, "filter", filter)
 	if err != nil {
 		repo.l.Errorf(ctx, "cart.repository.mongo.buildCartQuery: %v", err)
-		return []models.Cart{}, err
+		return nil, err
 	}
+
+	var carts []models.Cart
 	cursor, err := col.Find(ctx, filter)
 	if err != nil {
 		repo.l.Errorf(ctx, "cart.repository.mongo.ListCart.Find: %v", err)
-		return []models.Cart{}, err
+		return nil, err
 	}
-	defer cursor.Close(ctx)
-	var carts []models.Cart
-	for cursor.Next(ctx) {
-		var cart models.Cart
-		if err := cursor.Decode(&cart); err != nil {
-			repo.l.Errorf(ctx, "Failed to decode cart: %v", err)
-			continue
-		}
-		carts = append(carts, cart)
+	err = cursor.All(ctx, &carts)
+	if err != nil {
+		repo.l.Errorf(ctx, "cart.repository.mongo.ListCart.All: %v", err)
+		return nil, err
 	}
-
-	repo.l.Debugf(ctx, "carts", carts)
 	return carts, nil
 }
