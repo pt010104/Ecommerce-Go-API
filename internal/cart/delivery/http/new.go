@@ -10,7 +10,6 @@ type Handler interface {
 	Create(c *gin.Context)
 	Update(c *gin.Context)
 	List(c *gin.Context)
-	Get(c *gin.Context)
 }
 
 type handler struct {

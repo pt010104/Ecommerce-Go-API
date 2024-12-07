@@ -192,6 +192,17 @@ func (r ListCartRequest) validate() error {
 
 }
 
+type ListCartResponse struct {
+	ID     string                 `json:"id"`
+	UserID string                 `json:"user_id"`
+	ShopID string                 `json:"shop_id"`
+	Item   []ListCartItemResponse `json:"item"`
+}
+type ListCartItemResponse struct {
+	ProductID string `json:"product_id"`
+	Quantity  int    `json:"quantity"`
+}
+
 type GetCartRequest struct {
 	ID     string `json:"id"`
 	UserID string
@@ -202,4 +213,23 @@ func (r GetCartRequest) validate() error {
 		return errWrongBody
 	}
 	return nil
+}
+func (h handler) newListResponse(carts []models.Cart) []ListCartResponse {
+	var res []ListCartResponse
+	for _, cart := range carts {
+		var items []ListCartItemResponse
+		for _, item := range cart.Items {
+			items = append(items, ListCartItemResponse{
+				ProductID: item.ProductID.Hex(),
+				Quantity:  item.Quantity,
+			})
+		}
+		res = append(res, ListCartResponse{
+			ID:     cart.ID.Hex(),
+			UserID: cart.UserID.Hex(),
+			ShopID: cart.ShopID.Hex(),
+			Item:   items,
+		})
+	}
+	return res
 }

@@ -39,6 +39,16 @@ func (h handler) CreateProduct(c *gin.Context) {
 
 	response.OK(c, product)
 }
+
+// @Summary      Get product details
+// @Description  Retrieve detailed information about a product by ID
+// @Tags         Product
+// @Accept       json
+// @Produce      json
+// @Param        request body detailProductReq true "Request Body"
+// @Success      200 {object} detailProductResp "Product Details"
+// @Failure      400 {object} response.Resp "Bad Request"
+// @Router       /api/v1/shops/ [get]
 func (h handler) DetailProduct(c *gin.Context) {
 	ctx := c.Request.Context()
 
@@ -104,6 +114,17 @@ func (h handler) DeleteProduct(c *gin.Context) {
 	response.OK(c, " delete success")
 
 }
+
+// @Summary      Get products with pagination
+// @Description  Retrieve a paginated list of products with optional filters , at least 1 parameter request body must be provided
+// @Tags         Product
+// @Accept       json
+// @Produce      json
+// @Param        request body getProductRequest false "Request Body"
+// @Param        page query int false "Page number"
+// @Param        limit query int false "Items per page"
+// @Success      200 {object} getProductResp "Paginated Products"
+// @Router       /api/v1/shops/products/get-product [get]
 func (h handler) GetProduct(c *gin.Context) {
 	ctx := c.Request.Context()
 

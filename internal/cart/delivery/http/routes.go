@@ -10,6 +10,5 @@ func MapRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
 	r.POST("/create-cart", h.Create)
 	r.POST("/update-cart", h.Update)
 	r.GET("", h.List)
-	r.GET("get-cart", h.Get)
 
 }
