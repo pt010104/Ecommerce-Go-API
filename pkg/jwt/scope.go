@@ -14,6 +14,11 @@ func NewScope(payload Payload) models.Scope {
 	}
 }
 
+func SetRoleToScope(scope models.Scope, role int) models.Scope {
+	scope.Role = role
+	return scope
+}
+
 func CreateScopeHeader(scope models.Scope) (string, error) {
 	jsonData, err := json.Marshal(scope)
 	if err != nil {

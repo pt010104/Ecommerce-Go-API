@@ -7,15 +7,17 @@ import (
 )
 
 type implUsecase struct {
-	l       log.Logger
-	repo    user.Repo
-	emailUC email.UseCase
+	l         log.Logger
+	repo      user.Repo
+	emailUC   email.UseCase
+	redisRepo user.Redis
 }
 
-func New(l log.Logger, repo user.Repo, emailUC email.UseCase) implUsecase {
+func New(l log.Logger, repo user.Repo, emailUC email.UseCase, redisRepo user.Redis) implUsecase {
 	return implUsecase{
-		l:       l,
-		repo:    repo,
-		emailUC: emailUC,
+		l:         l,
+		repo:      repo,
+		emailUC:   emailUC,
+		redisRepo: redisRepo,
 	}
 }

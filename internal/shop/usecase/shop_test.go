@@ -26,7 +26,7 @@ func TestUpdateShop(t *testing.T) {
 
 	type mockRepoList struct {
 		isCalled bool
-		intput   shop.GetOption
+		intput   shop.GetShopsFilter
 		output   []models.Shop
 		err      error
 	}
@@ -98,10 +98,8 @@ func TestUpdateShop(t *testing.T) {
 				},
 				mockRepoList: mockRepoList{
 					isCalled: true,
-					intput: shop.GetOption{
-						GetShopsFilter: shop.GetShopsFilter{
-							IDs: ids,
-						},
+					intput: shop.GetShopsFilter{
+						IDs: ids,
 					},
 
 					output: []models.Shop{
@@ -154,10 +152,8 @@ func TestUpdateShop(t *testing.T) {
 				},
 				mockRepoList: mockRepoList{
 					isCalled: true,
-					intput: shop.GetOption{
-						GetShopsFilter: shop.GetShopsFilter{
-							IDs: []string{ids[0]},
-						},
+					intput: shop.GetShopsFilter{
+						IDs: []string{ids[0]},
 					},
 
 					output: []models.Shop{
@@ -198,10 +194,8 @@ func TestUpdateShop(t *testing.T) {
 				},
 				mockRepoList: mockRepoList{
 					isCalled: true,
-					intput: shop.GetOption{
-						GetShopsFilter: shop.GetShopsFilter{
-							IDs: ids[:len(ids)-1],
-						},
+					intput: shop.GetShopsFilter{
+						IDs: ids[:len(ids)-1],
 					},
 					output: []models.Shop{
 						{

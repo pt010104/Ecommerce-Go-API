@@ -39,7 +39,19 @@ func BuildQueryWithSoftDelete(query bson.M) bson.M {
 	query["deleted_at"] = nil
 	return query
 }
+func BuildShopScopeQuery(ctx context.Context, l log.Logger, sc models.Scope) (bson.M, error) {
+	filter := bson.M{}
 
+	if sc.ShopID != "" {
+		ShopID, err := primitive.ObjectIDFromHex(sc.ShopID)
+		if err != nil {
+			return nil, err
+		}
+		filter["shop_id"] = ShopID
+	}
+
+	return filter, nil
+}
 func BuildScopeQuery(ctx context.Context, l log.Logger, sc models.Scope) (bson.M, error) {
 	filter := bson.M{}
 

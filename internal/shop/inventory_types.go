@@ -7,7 +7,6 @@ import (
 
 // Inventory
 type CreateInventoryInput struct {
-	ProductID       primitive.ObjectID
 	StockLevel      uint
 	ReorderLevel    *uint
 	ReorderQuantity *uint
@@ -18,7 +17,7 @@ type CreateInventoryOutput struct {
 }
 
 type UpdateInventoryInput struct {
-	ProductID       primitive.ObjectID
+	ID              primitive.ObjectID
 	StockLevel      *uint
 	ReorderLevel    *uint
 	ReorderQuantity *uint

@@ -25,3 +25,22 @@ func (repo implRepo) CreateCategory(ctx context.Context, sc models.Scope, opt ad
 	}
 	return cate, nil
 }
+
+func (repo implRepo) ListCategories(ctx context.Context, sc models.Scope, opt admins.GetCategoriesFilter) ([]models.Category, error) {
+	col := repo.getCategoryCollection()
+
+	filter := repo.buildCategoryQuery(opt)
+
+	var cates []models.Category
+	cursor, err := col.Find(ctx, filter)
+	if err != nil {
+		repo.l.Errorf(ctx, "admins.repo.ListCategories.Find:", err)
+		return nil, err
+	}
+	err = cursor.All(ctx, &cates)
+	if err != nil {
+		repo.l.Errorf(ctx, "admins.repo.ListCategories.All:", err)
+		return nil, err
+	}
+	return cates, nil
+}

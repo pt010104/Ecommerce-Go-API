@@ -37,23 +37,21 @@ func TestCreateInventory(t *testing.T) {
 	}{
 		"success without ReorderLevel": {
 			input: shop.CreateInventoryInput{
-				ProductID:  id,
 				StockLevel: 10,
 			},
 			mockRepo: mockRepoCreate{
 				isCalled: true,
 				input: shop.CreateInventoryOption{
-					ProductID:  id,
 					StockLevel: 10,
 				},
 				output: models.Inventory{
-					ProductID:  id,
+					ID:         id,
 					StockLevel: 10,
 				},
 				err: nil,
 			},
 			wantRes: models.Inventory{
-				ProductID:  id,
+				ID:         id,
 				StockLevel: 10,
 			},
 
@@ -61,20 +59,18 @@ func TestCreateInventory(t *testing.T) {
 		},
 		"success with ReorderLevel but without ReorderQuantity": {
 			input: shop.CreateInventoryInput{
-				ProductID:    id,
 				StockLevel:   10,
 				ReorderLevel: reorderLevelPtr,
 			},
 			mockRepo: mockRepoCreate{
 				isCalled: true,
 				input: shop.CreateInventoryOption{
-					ProductID:       id,
 					StockLevel:      10,
 					ReorderLevel:    reorderLevelPtr,
 					ReorderQuantity: nil,
 				},
 				output: models.Inventory{
-					ProductID:       id,
+					ID:              id,
 					StockLevel:      10,
 					ReorderLevel:    nil,
 					ReorderQuantity: nil,
@@ -82,7 +78,7 @@ func TestCreateInventory(t *testing.T) {
 				err: nil,
 			},
 			wantRes: models.Inventory{
-				ProductID:       id,
+				ID:              id,
 				StockLevel:      10,
 				ReorderLevel:    nil,
 				ReorderQuantity: nil,
@@ -91,7 +87,6 @@ func TestCreateInventory(t *testing.T) {
 		},
 		"success with ReorderLevel with ReorderQuantity": {
 			input: shop.CreateInventoryInput{
-				ProductID:       id,
 				StockLevel:      10,
 				ReorderLevel:    reorderLevelPtr,
 				ReorderQuantity: reorderLevelPtr,
@@ -99,13 +94,12 @@ func TestCreateInventory(t *testing.T) {
 			mockRepo: mockRepoCreate{
 				isCalled: true,
 				input: shop.CreateInventoryOption{
-					ProductID:       id,
 					StockLevel:      10,
 					ReorderLevel:    reorderLevelPtr,
 					ReorderQuantity: reorderLevelPtr,
 				},
 				output: models.Inventory{
-					ProductID:       id,
+					ID:              id,
 					StockLevel:      10,
 					ReorderLevel:    reorderLevelPtr,
 					ReorderQuantity: reorderLevelPtr,
@@ -113,29 +107,12 @@ func TestCreateInventory(t *testing.T) {
 				err: nil,
 			},
 			wantRes: models.Inventory{
-				ProductID:       id,
+				ID:              id,
 				StockLevel:      10,
 				ReorderLevel:    reorderLevelPtr,
 				ReorderQuantity: reorderLevelPtr,
 			},
 			wantErr: nil,
-		},
-		"fail with not exist productID": {
-			input: shop.CreateInventoryInput{
-				ProductID:  id,
-				StockLevel: 10,
-			},
-			mockRepo: mockRepoCreate{
-				isCalled: true,
-				input: shop.CreateInventoryOption{
-					ProductID:  id,
-					StockLevel: 10,
-				},
-				output: models.Inventory{},
-				err:    mongo.ErrNoDocuments,
-			},
-			wantRes: models.Inventory{},
-			wantErr: mongo.ErrNoDocuments,
 		},
 	}
 
@@ -174,42 +151,42 @@ func TestDetailInventory(t *testing.T) {
 	}
 
 	type mockRepoDetail struct {
-		isCalled  bool
-		productID primitive.ObjectID
-		output    models.Inventory
-		err       error
+		isCalled bool
+		ID       primitive.ObjectID
+		output   models.Inventory
+		err      error
 	}
 
 	id := primitive.NewObjectID()
 
 	tcs := map[string]struct {
-		productID primitive.ObjectID
-		mockRepo  mockRepoDetail
-		wantRes   models.Inventory
-		wantErr   error
+		ID       primitive.ObjectID
+		mockRepo mockRepoDetail
+		wantRes  models.Inventory
+		wantErr  error
 	}{
 		"success": {
-			productID: id,
+			ID: id,
 			mockRepo: mockRepoDetail{
-				isCalled:  true,
-				productID: id,
+				isCalled: true,
+				ID:       id,
 				output: models.Inventory{
-					ProductID: id,
+					ID: id,
 				},
 				err: nil,
 			},
 			wantRes: models.Inventory{
-				ProductID: id,
+				ID: id,
 			},
 			wantErr: nil,
 		},
-		"fail with not exist productID": {
-			productID: id,
+		"fail with not exist ID": {
+			ID: id,
 			mockRepo: mockRepoDetail{
-				isCalled:  true,
-				productID: id,
-				output:    models.Inventory{},
-				err:       mongo.ErrNoDocuments,
+				isCalled: true,
+				ID:       id,
+				output:   models.Inventory{},
+				err:      mongo.ErrNoDocuments,
 			},
 			wantRes: models.Inventory{},
 			wantErr: mongo.ErrNoDocuments,
@@ -223,14 +200,14 @@ func TestDetailInventory(t *testing.T) {
 			uc, deps := initUseCase(t)
 
 			if tc.mockRepo.isCalled {
-				deps.repo.EXPECT().DetailInventory(ctx, scope, tc.mockRepo.productID).
+				deps.repo.EXPECT().DetailInventory(ctx, scope, tc.mockRepo.ID).
 					Return(
 						tc.mockRepo.output,
 						tc.mockRepo.err,
 					)
 			}
 
-			res, err := uc.DetailInventory(ctx, scope, tc.productID)
+			res, err := uc.DetailInventory(ctx, scope, tc.ID)
 			if err != nil {
 				require.Equal(t, tc.wantErr, err)
 			} else {
@@ -257,10 +234,10 @@ func TestUpdateInventory(t *testing.T) {
 	}
 
 	type mockRepoDetail struct {
-		isCalled  bool
-		productID primitive.ObjectID
-		output    models.Inventory
-		err       error
+		isCalled bool
+		ID       primitive.ObjectID
+		output   models.Inventory
+		err      error
 	}
 
 	type mockRepo struct {
@@ -280,15 +257,15 @@ func TestUpdateInventory(t *testing.T) {
 	}{
 		"success without ReorderLevel": {
 			input: shop.UpdateInventoryInput{
-				ProductID:  id,
+				ID:         id,
 				StockLevel: uintPtr,
 			},
 			mockRepo: mockRepo{
 				mockRepoDetail: mockRepoDetail{
-					isCalled:  true,
-					productID: id,
+					isCalled: true,
+					ID:       id,
 					output: models.Inventory{
-						ProductID:  id,
+						ID:         id,
 						StockLevel: 10,
 					},
 					err: nil,
@@ -297,36 +274,36 @@ func TestUpdateInventory(t *testing.T) {
 					isCalled: true,
 					input: shop.UpdateInventoryOption{
 						Model: models.Inventory{
-							ProductID:  id,
+							ID:         id,
 							StockLevel: 10,
 						},
 						StockLevel: uintPtr,
 					},
 					output: models.Inventory{
-						ProductID:  id,
+						ID:         id,
 						StockLevel: 5,
 					},
 					err: nil,
 				},
 			},
 			wantRes: models.Inventory{
-				ProductID:  id,
+				ID:         id,
 				StockLevel: 5,
 			},
 			wantErr: nil,
 		},
 		"success with ReorderLevel but without ReorderQuantity": {
 			input: shop.UpdateInventoryInput{
-				ProductID:    id,
+				ID:           id,
 				StockLevel:   uintPtr,
 				ReorderLevel: uintPtr,
 			},
 			mockRepo: mockRepo{
 				mockRepoDetail: mockRepoDetail{
-					isCalled:  true,
-					productID: id,
+					isCalled: true,
+					ID:       id,
 					output: models.Inventory{
-						ProductID:  id,
+						ID:         id,
 						StockLevel: 10,
 					},
 					err: nil,
@@ -335,14 +312,14 @@ func TestUpdateInventory(t *testing.T) {
 					isCalled: true,
 					input: shop.UpdateInventoryOption{
 						Model: models.Inventory{
-							ProductID:  id,
+							ID:         id,
 							StockLevel: 10,
 						},
 						StockLevel:   uintPtr,
 						ReorderLevel: uintPtr,
 					},
 					output: models.Inventory{
-						ProductID:    id,
+						ID:           id,
 						StockLevel:   5,
 						ReorderLevel: uintPtr,
 					},
@@ -350,7 +327,7 @@ func TestUpdateInventory(t *testing.T) {
 				},
 			},
 			wantRes: models.Inventory{
-				ProductID:    id,
+				ID:           id,
 				StockLevel:   5,
 				ReorderLevel: uintPtr,
 			},
@@ -358,17 +335,17 @@ func TestUpdateInventory(t *testing.T) {
 		},
 		"success with ReorderLevel and ReorderQuantity": {
 			input: shop.UpdateInventoryInput{
-				ProductID:       id,
+				ID:              id,
 				StockLevel:      uintPtr,
 				ReorderLevel:    uintPtr,
 				ReorderQuantity: uintPtr,
 			},
 			mockRepo: mockRepo{
 				mockRepoDetail: mockRepoDetail{
-					isCalled:  true,
-					productID: id,
+					isCalled: true,
+					ID:       id,
 					output: models.Inventory{
-						ProductID:  id,
+						ID:         id,
 						StockLevel: 10,
 					},
 					err: nil,
@@ -377,7 +354,7 @@ func TestUpdateInventory(t *testing.T) {
 					isCalled: true,
 					input: shop.UpdateInventoryOption{
 						Model: models.Inventory{
-							ProductID:  id,
+							ID:         id,
 							StockLevel: 10,
 						},
 						StockLevel:      uintPtr,
@@ -385,7 +362,7 @@ func TestUpdateInventory(t *testing.T) {
 						ReorderQuantity: uintPtr,
 					},
 					output: models.Inventory{
-						ProductID:       id,
+						ID:              id,
 						StockLevel:      5,
 						ReorderLevel:    uintPtr,
 						ReorderQuantity: uintPtr,
@@ -394,23 +371,23 @@ func TestUpdateInventory(t *testing.T) {
 				},
 			},
 			wantRes: models.Inventory{
-				ProductID:       id,
+				ID:              id,
 				StockLevel:      5,
 				ReorderLevel:    uintPtr,
 				ReorderQuantity: uintPtr,
 			},
 			wantErr: nil,
 		},
-		"fail with not exist productID": {
+		"fail with not exist ID": {
 			input: shop.UpdateInventoryInput{
-				ProductID: id,
+				ID: id,
 			},
 			mockRepo: mockRepo{
 				mockRepoDetail: mockRepoDetail{
-					isCalled:  true,
-					productID: id,
-					output:    models.Inventory{},
-					err:       mongo.ErrNoDocuments,
+					isCalled: true,
+					ID:       id,
+					output:   models.Inventory{},
+					err:      mongo.ErrNoDocuments,
 				},
 			},
 			wantRes: models.Inventory{},
@@ -425,7 +402,7 @@ func TestUpdateInventory(t *testing.T) {
 			uc, deps := initUseCase(t)
 
 			if tc.mockRepo.mockRepoDetail.isCalled {
-				deps.repo.EXPECT().DetailInventory(ctx, scope, tc.mockRepo.productID).
+				deps.repo.EXPECT().DetailInventory(ctx, scope, tc.mockRepo.ID).
 					Return(
 						tc.mockRepo.mockRepoDetail.output,
 						tc.mockRepo.mockRepoDetail.err,
@@ -460,10 +437,10 @@ func TestListlInventory(t *testing.T) {
 	}
 
 	type mockRepoList struct {
-		isCalled   bool
-		productIDs []primitive.ObjectID
-		output     []models.Inventory
-		err        error
+		isCalled bool
+		IDs      []primitive.ObjectID
+		output   []models.Inventory
+		err      error
 	}
 
 	ids := []primitive.ObjectID{
@@ -473,74 +450,74 @@ func TestListlInventory(t *testing.T) {
 	}
 
 	tcs := map[string]struct {
-		productIDs []primitive.ObjectID
-		mockRepo   mockRepoList
-		wantRes    []models.Inventory
-		wantErr    error
+		IDs      []primitive.ObjectID
+		mockRepo mockRepoList
+		wantRes  []models.Inventory
+		wantErr  error
 	}{
 		"success": {
-			productIDs: ids,
+			IDs: ids,
 			mockRepo: mockRepoList{
-				isCalled:   true,
-				productIDs: ids,
+				isCalled: true,
+				IDs:      ids,
 				output: []models.Inventory{
 					{
-						ProductID: ids[0],
+						ID: ids[0],
 					},
 					{
-						ProductID: ids[1],
+						ID: ids[1],
 					},
 					{
-						ProductID: ids[2],
+						ID: ids[2],
 					},
 				},
 				err: nil,
 			},
 			wantRes: []models.Inventory{
 				{
-					ProductID: ids[0],
+					ID: ids[0],
 				},
 				{
-					ProductID: ids[1],
+					ID: ids[1],
 				},
 				{
-					ProductID: ids[2],
+					ID: ids[2],
 				},
 			},
 			wantErr: nil,
 		},
-		"success with not exist 1 productID": {
-			productIDs: ids,
+		"success with not exist 1 ID": {
+			IDs: ids,
 			mockRepo: mockRepoList{
-				isCalled:   true,
-				productIDs: ids,
+				isCalled: true,
+				IDs:      ids,
 				output: []models.Inventory{
 					{
-						ProductID: ids[0],
+						ID: ids[0],
 					},
 					{
-						ProductID: ids[1],
+						ID: ids[1],
 					},
 				},
 				err: nil,
 			},
 			wantRes: []models.Inventory{
 				{
-					ProductID: ids[0],
+					ID: ids[0],
 				},
 				{
-					ProductID: ids[1],
+					ID: ids[1],
 				},
 			},
 			wantErr: mongo.ErrNoDocuments,
 		},
-		"success with not exist any productID": {
-			productIDs: ids,
+		"success with not exist any ID": {
+			IDs: ids,
 			mockRepo: mockRepoList{
-				isCalled:   true,
-				productIDs: ids,
-				output:     []models.Inventory{},
-				err:        nil,
+				isCalled: true,
+				IDs:      ids,
+				output:   []models.Inventory{},
+				err:      nil,
 			},
 			wantRes: []models.Inventory{},
 			wantErr: mongo.ErrNoDocuments,
@@ -554,14 +531,14 @@ func TestListlInventory(t *testing.T) {
 			uc, deps := initUseCase(t)
 
 			if tc.mockRepo.isCalled {
-				deps.repo.EXPECT().ListInventory(ctx, scope, tc.mockRepo.productIDs).
+				deps.repo.EXPECT().ListInventory(ctx, scope, tc.mockRepo.IDs).
 					Return(
 						tc.mockRepo.output,
 						tc.mockRepo.err,
 					)
 			}
 
-			res, err := uc.ListInventory(ctx, scope, tc.productIDs)
+			res, err := uc.ListInventory(ctx, scope, tc.IDs)
 			if err != nil {
 				require.Equal(t, tc.wantErr, err)
 			} else {
@@ -581,9 +558,9 @@ func TestDeleteInventory(t *testing.T) {
 	}
 
 	type mockRepoDelete struct {
-		isCalled   bool
-		productIDs []primitive.ObjectID
-		err        error
+		isCalled bool
+		IDs      []primitive.ObjectID
+		err      error
 	}
 
 	ids := []primitive.ObjectID{
@@ -593,34 +570,34 @@ func TestDeleteInventory(t *testing.T) {
 	}
 
 	tcs := map[string]struct {
-		productIDs []primitive.ObjectID
-		mockRepo   mockRepoDelete
-		wantErr    error
+		IDs      []primitive.ObjectID
+		mockRepo mockRepoDelete
+		wantErr  error
 	}{
 		"success": {
-			productIDs: ids,
+			IDs: ids,
 			mockRepo: mockRepoDelete{
-				isCalled:   true,
-				productIDs: ids,
-				err:        nil,
+				isCalled: true,
+				IDs:      ids,
+				err:      nil,
 			},
 			wantErr: nil,
 		},
-		"success with not exist 1 productID": {
-			productIDs: ids,
+		"success with not exist 1 ID": {
+			IDs: ids,
 			mockRepo: mockRepoDelete{
-				isCalled:   true,
-				productIDs: ids,
-				err:        nil,
+				isCalled: true,
+				IDs:      ids,
+				err:      nil,
 			},
 			wantErr: nil,
 		},
-		"success with not exist any productID": {
-			productIDs: ids,
+		"success with not exist any ID": {
+			IDs: ids,
 			mockRepo: mockRepoDelete{
-				isCalled:   true,
-				productIDs: ids,
-				err:        nil,
+				isCalled: true,
+				IDs:      ids,
+				err:      nil,
 			},
 			wantErr: nil,
 		},
@@ -633,13 +610,13 @@ func TestDeleteInventory(t *testing.T) {
 			uc, deps := initUseCase(t)
 
 			if tc.mockRepo.isCalled {
-				deps.repo.EXPECT().DeleteInventory(ctx, scope, tc.mockRepo.productIDs).
+				deps.repo.EXPECT().DeleteInventory(ctx, scope, tc.mockRepo.IDs).
 					Return(
 						tc.mockRepo.err,
 					)
 			}
 
-			err := uc.DeleteInventory(ctx, scope, tc.productIDs)
+			err := uc.DeleteInventory(ctx, scope, tc.IDs)
 			if err != nil {
 				require.Equal(t, tc.wantErr, err)
 			} else {

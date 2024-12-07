@@ -8,4 +8,5 @@ import (
 
 type Repo interface {
 	CreateCategory(ctx context.Context, sc models.Scope, opt CreateCategoryOption) (models.Category, error)
+	ListCategories(ctx context.Context, sc models.Scope, filter GetCategoriesFilter) ([]models.Category, error)
 }

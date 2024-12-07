@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func (repo implRepo) buildShopQuery(opt shop.GetOption) (bson.M, error) {
+func (repo implRepo) buildShopQuery(opt shop.GetShopsFilter) (bson.M, error) {
 	filter := bson.M{}
 
 	filter = mongo.BuildQueryWithSoftDelete(filter)

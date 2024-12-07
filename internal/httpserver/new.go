@@ -3,6 +3,7 @@ package httpserver
 import (
 	"github.com/gin-gonic/gin"
 	pkgLog "github.com/pt010104/api-golang/pkg/log"
+	"github.com/pt010104/api-golang/pkg/redis"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -17,6 +18,7 @@ type HTTPServer struct {
 	database     mongo.Database
 	jwtSecretKey string
 	mode         string
+	redis        redis.Client
 }
 
 type Config struct {
@@ -24,6 +26,7 @@ type Config struct {
 	JWTSecretKey string
 	Mode         string
 	Database     mongo.Database
+	Redis        redis.Client
 }
 
 func New(l pkgLog.Logger, cfg Config) *HTTPServer {
@@ -40,6 +43,7 @@ func New(l pkgLog.Logger, cfg Config) *HTTPServer {
 		jwtSecretKey: cfg.JWTSecretKey,
 		port:         cfg.Port,
 		mode:         cfg.Mode,
+		redis:        cfg.Redis,
 	}
 
 }

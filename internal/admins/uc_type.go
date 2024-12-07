@@ -7,3 +7,8 @@ type CreateCategoryInput struct {
 type VerifyShopInput struct {
 	ShopIDs []string
 }
+
+type GetCategoriesFilter struct {
+	IDs  []string
+	Name string
+}
