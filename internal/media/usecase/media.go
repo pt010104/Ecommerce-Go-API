@@ -8,25 +8,23 @@ import (
 )
 
 func (uc implUsecase) Upload(ctx context.Context, sc models.Scope, opt media.UploadInput) error {
-	if (opt.UserID.IsZero() && opt.ShopID.IsZero()) || len(opt.Files) == 0 {
+	if len(opt.Files) == 0 {
 		return media.ErrRequireField
 	}
 
 	for _, file := range opt.Files {
 		uploadOpt := media.UploadOption{
-			UserID:   opt.UserID,
-			ShopID:   opt.ShopID,
-			FileName: uc.generateFilename(opt.UserID),
-			Folder:   uc.determineFolder(opt.UserID, opt.ShopID),
+			FileName: uc.generateFilename(sc.UserID),
+			Folder:   uc.determineFolder(sc.UserID, sc.ShopID),
 		}
 
-		err := uc.repo.Create(ctx, sc, uploadOpt)
+		m, err := uc.repo.Create(ctx, sc, uploadOpt)
 		if err != nil {
 			uc.l.Errorf(ctx, "media.usecase.Upload.Create: %v", err)
 			return err
 		}
 
-		err = uc.publishUploadMediaMessage(ctx, file, uploadOpt)
+		err = uc.publishUploadMediaMessage(ctx, sc, file, uploadOpt, m.ID.Hex())
 		if err != nil {
 			uc.l.Errorf(ctx, "media.usecase.Upload.publishMediaMessage: %v", err)
 			return err
@@ -34,4 +32,14 @@ func (uc implUsecase) Upload(ctx context.Context, sc models.Scope, opt media.Upl
 	}
 
 	return nil
+}
+
+func (uc implUsecase) Detail(ctx context.Context, sc models.Scope, id string) (models.Media, error) {
+	m, err := uc.repo.Detail(ctx, sc, id)
+	if err != nil {
+		uc.l.Errorf(ctx, "media.usecase.Detail.repo.Detail: %v", err)
+		return models.Media{}, err
+	}
+
+	return m, nil
 }

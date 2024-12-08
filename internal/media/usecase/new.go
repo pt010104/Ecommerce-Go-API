@@ -17,8 +17,9 @@ type implUsecase struct {
 
 func New(l log.Logger, repo media.Repository, prod producer.Producer, cloud cloudinary.Cloudinary) media.UseCase {
 	return &implUsecase{
-		l:    l,
-		repo: repo,
-		prod: prod,
+		l:     l,
+		repo:  repo,
+		prod:  prod,
+		cloud: cloud,
 	}
 }

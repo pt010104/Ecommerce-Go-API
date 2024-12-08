@@ -33,3 +33,10 @@ func (r uploadRequest) toInput() media.UploadInput {
 		Files: files,
 	}
 }
+
+func (r uploadRequest) validate() error {
+	if len(r.Files) == 0 {
+		return errWrongBody
+	}
+	return nil
+}

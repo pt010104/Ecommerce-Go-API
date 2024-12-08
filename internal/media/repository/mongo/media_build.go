@@ -5,17 +5,18 @@ import (
 
 	"github.com/pt010104/api-golang/internal/media"
 	"github.com/pt010104/api-golang/internal/models"
+	"github.com/pt010104/api-golang/pkg/mongo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func (r implRepository) buildMediaModel(opt media.UploadOption) (models.Media, error) {
+func (r implRepository) buildMediaModel(sc models.Scope, opt media.UploadOption) (models.Media, error) {
 	now := time.Now()
 
 	m := models.Media{
 		ID:        primitive.NewObjectID(),
-		UserID:    opt.UserID,
-		ShopID:    opt.ShopID,
+		UserID:    mongo.ObjectIDFromHexOrNil(sc.UserID),
+		ShopID:    mongo.ObjectIDFromHexOrNil(sc.ShopID),
 		FileName:  opt.FileName,
 		Folder:    opt.Folder,
 		Status:    models.MediaStatusPending,
@@ -43,5 +44,7 @@ func (r implRepository) buildUpdateModel(opt media.UpdateOption) bson.M {
 	updateSet["updated_at"] = now
 	opt.Model.UpdatedAt = now
 
-	return updateSet
+	return bson.M{
+		"$set": updateSet,
+	}
 }

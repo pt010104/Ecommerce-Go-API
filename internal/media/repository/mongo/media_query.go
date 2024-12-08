@@ -15,7 +15,7 @@ func (r implRepository) buildDetailQuery(ctx context.Context, sc models.Scope, i
 		return nil, err
 	}
 
-	filter["_id"] = id
+	filter["_id"] = mongo.ObjectIDFromHexOrNil(id)
 
 	return filter, nil
 }

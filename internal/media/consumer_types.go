@@ -1,11 +1,9 @@
 package media
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
-
 type ConsumeUploadMsgInput struct {
-	ID         primitive.ObjectID
-	UserID     primitive.ObjectID
-	ShopID     primitive.ObjectID
+	ID         string
+	UserID     string
+	ShopID     string
 	FolderName string
 	FileName   string
 	File       []byte

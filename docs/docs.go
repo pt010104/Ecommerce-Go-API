@@ -98,7 +98,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/media/upload": {
+        "/api/v1/media": {
             "post": {
                 "description": "Upload one or multiple media files",
                 "consumes": [

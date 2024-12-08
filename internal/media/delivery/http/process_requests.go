@@ -22,13 +22,13 @@ func (h handler) processUploadRequest(c *gin.Context) (models.Scope, uploadReque
 		return models.Scope{}, uploadRequest{}, errWrongBody
 	}
 
-	files := form.File["files"]
-	if len(files) == 0 {
-		return models.Scope{}, uploadRequest{}, errNoFiles
+	req := uploadRequest{
+		Files: form.File["files"],
 	}
 
-	req := uploadRequest{
-		Files: files,
+	if err := req.validate(); err != nil {
+		h.l.Errorf(ctx, "media.delivery.http.processUploadRequest: %v", err)
+		return models.Scope{}, uploadRequest{}, err
 	}
 
 	return sc, req, nil

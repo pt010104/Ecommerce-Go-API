@@ -16,22 +16,22 @@ func (r implRepository) getCollection(sc models.Scope) mongo.Collection {
 	return *r.database.Collection(collection)
 }
 
-func (r implRepository) Create(ctx context.Context, sc models.Scope, opt media.UploadOption) error {
+func (r implRepository) Create(ctx context.Context, sc models.Scope, opt media.UploadOption) (models.Media, error) {
 	col := r.getCollection(sc)
 
-	m, err := r.buildMediaModel(opt)
+	m, err := r.buildMediaModel(sc, opt)
 	if err != nil {
 		r.l.Errorf(ctx, "media.repository.mongo.Create.buildMediaModel: %v", err)
-		return err
+		return models.Media{}, err
 	}
 
 	_, err = col.InsertOne(ctx, m)
 	if err != nil {
 		r.l.Errorf(ctx, "media.repository.mongo.Create.InsertOne: %v", err)
-		return err
+		return models.Media{}, err
 	}
 
-	return nil
+	return m, nil
 }
 
 func (r implRepository) Update(ctx context.Context, sc models.Scope, id string, opt media.UpdateOption) (models.Media, error) {

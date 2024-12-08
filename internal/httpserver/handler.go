@@ -49,6 +49,9 @@ func (srv HTTPServer) mapHandlers() error {
 
 	//Producer
 	prod := producer.New(srv.l, srv.amqpConn)
+	if err := prod.Run(); err != nil {
+		return err
+	}
 
 	//Usecase
 	emailUC := emailUC.New(srv.l)

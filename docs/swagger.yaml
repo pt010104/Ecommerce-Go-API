@@ -430,7 +430,7 @@ paths:
       summary: Verify shop
       tags:
       - Admin
-  /api/v1/media/upload:
+  /api/v1/media:
     post:
       consumes:
       - multipart/form-data

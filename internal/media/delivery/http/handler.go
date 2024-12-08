@@ -19,7 +19,7 @@ import (
 // @Failure 400 {object} response.Resp "Bad Request"
 // @Failure 401 {object} response.Resp "Unauthorized"
 // @Failure 500 {object} response.Resp "Internal Server Error"
-// @Router /api/v1/media/upload [post]
+// @Router /api/v1/media [post]
 func (h handler) Upload(c *gin.Context) {
 	ctx := c.Request.Context()
 

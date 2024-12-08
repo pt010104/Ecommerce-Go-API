@@ -32,8 +32,8 @@ func (c Consumer) uploadWorker(d amqp.Delivery) {
 	}
 
 	sc := models.Scope{
-		UserID: msg.UserID.Hex(),
-		ShopID: msg.ShopID.Hex(),
+		UserID: msg.UserID,
+		ShopID: msg.ShopID,
 	}
 
 	err = c.uc.ConsumeUploadMsg(ctx, sc, input)

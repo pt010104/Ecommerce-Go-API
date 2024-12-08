@@ -5,9 +5,7 @@ import (
 )
 
 type UploadInput struct {
-	UserID primitive.ObjectID
-	ShopID primitive.ObjectID
-	Files  [][]byte
+	Files [][]byte
 }
 
 type GetFilter struct {

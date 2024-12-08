@@ -5,13 +5,15 @@ import (
 
 	"github.com/pt010104/api-golang/internal/media"
 	"github.com/pt010104/api-golang/internal/media/delivery/rabbitmq"
+	"github.com/pt010104/api-golang/internal/models"
 )
 
-func (uc implUsecase) publishUploadMediaMessage(ctx context.Context, file []byte, uploadOpt media.UploadOption) error {
+func (uc implUsecase) publishUploadMediaMessage(ctx context.Context, sc models.Scope, file []byte, uploadOpt media.UploadOption, id string) error {
 	message := rabbitmq.UploadMessage{
 		File:       file,
-		UserID:     uploadOpt.UserID,
-		ShopID:     uploadOpt.ShopID,
+		ID:         id,
+		UserID:     sc.UserID,
+		ShopID:     sc.ShopID,
 		FolderName: uploadOpt.Folder,
 		FileName:   uploadOpt.FileName,
 	}
