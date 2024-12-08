@@ -1,17 +1,18 @@
 package main
 
 import (
+	"github.com/cloudinary/cloudinary-go"
 	"github.com/pt010104/api-golang/config"
 	"github.com/pt010104/api-golang/internal/appconfig/mongo"
 	"github.com/pt010104/api-golang/internal/appconfig/redis"
 	httpServer "github.com/pt010104/api-golang/internal/httpserver"
 	pkgLog "github.com/pt010104/api-golang/pkg/log"
+	"github.com/pt010104/api-golang/pkg/rabbitmq"
 
 	"log"
 )
 
 func main() {
-	//t
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatalf("Failed to load config: %v", err)
@@ -37,17 +38,28 @@ func main() {
 	}
 	defer redisClient.Disconnect()
 
-	log.Println("Sending verification email...")
+	amqpConn, err := rabbitmq.Dial(cfg.RabbitMQConfig.URL, true)
+	if err != nil {
+		panic(err)
+	}
+	defer amqpConn.Close()
+
+	cld, err := cloudinary.NewFromURL(cfg.CloudinaryConfig.URL)
+	if err != nil {
+		panic(err)
+	}
+
 	srv := httpServer.New(l, httpServer.Config{
 		Port:         cfg.HTTPServer.Port,
 		JWTSecretKey: cfg.JWT.SecretKey,
 		Mode:         cfg.HTTPServer.Mode,
 		Database:     *db,
 		Redis:        redisClient,
+		AMQPConn:     amqpConn,
+		Cloudinary:   cld,
 	})
 
 	if err := srv.Run(); err != nil {
-
 		panic(err)
 	}
 

@@ -1,8 +1,10 @@
 package httpserver
 
 import (
+	cloudinary "github.com/cloudinary/cloudinary-go/"
 	"github.com/gin-gonic/gin"
 	pkgLog "github.com/pt010104/api-golang/pkg/log"
+	"github.com/pt010104/api-golang/pkg/rabbitmq"
 	"github.com/pt010104/api-golang/pkg/redis"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -19,6 +21,7 @@ type HTTPServer struct {
 	jwtSecretKey string
 	mode         string
 	redis        redis.Client
+	amqpConn     rabbitmq.Connection
 }
 
 type Config struct {
@@ -27,6 +30,8 @@ type Config struct {
 	Mode         string
 	Database     mongo.Database
 	Redis        redis.Client
+	AMQPConn     rabbitmq.Connection
+	Cloudinary   cloudinary.Cloudinary
 }
 
 func New(l pkgLog.Logger, cfg Config) *HTTPServer {
@@ -44,6 +49,7 @@ func New(l pkgLog.Logger, cfg Config) *HTTPServer {
 		port:         cfg.Port,
 		mode:         cfg.Mode,
 		redis:        cfg.Redis,
+		amqpConn:     cfg.AMQPConn,
 	}
 
 }

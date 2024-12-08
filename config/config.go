@@ -20,15 +20,25 @@ type LoggerConfig struct {
 	Encoding string `env:"LOG_ENCODING" envDefault:"console"`
 }
 
+type CloudinaryConfig struct {
+	URL string `env:"CLOUDINARY_URL"`
+}
+
 type Config struct {
-	HTTPServer  HTTPServerConfig
-	Logger      LoggerConfig
-	Mongo       MongoConfig
-	JWT         JWTConfig
-	RedisConfig RedisConfig
+	HTTPServer       HTTPServerConfig
+	Logger           LoggerConfig
+	Mongo            MongoConfig
+	JWT              JWTConfig
+	RedisConfig      RedisConfig
+	RabbitMQConfig   RabbitMQConfig
+	CloudinaryConfig CloudinaryConfig
 }
 type JWTConfig struct {
 	SecretKey string `env:"JWT_SECRET"`
+}
+
+type RabbitMQConfig struct {
+	URL string `env:"RABBITMQ_URL"`
 }
 
 type RedisConfig struct {
