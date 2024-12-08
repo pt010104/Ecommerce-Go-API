@@ -430,6 +430,62 @@ paths:
       summary: Verify shop
       tags:
       - Admin
+  /api/v1/media/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload one or multiple media files
+      parameters:
+      - default: '"*"'
+        description: Access-Control-Allow-Origin
+        in: header
+        name: Access-Control-Allow-Origin
+        type: string
+      - default: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+        description: Bearer JWT token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - default: 6707825d45804caaf8316957
+        description: User ID
+        in: header
+        name: x-client-id
+        required: true
+        type: string
+      - default: zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=
+        description: Session ID
+        in: header
+        name: session-id
+        required: true
+        type: string
+      - description: Media files to upload
+        in: formData
+        name: files
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Resp'
+      summary: Upload media files
+      tags:
+      - Media
   /api/v1/shops:
     delete:
       consumes:

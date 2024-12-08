@@ -1,7 +1,6 @@
 package mongo
 
 import (
-	"context"
 	"time"
 
 	"github.com/pt010104/api-golang/internal/media"
@@ -10,7 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func (r implRepository) buildMediaModel(ctx context.Context, opt media.UploadOption) (models.Media, error) {
+func (r implRepository) buildMediaModel(opt media.UploadOption) (models.Media, error) {
 	now := time.Now()
 
 	m := models.Media{

@@ -5,6 +5,7 @@ import (
 	"github.com/pt010104/api-golang/config"
 	"github.com/pt010104/api-golang/internal/appconfig/mongo"
 	"github.com/pt010104/api-golang/internal/appconfig/redis"
+	"github.com/pt010104/api-golang/internal/consumer"
 	httpServer "github.com/pt010104/api-golang/internal/httpserver"
 	pkgLog "github.com/pt010104/api-golang/pkg/log"
 	"github.com/pt010104/api-golang/pkg/rabbitmq"
@@ -49,6 +50,13 @@ func main() {
 		panic(err)
 	}
 
+	consumerServer := consumer.NewServer(l, amqpConn, *db, redisClient, *cld)
+	go func() {
+		if err := consumerServer.Run(); err != nil {
+			panic(err)
+		}
+	}()
+
 	srv := httpServer.New(l, httpServer.Config{
 		Port:         cfg.HTTPServer.Port,
 		JWTSecretKey: cfg.JWT.SecretKey,
@@ -56,7 +64,7 @@ func main() {
 		Database:     *db,
 		Redis:        redisClient,
 		AMQPConn:     amqpConn,
-		Cloudinary:   cld,
+		Cloudinary:   *cld,
 	})
 
 	if err := srv.Run(); err != nil {

@@ -5,7 +5,6 @@ go 1.22.7
 require (
 	github.com/caarlos0/env/v9 v9.0.0
 	github.com/cloudinary/cloudinary-go v1.7.0
-	github.com/cloudinary/cloudinary-go/v2 v2.9.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang-jwt/jwt/v5 v5.2.1

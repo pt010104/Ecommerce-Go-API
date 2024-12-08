@@ -19,7 +19,7 @@ func (r implRepository) getCollection(sc models.Scope) mongo.Collection {
 func (r implRepository) Create(ctx context.Context, sc models.Scope, opt media.UploadOption) error {
 	col := r.getCollection(sc)
 
-	m, err := r.buildMediaModel(ctx, opt)
+	m, err := r.buildMediaModel(opt)
 	if err != nil {
 		r.l.Errorf(ctx, "media.repository.mongo.Create.buildMediaModel: %v", err)
 		return err

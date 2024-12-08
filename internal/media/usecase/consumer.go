@@ -8,9 +8,9 @@ import (
 	"github.com/pt010104/api-golang/internal/models"
 )
 
-func (uc *implUsecase) ConsumeUploadMessage(ctx context.Context, sc models.Scope, input media.ConsumeUploadMsgInput) error {
+func (uc *implUsecase) ConsumeUploadMsg(ctx context.Context, sc models.Scope, input media.ConsumeUploadMsgInput) error {
 	status := models.MediaStatusFailed
-	med, err := uc.repo.Detail(ctx, sc, input.ID)
+	med, err := uc.repo.Detail(ctx, sc, input.ID.Hex())
 	if err != nil {
 		uc.l.Errorf(ctx, "media.usecase.ConsumeUploadMessage.repo.Detail: %v", err)
 		return err
@@ -18,14 +18,14 @@ func (uc *implUsecase) ConsumeUploadMessage(ctx context.Context, sc models.Scope
 
 	res, err := uc.cloud.Upload.Upload(ctx, input.File, uploader.UploadParams{
 		Folder:   input.FolderName,
-		PublicID: input.ID,
+		PublicID: input.FileName,
 	})
 	if err != nil {
 		uc.l.Errorf(ctx, "media.usecase.ConsumeUploadMessage.cloud.Upload.Upload: %v", err)
 		status = models.MediaStatusFailed
 	}
 
-	_, err = uc.repo.Update(ctx, sc, input.ID, media.UpdateOption{
+	_, err = uc.repo.Update(ctx, sc, input.ID.Hex(), media.UpdateOption{
 		Model:  med,
 		URL:    res.URL,
 		Status: status,

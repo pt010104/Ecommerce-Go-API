@@ -15,7 +15,7 @@ type implUsecase struct {
 	cloud cloudinary.Cloudinary
 }
 
-func NewUsecase(l log.Logger, repo media.Repository, prod producer.Producer, cloud cloudinary.Cloudinary) media.UseCase {
+func New(l log.Logger, repo media.Repository, prod producer.Producer, cloud cloudinary.Cloudinary) media.UseCase {
 	return &implUsecase{
 		l:    l,
 		repo: repo,
