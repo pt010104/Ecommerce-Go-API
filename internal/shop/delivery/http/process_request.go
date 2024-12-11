@@ -118,7 +118,7 @@ func (h handler) processGetShopIDByUserIDRequest(c *gin.Context) (models.Scope, 
 	}
 
 	var req GetShopIDByUserIDRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBindUri(&req); err != nil {
 		h.l.Errorf(ctx, "shop.delivery.http.handler.processGetShopIDByUserIDRequestt: invalid request body")
 		return models.Scope{}, req, errWrongBody
 	}

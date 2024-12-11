@@ -170,7 +170,7 @@ type updateResp struct {
 	AvgRate float64 `json:"avg_rate"`
 }
 type GetShopIDByUserIDRequest struct {
-	ID string `json:"id"`
+	ID string `uri:"id" binding:"required"`
 }
 
 func (r GetShopIDByUserIDRequest) validate() error {
