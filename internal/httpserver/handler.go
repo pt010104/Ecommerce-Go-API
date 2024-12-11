@@ -13,7 +13,7 @@ import (
 	cartUC "github.com/pt010104/api-golang/internal/cart/usecase"
 	shopRepo "github.com/pt010104/api-golang/internal/shop/repository/mongo"
 	userRepo "github.com/pt010104/api-golang/internal/user/repository/mongo"
-	"github.com/pt010104/api-golang/internal/user/repository/mongo/redis"
+	"github.com/pt010104/api-golang/internal/user/repository/redis"
 	voucherRepo "github.com/pt010104/api-golang/internal/vouchers/repository/mongo"
 
 	adminUC "github.com/pt010104/api-golang/internal/admins/usecase"

@@ -47,7 +47,6 @@ func main() {
 	})
 
 	if err := srv.Run(); err != nil {
-
 		panic(err)
 	}
 
