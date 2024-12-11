@@ -7,8 +7,9 @@ import (
 )
 
 type Redis interface {
-	SetSecretKey(ctx context.Context, sessionID string, secretKey string) error
-	GetSecretKey(ctx context.Context, sessionID string) ([]byte, error)
-
+	GetSecretKey(ctx context.Context, sc models.Scope) (string, error)
 	StoreSecretKey(sc models.Scope, secretKey string, ctx context.Context) error
+
+	DetailUser(ctx context.Context, userID string) (models.User, error)
+	StoreUser(ctx context.Context, user models.User) error
 }

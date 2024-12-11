@@ -221,3 +221,24 @@ func (h handler) Update(c *gin.Context) {
 
 	response.OK(c, h.newUpdateShopResp(updatedShop))
 }
+
+func (h handler) GetShopIDByUserID(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	sc, req, err := h.processGetShopIDByUserIDRequest(c)
+	if err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.GetShopIDByUserID: %v", err)
+		response.Error(c, err)
+		return
+	}
+
+	shopID, err := h.uc.GetIDByUserID(ctx, sc, req.ID)
+	if err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.GetShopIDByUserID: %v", err)
+		err := h.mapErrors(err)
+		response.Error(c, err)
+		return
+	}
+
+	response.OK(c, shopID)
+}

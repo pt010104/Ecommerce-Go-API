@@ -7,17 +7,15 @@ import (
 )
 
 type Middleware struct {
-	l        log.Logger
-	userRepo user.Repo
-	shopUC   shop.UseCase
-	userUC   user.UseCase
+	l      log.Logger
+	shopUC shop.UseCase
+	userUC user.UseCase
 }
 
 func New(l log.Logger, userRepo user.Repo, shopUC shop.UseCase, userUC user.UseCase) Middleware {
 	return Middleware{
-		l:        l,
-		userRepo: userRepo,
-		shopUC:   shopUC,
-		userUC:   userUC,
+		l:      l,
+		shopUC: shopUC,
+		userUC: userUC,
 	}
 }

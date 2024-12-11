@@ -169,6 +169,19 @@ type updateResp struct {
 	Address address `json:"address"`
 	AvgRate float64 `json:"avg_rate"`
 }
+type GetShopIDByUserIDRequest struct {
+	ID string `json:"id"`
+}
+
+func (r GetShopIDByUserIDRequest) validate() error {
+
+	if !mongo.IsObjectID(r.ID) {
+		return errWrongBody
+	}
+
+	return nil
+}
+
 type updateShopRequest struct {
 	IDs      []string `json:"ids" binding:"required"`
 	Name     string   `json:"name"`

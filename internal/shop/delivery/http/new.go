@@ -12,7 +12,7 @@ type Handler interface {
 	Get(c *gin.Context)
 	Delete(c *gin.Context)
 	Update(c *gin.Context)
-
+	GetShopIDByUserID(c *gin.Context)
 	CreateProduct(c *gin.Context)
 	DetailProduct(c *gin.Context)
 	ListProduct(c *gin.Context)

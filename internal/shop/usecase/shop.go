@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"github.com/pt010104/api-golang/internal/models"
@@ -150,4 +151,14 @@ func (uc implUsecase) ListShop(ctx context.Context, sc models.Scope, opt shop.Ge
 	}
 
 	return s, nil
+}
+func (uc implUsecase) GetIDByUserID(ctx context.Context, sc models.Scope, userID string) (string, error) {
+	fmt.Print(userID)
+	id, err := uc.repo.GetShopIDByUserID(ctx, sc, userID)
+	if err != nil {
+		uc.l.Errorf(ctx, "shop.usecase.GetIDByUserID: %v", err)
+		return "", err
+	}
+
+	return id, nil
 }

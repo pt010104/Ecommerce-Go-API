@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/pt010104/api-golang/internal/models"
@@ -97,7 +98,21 @@ func (repo implRepo) DetailShop(ctx context.Context, sc models.Scope, id string)
 
 	return s, nil
 }
+func (repo implRepo) GetShopIDByUserID(ctx context.Context, sc models.Scope, userID string) (string, error) {
+	col := repo.getShopCollection()
+	//usse this mongo.ObjectIDFromHexOrNil
+	filter := repo.buildGetShopIDByUserIdQuery(ctx, userID)
+	var s models.Shop
+	//print filter
+	fmt.Println(filter)
+	err := col.FindOne(ctx, filter).Decode(&s)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.GetShopIDByUserID.FindOne: %v", err)
+		return "", err
+	}
 
+	return s.ID.Hex(), nil
+}
 func (repo implRepo) DeleteShop(ctx context.Context, sc models.Scope) error {
 
 	col := repo.getShopCollection()

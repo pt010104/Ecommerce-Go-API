@@ -16,7 +16,7 @@ type UseCase interface {
 	Detail(ctx context.Context, sc models.Scope, id string) (models.Shop, error)
 	Delete(ctx context.Context, sc models.Scope) error
 	Update(ctx context.Context, sc models.Scope, input UpdateInput) ([]models.Shop, error)
-
+	GetIDByUserID(ctx context.Context, sc models.Scope, userID string) (string, error)
 	//Inventory
 	CreateInventory(ctx context.Context, sc models.Scope, input CreateInventoryInput) (models.Inventory, error)
 	DetailInventory(ctx context.Context, id primitive.ObjectID) (models.Inventory, error)

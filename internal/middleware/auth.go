@@ -1,9 +1,12 @@
 package middleware
 
 import (
+	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/gin-gonic/gin"
+	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/pkg/jwt"
 	"github.com/pt010104/api-golang/pkg/response"
 )
@@ -14,18 +17,41 @@ func (m Middleware) Auth() gin.HandlerFunc {
 		sessionID := c.GetHeader("session-id")
 
 		ctx := c.Request.Context()
-		k, err := m.userUC.DetailKeyToken(ctx, userID, sessionID)
-		if err != nil {
+
+		var wg sync.WaitGroup
+		var wgErr error
+		var k models.KeyToken
+		var u models.User
+
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			var err error
+			k, err = m.userUC.DetailKeyToken(ctx, userID, sessionID)
+			if err != nil {
+				wgErr = fmt.Errorf("middleware.Auth.user.usecase.DetailKeyToken: %v", err)
+				return
+			}
+		}()
+
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			var err error
+			u, err = m.userUC.Detail(ctx, models.Scope{}, userID)
+			if err != nil {
+				wgErr = fmt.Errorf("middleware.Auth.user.usecase.DetailUser: %v", err)
+				return
+			}
+		}()
+
+		wg.Wait()
+		if wgErr != nil {
 			response.Unauthorized(c)
 			c.Abort()
 			return
 		}
-		u, err := m.userRepo.DetailUser(ctx, userID)
-		if err != nil {
-			response.Unauthorized(c)
-			c.Abort()
-			return
-		}
+
 		role := u.Role
 		keyString := k.SecretKey
 

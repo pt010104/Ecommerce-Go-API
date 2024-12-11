@@ -261,16 +261,25 @@ func (uc implUsecase) VerifyEmail(ctx context.Context, email string) (token stri
 }
 
 func (uc implUsecase) Detail(ctx context.Context, sc models.Scope, id string) (models.User, error) {
+	if cachedUser, err := uc.redisRepo.DetailUser(ctx, id); err == nil {
+		return cachedUser, nil
+	}
+
 	u, err := uc.repo.DetailUser(ctx, id)
 	if err != nil {
+		uc.l.Warnf(ctx, "user.usecase.Detail.repo.DetailUser: %v", err)
 		if err == mongo.ErrNoDocuments {
-			uc.l.Warnf(ctx, "user.usecase.Detail.repo.DetailUser: %v", err)
 			return models.User{}, user.ErrUserNotFound
 		}
-		uc.l.Errorf(ctx, "user.usecase.Detail.repo.DetailUser: %v", err)
+
 		return models.User{}, err
 	}
-	uc.repo.DeleteKeyToken(ctx, sc.UserID, sc.SessionID)
+
+	err = uc.redisRepo.StoreUser(ctx, u)
+	if err != nil {
+		uc.l.Warnf(ctx, "user.usecase.Detail.redis.StoreUser: %v", err)
+	}
+
 	return u, nil
 }
 
@@ -440,18 +449,15 @@ func (uc implUsecase) DistributeNewToken(ctx context.Context, input user.Distrib
 }
 func (uc implUsecase) DetailKeyToken(ctx context.Context, userID string, sessionID string) (models.KeyToken, error) {
 
-	key, err := uc.redisRepo.GetSecretKey(ctx, sessionID)
+	key, err := uc.redisRepo.GetSecretKey(ctx, models.Scope{
+		UserID:    userID,
+		SessionID: sessionID,
+	})
 	if err != nil {
-		if err.Error() == "redis: nil" { // Cache miss
-			uc.l.Infof(ctx, "Cache miss for sessionID: %s", sessionID)
-		} else { // Handle actual Redis errors
-			uc.l.Errorf(ctx, "user.usecase.DetailKeyToken.Redis", err)
-			return models.KeyToken{}, err
-		}
+		uc.l.Warnf(ctx, "user.usecase.DetailKeyToken.GetSecretKey", err)
 	}
 
 	if len(key) > 0 {
-
 		return models.KeyToken{SecretKey: string(key)}, nil
 	}
 
@@ -461,7 +467,10 @@ func (uc implUsecase) DetailKeyToken(ctx context.Context, userID string, session
 		return models.KeyToken{}, err
 	}
 
-	cacheErr := uc.redisRepo.StoreSecretKey(models.Scope{SessionID: sessionID}, k.SecretKey, ctx)
+	cacheErr := uc.redisRepo.StoreSecretKey(models.Scope{
+		UserID:    userID,
+		SessionID: sessionID,
+	}, k.SecretKey, ctx)
 	if cacheErr != nil {
 		uc.l.Warnf(ctx, "user.usecase.DetailKeyToken.CacheUpdate", cacheErr)
 	}
