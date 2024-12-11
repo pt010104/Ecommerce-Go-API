@@ -18,6 +18,7 @@ func MapShopRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
 	r.GET("", h.Get)
 	r.DELETE("", h.Delete)
 	r.PATCH("", h.Update)
+	r.GET("get-shop-id-by-user-id", h.GetShopIDByUserID)
 }
 
 func MapProductRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {

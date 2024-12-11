@@ -108,3 +108,26 @@ func (h handler) processUpdateShopRequest(c *gin.Context) (models.Scope, updateS
 
 	return sc, req, nil
 }
+func (h handler) processGetShopIDByUserIDRequest(c *gin.Context) (models.Scope, GetShopIDByUserIDRequest, error) {
+	ctx := c.Request.Context()
+
+	payload, ok := jwt.GetPayloadFromContext(ctx)
+	if !ok {
+		h.l.Errorf(ctx, "shop.delivery.http.handler.processGetShopIDByUserIDRequest: unauthorized")
+		return models.Scope{}, GetShopIDByUserIDRequest{}, pkgErrors.NewUnauthorizedHTTPError()
+	}
+
+	var req GetShopIDByUserIDRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.handler.processGetShopIDByUserIDRequestt: invalid request body")
+		return models.Scope{}, req, errWrongBody
+	}
+	if err := req.validate(); err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.handler.processGetShopIDByUserIDRequest: invalid request")
+		return models.Scope{}, req, err
+	}
+
+	sc := jwt.NewScope(payload)
+
+	return sc, req, nil
+}

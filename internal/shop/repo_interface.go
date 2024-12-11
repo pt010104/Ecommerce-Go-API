@@ -17,7 +17,7 @@ type Repository interface {
 	DetailShop(ctx context.Context, sc models.Scope, id string) (models.Shop, error)
 	DeleteShop(ctx context.Context, sc models.Scope) error
 	UpdateShop(ctx context.Context, sc models.Scope, option UpdateOption) (models.Shop, error)
-
+	GetShopIDByUserID(ctx context.Context, sc models.Scope, userID string) (string, error)
 	// Inventory
 	CreateInventory(ctx context.Context, sc models.Scope, opt CreateInventoryOption) (models.Inventory, error)
 	DetailInventory(ctx context.Context, ID primitive.ObjectID) (models.Inventory, error)

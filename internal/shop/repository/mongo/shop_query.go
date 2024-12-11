@@ -49,3 +49,8 @@ func (repo implRepo) buildShopDetailQuery(ctx context.Context, sc models.Scope, 
 
 	return filter, nil
 }
+func (repo implRepo) buildGetShopIDByUserIdQuery(ctx context.Context, userID string) bson.M {
+	return bson.M{
+		"user_id": mongo.ObjectIDFromHexOrNil(userID),
+	}
+}
