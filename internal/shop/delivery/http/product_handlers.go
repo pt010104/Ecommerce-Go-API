@@ -40,15 +40,24 @@ func (h handler) CreateProduct(c *gin.Context) {
 	response.OK(c, product)
 }
 
-// @Summary      Get product details
-// @Description  Retrieve detailed information about a product by ID
-// @Tags         Product
-// @Accept       json
-// @Produce      json
-// @Param        request body detailProductReq true "Request Body"
-// @Success      200 {object} detailProductResp "Product Details"
-// @Failure      400 {object} response.Resp "Bad Request"
-// @Router       /api/v1/shops/ [get]
+// @Summary		get shop detail by their id
+// @Schemes		http https
+// @Description	Get shop detail by id
+// @Tags			Products
+// @Accept			json
+// @Produce		json
+//
+// @Param			Access-Control-Allow-Origin	header		string		false	"Access-Control-Allow-Origin"	default("*")
+// @Param			Authorization				header		string		true	"Bearer JWT token"				default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
+// @Param			x-client-id					header		string		true	"User ID"						default(6707825d45804caaf8316957)
+// @Param			session-id					header		string		true	"Session ID"					default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
+// @Param			id							path		string		true	"User ID"
+//
+// @Success		200							{object}	detailProductResp	"Success"
+// @Failure		400							{object}	response.Resp	"Bad Request"
+// @Failure		500							{object}	response.Resp	"Internal Server Error"
+//
+// @Router			/api/v1/shops/products/{id} [GET]
 func (h handler) DetailProduct(c *gin.Context) {
 	ctx := c.Request.Context()
 

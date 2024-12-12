@@ -39,7 +39,7 @@ func (h handler) processDetailProductRequest(c *gin.Context) (models.Scope, deta
 	}
 
 	var req detailProductReq
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBindUri(&req); err != nil {
 		h.l.Errorf(ctx, "shop.delivery.http.handler.processCreateRequest: invalid request")
 		return models.Scope{}, detailProductReq{}, errWrongBody
 	}

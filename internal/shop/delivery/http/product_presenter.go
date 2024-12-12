@@ -67,7 +67,7 @@ func (r createProductReq) validate() error {
 }
 
 type detailProductReq struct {
-	ID string `json:"id" binding:"required"`
+	ID string `uri:"id" binding:"required"`
 }
 type detailProductResp struct {
 	ID            string   `json:"id" binding:"required"`
