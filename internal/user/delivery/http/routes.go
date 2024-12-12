@@ -16,4 +16,5 @@ func MapRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
 	r.Use(mw.Auth())
 	r.GET("/:id", h.Detail)
 	r.POST("/sign-out", h.SignOut)
+	r.PUT("", h.Update)
 }

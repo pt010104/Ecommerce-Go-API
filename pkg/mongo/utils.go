@@ -52,6 +52,7 @@ func BuildShopScopeQuery(ctx context.Context, l log.Logger, sc models.Scope) (bs
 
 	return filter, nil
 }
+
 func BuildScopeQuery(ctx context.Context, l log.Logger, sc models.Scope) (bson.M, error) {
 	filter := bson.M{}
 

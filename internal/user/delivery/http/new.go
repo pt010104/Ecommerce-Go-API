@@ -16,6 +16,7 @@ type Handler interface {
 	VerifyEmail(c *gin.Context)
 	VerifyUser(c *gin.Context)
 	DistributeNewToken(c *gin.Context)
+	Update(c *gin.Context)
 }
 type handler struct {
 	l  log.Logger

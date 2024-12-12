@@ -38,7 +38,7 @@ func (m Middleware) Auth() gin.HandlerFunc {
 		go func() {
 			defer wg.Done()
 			var err error
-			u, err = m.userUC.Detail(ctx, models.Scope{}, userID)
+			u, err = m.userUC.GetModel(ctx, userID)
 			if err != nil {
 				wgErr = fmt.Errorf("middleware.Auth.user.usecase.DetailUser: %v", err)
 				return

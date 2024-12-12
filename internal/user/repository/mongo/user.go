@@ -55,7 +55,6 @@ func (repo implRepo) GetUser(ctx context.Context, opt user.GetUserOption) (model
 	return user, nil
 }
 func (repo implRepo) UpdateUser(ctx context.Context, opt user.UpdateUserOption) (models.User, error) {
-
 	col := repo.getUserCollection()
 
 	filter, err := repo.buildUserDetailQuery(ctx, opt.Model.ID.Hex())

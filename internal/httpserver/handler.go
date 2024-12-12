@@ -3,6 +3,7 @@ package httpserver
 import (
 	adminHTTP "github.com/pt010104/api-golang/internal/admins/delivery/http"
 	cartHTTP "github.com/pt010104/api-golang/internal/cart/delivery/http"
+	mediaHTTP "github.com/pt010104/api-golang/internal/media/delivery/http"
 	"github.com/pt010104/api-golang/internal/middleware"
 	shopHTTP "github.com/pt010104/api-golang/internal/shop/delivery/http"
 	userHTTP "github.com/pt010104/api-golang/internal/user/delivery/http"
@@ -11,6 +12,7 @@ import (
 	adminRepo "github.com/pt010104/api-golang/internal/admins/repository/mongo"
 	cartRepo "github.com/pt010104/api-golang/internal/cart/repository/mongo"
 	cartUC "github.com/pt010104/api-golang/internal/cart/usecase"
+	mediaRepo "github.com/pt010104/api-golang/internal/media/repository/mongo"
 	shopRepo "github.com/pt010104/api-golang/internal/shop/repository/mongo"
 	userRepo "github.com/pt010104/api-golang/internal/user/repository/mongo"
 	"github.com/pt010104/api-golang/internal/user/repository/redis"
@@ -18,10 +20,12 @@ import (
 
 	adminUC "github.com/pt010104/api-golang/internal/admins/usecase"
 	emailUC "github.com/pt010104/api-golang/internal/email/usecase"
+	mediaUC "github.com/pt010104/api-golang/internal/media/usecase"
 	shopUC "github.com/pt010104/api-golang/internal/shop/usecase"
 	userUC "github.com/pt010104/api-golang/internal/user/usecase"
 	voucherUC "github.com/pt010104/api-golang/internal/vouchers/usecase"
 
+	producer "github.com/pt010104/api-golang/internal/media/delivery/rabbitmq/producer"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
@@ -41,9 +45,18 @@ func (srv HTTPServer) mapHandlers() error {
 	voucherRepo := voucherRepo.New(srv.l, srv.database)
 	redisRepo := redis.New(srv.l, srv.redis)
 	cartRepo := cartRepo.New(srv.l, srv.database)
+	mediaRepo := mediaRepo.New(srv.l, srv.database)
+
+	//Producer
+	prod := producer.New(srv.l, srv.amqpConn)
+	if err := prod.Run(); err != nil {
+		return err
+	}
+
 	//Usecase
 	emailUC := emailUC.New(srv.l)
-	userUC := userUC.New(srv.l, userRepo, emailUC, redisRepo)
+	mediaUC := mediaUC.New(srv.l, mediaRepo, prod, srv.cloudinary)
+	userUC := userUC.New(srv.l, userRepo, emailUC, redisRepo, mediaUC)
 	shopUC := shopUC.New(srv.l, shopRepo, nil)
 	adminUC := adminUC.New(adminRepo, srv.l, shopUC)
 	shopUC.SetAdminUC(adminUC)
@@ -56,6 +69,7 @@ func (srv HTTPServer) mapHandlers() error {
 	adminH := adminHTTP.New(srv.l, adminUC)
 	voucherH := voucherHTTP.New(srv.l, voucherUC)
 	cartH := cartHTTP.New(srv.l, cartUC)
+	mediaH := mediaHTTP.New(srv.l, mediaUC)
 	mw := middleware.New(srv.l, userRepo, shopUC, userUC)
 
 	//Routes
@@ -66,6 +80,7 @@ func (srv HTTPServer) mapHandlers() error {
 	adminHTTP.MapRouters(api.Group("/admin"), adminH, mw)
 	voucherHTTP.MapRouters(api.Group("/vouchers"), voucherH, mw)
 	cartHTTP.MapRouters(api.Group("/carts"), cartH, mw)
+	mediaHTTP.MapRouters(api.Group("/media"), mediaH, mw)
 
 	return nil
 }
