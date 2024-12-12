@@ -903,7 +903,9 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {}
+                        "schema": {
+                            "type": "object"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -969,7 +971,9 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {}
+                        "schema": {
+                            "type": "object"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1157,7 +1161,9 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {}
+                        "schema": {
+                            "type": "object"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1208,7 +1214,9 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {}
+                        "schema": {
+                            "type": "object"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1271,7 +1279,9 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {}
+                        "schema": {
+                            "type": "object"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1377,7 +1387,7 @@ const docTemplate = `{
         },
         "/carts": {
             "get": {
-                "description": "Retrieve a list of carts based on user ID and filters",
+                "description": "Retrieve a list of carts based on user ID and filters , if no query is passed , all cart of current user will be returned",
                 "consumes": [
                     "application/json"
                 ],
@@ -1418,13 +1428,6 @@ const docTemplate = `{
                         "description": "Session ID",
                         "name": "session-id",
                         "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "user_id",
-                        "in": "query",
                         "required": true
                     },
                     {

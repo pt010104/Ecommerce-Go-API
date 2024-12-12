@@ -1015,7 +1015,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -1060,7 +1061,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -1185,7 +1187,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -1219,7 +1222,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -1262,7 +1266,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -1282,7 +1287,8 @@ paths:
     get:
       consumes:
       - application/json
-      description: Retrieve a list of carts based on user ID and filters
+      description: Retrieve a list of carts based on user ID and filters , if no query
+        is passed , all cart of current user will be returned
       parameters:
       - default: '"*"'
         description: Access-Control-Allow-Origin
@@ -1305,11 +1311,6 @@ paths:
         description: Session ID
         in: header
         name: session-id
-        required: true
-        type: string
-      - description: User ID
-        in: query
-        name: user_id
         required: true
         type: string
       - collectionFormat: csv

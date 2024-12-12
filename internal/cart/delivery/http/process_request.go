@@ -66,7 +66,7 @@ func (h handler) processListCartRequest(c *gin.Context) (models.Scope, ListCartR
 
 	var req ListCartRequest
 	req.UserID = c.GetHeader("x-client-id")
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBindQuery(&req); err != nil {
 		h.l.Errorf(ctx, "cart.delivery.http.handler.processListCartRequest: invalid request")
 		return models.Scope{}, req, errWrongBody
 	}

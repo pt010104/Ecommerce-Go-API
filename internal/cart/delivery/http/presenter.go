@@ -159,8 +159,8 @@ func (r UpdateCartRequest) toInput() cart.UpdateCartOption {
 
 type ListCartRequest struct {
 	UserID  string
-	IDs     []string `json:"ids"`
-	ShopIDs []string `json:"shop_ids"`
+	IDs     []string `form:"ids"`
+	ShopIDs []string `form:"shop_ids"`
 }
 
 func (r ListCartRequest) toInput() cart.GetCartFilter {
@@ -204,7 +204,7 @@ type ListCartItemResponse struct {
 }
 
 type GetCartRequest struct {
-	ID     string `json:"id"`
+	ID     string `uri:"id"`
 	UserID string
 }
 

@@ -59,7 +59,7 @@ func (h handler) processListProductRequest(c *gin.Context) (models.Scope, listPr
 	}
 
 	var req listProductRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBindQuery(&req); err != nil {
 		h.l.Errorf(ctx, "shop.delivery.http.handler.processListRequest: invalid request")
 		return models.Scope{}, req, errWrongQuery
 	}

@@ -103,9 +103,9 @@ type deleteProductRequest struct {
 }
 
 type listProductRequest struct {
-	IDs    []string `json:"ids"`
-	Search string   `json:"search"`
-	ShopID string   `json:"shop_id"`
+	IDs    []string `form:"ids"`
+	Search string   `form:"search"`
+	ShopID string   `form:"shop_id"`
 }
 type getProductRequest struct {
 	IDs     []string `form:"ids"`
