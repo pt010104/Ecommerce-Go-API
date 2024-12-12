@@ -35,6 +35,7 @@ func (uc implUsecase) Upload(ctx context.Context, sc models.Scope, opt media.Upl
 }
 
 func (uc implUsecase) Detail(ctx context.Context, sc models.Scope, id string) (models.Media, error) {
+	uc.l.Infof(ctx, "media.usecase.Detail: %v", id)
 	m, err := uc.repo.Detail(ctx, sc, id)
 	if err != nil {
 		uc.l.Errorf(ctx, "media.usecase.Detail.repo.Detail: %v", err)

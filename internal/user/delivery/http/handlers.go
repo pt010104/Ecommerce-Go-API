@@ -1,7 +1,10 @@
 package http
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
+
 	"github.com/pt010104/api-golang/pkg/response"
 )
 
@@ -318,4 +321,41 @@ func (h handler) DistributeNewToken(c *gin.Context) {
 		return
 	}
 	response.OK(c, h.newDistributeNewTokenResp(e))
+}
+
+// @Summary		Update User avatar
+// @Schemes		http https
+// @Description	Update user avatar
+// @Tags			User
+// @Accept			json
+// @Produce		json
+//
+// @Param			Access-Control-Allow-Origin	header		string	false	"Access-Control-Allow-Origin"	default("*")
+// @Param			Authorization				header		string	true	"Bearer JWT token"				default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
+// @Param			x-client-id					header		string	true	"User ID"						default(6707825d45804caaf8316957)
+// @Param			session-id					header		string	true	"Session ID"					default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
+// @Param			media_id					media_id body		string	true	"MediaID"
+//
+// @Success		200							{object}	UpdateAvatarResp
+// @Failure		400							{object}	response.Resp	"Bad Request"
+// @Failure		404							{object}	response.Resp	"User Not Found"
+// @Failure		500							{object}	response.Resp	"Internal Server Error"
+//
+// @Router			/api/v1/users/update-avater [post]
+func (h handler) UpdateAvatar(c *gin.Context) {
+	ctx := c.Request.Context()
+	sc, req, err := h.processUpdateAvatarRequest(c)
+	if err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.UpdateAvatar.processUpdateAvatarRequest: %v", err)
+		response.Error(c, err)
+		return
+	}
+	u, err := h.uc.UpdateAvatar(ctx, sc, req.toInput())
+	fmt.Print("reqid", req.MediaID)
+	if err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.UpdateAvatar.uc.UpdateAvatar: %v", err)
+		response.Error(c, err)
+		return
+	}
+	response.OK(c, h.newUpdateAvatarResp(u))
 }

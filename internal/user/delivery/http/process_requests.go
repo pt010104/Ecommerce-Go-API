@@ -141,3 +141,18 @@ func (h handler) processDistributeNewTokenRequest(c *gin.Context) (distributeNew
 
 	return req, nil
 }
+func (h handler) processUpdateAvatarRequest(c *gin.Context) (models.Scope, UpdateAvatarReq, error) {
+	ctx := c.Request.Context()
+	payload, ok := jwt.GetPayloadFromContext(ctx)
+	if !ok {
+		h.l.Errorf(ctx, "survey.delivery.http.handler.processUpdateAvatarRequest: unauthorized")
+		return models.Scope{}, UpdateAvatarReq{}, pkgErrors.NewUnauthorizedHTTPError()
+	}
+	var req UpdateAvatarReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.processUpdateAvatarRequest: invalid request")
+		return models.Scope{}, UpdateAvatarReq{}, errWrongBody
+	}
+	sc := jwt.NewScope(payload)
+	return sc, req, nil
+}

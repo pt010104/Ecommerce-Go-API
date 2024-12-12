@@ -64,12 +64,14 @@ func (repo implRepo) UpdateUser(ctx context.Context, opt user.UpdateUserOption) 
 		return models.User{}, err
 
 	}
+	//print filter
 
 	update, nm, err := repo.buildUpdateUserModel(ctx, opt)
 	if err != nil {
 		repo.l.Errorf(ctx, "user.repository.mongo.UpdateUser.buildUpdateUserModel: %v", err)
 		return models.User{}, err
 	}
+	repo.l.Infof(ctx, "UpdateUser: %v", opt.MediaID)
 
 	_, err = col.UpdateOne(ctx, filter, update)
 	if err != nil {

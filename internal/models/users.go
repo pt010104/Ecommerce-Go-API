@@ -15,4 +15,5 @@ type User struct {
 	UpdatedAt  time.Time          `bson:"updated_at"`
 	IsVerified bool               `bson:"is_verified"`
 	Role       int                `bson:"role"`
+	MediaID    primitive.ObjectID `bson:"media_id"`
 }

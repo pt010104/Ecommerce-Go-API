@@ -48,3 +48,11 @@ type DistributeNewTokenInput struct {
 type DistributeNewTokenOutput struct {
 	Token Token
 }
+type UpdateAvatarInput struct {
+	UserID  string
+	MediaID string
+}
+type DetailUserOutput struct {
+	User       models.User
+	Avatar_URL string
+}

@@ -3,6 +3,7 @@ package http
 import (
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/user"
+	"github.com/pt010104/api-golang/pkg/mongo"
 )
 
 type signupReq struct {
@@ -92,13 +93,19 @@ type detailResp struct {
 	ID    string `json:"id"`
 	Email string `json:"email"`
 	Name  string `json:"name"`
+
+	Avatar Avatar_obj `json:"avatar"`
 }
 
-func (h handler) newDetailResp(u models.User) detailResp {
+func (h handler) newDetailResp(u user.DetailUserOutput) detailResp {
 	return detailResp{
-		ID:    u.ID.Hex(),
-		Email: u.Email,
-		Name:  u.Name,
+		ID:    u.User.ID.Hex(),
+		Email: u.User.Email,
+		Name:  u.User.Name,
+		Avatar: Avatar_obj{
+			MediaID: u.User.MediaID.Hex(),
+			URL:     u.Avatar_URL,
+		},
 	}
 }
 
@@ -124,6 +131,10 @@ func (r distributeNewTokenReq) toInput() user.DistributeNewTokenInput {
 	}
 }
 
+type Avatar_obj struct {
+	MediaID string `json:"media_id"`
+	URL     string `json:"url"`
+}
 type signInResp struct {
 	ID        string     `json:"id"`
 	SessionID string     `json:"session_id"`
@@ -151,5 +162,32 @@ func (h handler) newDistributeNewTokenResp(output user.DistributeNewTokenOutput)
 	return distributeNewTokenResp{
 		NewAccessToken:  output.Token.AccessToken,
 		NewRefreshToken: output.Token.RefreshToken,
+	}
+}
+
+type UpdateAvatarReq struct {
+	MediaID string `json:"media_id" binding:"required"`
+}
+
+func (r UpdateAvatarReq) toInput() user.UpdateAvatarInput {
+	return user.UpdateAvatarInput{
+		MediaID: r.MediaID,
+	}
+}
+func (r UpdateAvatarReq) validate() error {
+	if r.MediaID == "" || !mongo.IsObjectID(r.MediaID) {
+		return errWrongBody
+	}
+
+	return nil
+}
+
+type UpdateAvatarResp struct {
+	MediaID string `json:"media_id"`
+}
+
+func (h handler) newUpdateAvatarResp(user models.User) UpdateAvatarResp {
+	return UpdateAvatarResp{
+		MediaID: user.MediaID.Hex(),
 	}
 }

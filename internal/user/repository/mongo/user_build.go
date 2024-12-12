@@ -22,6 +22,7 @@ func (impl implRepo) buildUserModel(context context.Context, opt user.CreateUser
 		UpdatedAt:  now,
 		IsVerified: false,
 		Role:       0,
+		MediaID:    primitive.NilObjectID,
 	}
 
 	return u, nil
@@ -49,7 +50,10 @@ func (impl implRepo) buildUpdateUserModel(context context.Context, opt user.Upda
 		setFields["password"] = opt.Password
 		opt.Model.Password = opt.Password
 	}
-
+	if opt.MediaID != primitive.NilObjectID {
+		setFields["media_id"] = opt.MediaID
+		opt.Model.MediaID = opt.MediaID
+	}
 	update := bson.M{}
 	if len(setFields) > 0 {
 		update["$set"] = setFields

@@ -33,6 +33,7 @@ type UpdateUserOption struct {
 	Password   string
 	Name       string
 	IsVerified bool
+	MediaID    primitive.ObjectID
 }
 type UpdateKeyTokenInput struct {
 	UserID       string

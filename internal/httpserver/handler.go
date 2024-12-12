@@ -55,13 +55,13 @@ func (srv HTTPServer) mapHandlers() error {
 
 	//Usecase
 	emailUC := emailUC.New(srv.l)
-	userUC := userUC.New(srv.l, userRepo, emailUC, redisRepo)
+	mediaUC := mediaUC.New(srv.l, mediaRepo, prod, srv.cloudinary)
+	userUC := userUC.New(srv.l, userRepo, emailUC, redisRepo, mediaUC)
 	shopUC := shopUC.New(srv.l, shopRepo, nil)
 	adminUC := adminUC.New(adminRepo, srv.l, shopUC)
 	shopUC.SetAdminUC(adminUC)
 	cartUC := cartUC.New(srv.l, cartRepo, shopUC)
 	voucherUC := voucherUC.New(voucherRepo, srv.l, shopUC)
-	mediaUC := mediaUC.New(srv.l, mediaRepo, prod, srv.cloudinary)
 
 	// Handlers
 	userH := userHTTP.New(srv.l, userUC)

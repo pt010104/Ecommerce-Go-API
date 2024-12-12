@@ -260,19 +260,35 @@ func (uc implUsecase) VerifyEmail(ctx context.Context, email string) (token stri
 
 }
 
-func (uc implUsecase) Detail(ctx context.Context, sc models.Scope, id string) (models.User, error) {
-	if cachedUser, err := uc.redisRepo.DetailUser(ctx, id); err == nil {
-		return cachedUser, nil
-	}
-
-	u, err := uc.repo.DetailUser(ctx, id)
-	if err != nil {
-		uc.l.Warnf(ctx, "user.usecase.Detail.repo.DetailUser: %v", err)
-		if err == mongo.ErrNoDocuments {
-			return models.User{}, user.ErrUserNotFound
+func (uc implUsecase) Detail(ctx context.Context, sc models.Scope, id string) (user.DetailUserOutput, error) {
+	cachedUser, err := uc.redisRepo.DetailUser(ctx, id)
+	if err == nil {
+		avatar, err := uc.mediaUC.Detail(ctx, sc, cachedUser.MediaID.Hex())
+		if err != nil {
+			uc.l.Errorf(ctx, "user.usecase.Detail.Detail: %v", err)
+			return user.DetailUserOutput{
+				User: models.User{},
+			}, err
 		}
 
-		return models.User{}, err
+		return user.DetailUserOutput{
+			User:       cachedUser,
+			Avatar_URL: avatar.URL,
+		}, nil
+	}
+
+	if err == mongo.ErrNoDocuments {
+		return user.DetailUserOutput{
+
+			User: models.User{},
+		}, user.ErrUserNotFound
+	}
+	u, err := uc.repo.DetailUser(ctx, id)
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.Detail.DetailUser: %v", err)
+		return user.DetailUserOutput{
+			User: models.User{},
+		}, err
 	}
 
 	err = uc.redisRepo.StoreUser(ctx, u)
@@ -280,7 +296,18 @@ func (uc implUsecase) Detail(ctx context.Context, sc models.Scope, id string) (m
 		uc.l.Warnf(ctx, "user.usecase.Detail.redis.StoreUser: %v", err)
 	}
 
-	return u, nil
+	avatar, err := uc.mediaUC.Detail(ctx, sc, u.MediaID.Hex())
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.Detail.Detail: %v", err)
+		return user.DetailUserOutput{
+			User: models.User{},
+		}, err
+	}
+
+	return user.DetailUserOutput{
+		User:       u,
+		Avatar_URL: avatar.URL,
+	}, nil
 }
 
 func (uc implUsecase) LogOut(ctx context.Context, sc models.Scope) error {
@@ -476,4 +503,48 @@ func (uc implUsecase) DetailKeyToken(ctx context.Context, userID string, session
 	}
 
 	return k, nil
+}
+func (uc implUsecase) UpdateAvatar(ctx context.Context, sc models.Scope, input user.UpdateAvatarInput) (models.User, error) {
+	//print input
+	//convert sc.UserID to primitive.ObjectID
+
+	_, err := primitive.ObjectIDFromHex(sc.UserID)
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.UpdateAvatar: %v", err)
+		return models.User{}, err
+	}
+	u, err := uc.repo.DetailUser(ctx, sc.UserID)
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.UpdateAvatar.DetailUser: %v", err)
+		return models.User{}, err
+	}
+	uc.l.Infof(ctx, "user.usecase.UpdateAvatar: %v", input)
+	_, err = uc.mediaUC.Detail(ctx, sc, input.MediaID)
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.UpdateAvatar.Detail: %v", err)
+		return models.User{}, err
+	}
+	mongoid, err := primitive.ObjectIDFromHex(input.MediaID)
+	if err != nil {
+
+		uc.l.Errorf(ctx, "user.usecase.UpdateAvatar: %v", err)
+		return models.User{}, err
+	}
+	nu, err := uc.repo.UpdateUser(ctx, user.UpdateUserOption{
+		Model: models.User{
+			ID: u.ID,
+		},
+		MediaID: mongoid,
+	})
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.UpdateAvatar.UpdateUser: %v", err)
+		return models.User{}, err
+	}
+	err = uc.redisRepo.StoreUser(ctx, nu)
+	if err != nil {
+		uc.l.Warnf(ctx, "user.usecase.Detail.redis.StoreUser: %v", err)
+	}
+
+	return nu, nil
+
 }
