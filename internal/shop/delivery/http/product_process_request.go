@@ -1,6 +1,8 @@
 package http
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/pt010104/api-golang/internal/models"
 	pkgErrors "github.com/pt010104/api-golang/pkg/errors"
@@ -98,14 +100,14 @@ func (h handler) processGetProductRequest(c *gin.Context) (models.Scope, getProd
 	}
 
 	var req getProductRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBindQuery(&req); err != nil {
 		h.l.Errorf(ctx, "shop.delivery.http.handler.processGetRequest: invalid request")
 		return models.Scope{}, req, errWrongQuery
 	}
-
+	fmt.Print("req", req.IDs)
 	if err := req.validate(); err != nil {
 		h.l.Errorf(ctx, "shop.delivery.http.handler.processGetRequest: invalid request")
-		return models.Scope{}, req, err
+		return models.Scope{}, req, errWrongBody
 	}
 
 	return sc, req, nil

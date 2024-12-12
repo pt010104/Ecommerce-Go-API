@@ -1,6 +1,8 @@
 package http
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 
 	"github.com/pt010104/api-golang/internal/shop"
@@ -129,16 +131,17 @@ func (h handler) DeleteProduct(c *gin.Context) {
 // @Tags         Product
 // @Accept       json
 // @Produce      json
-// @Param        request body getProductRequest false "Request Body"
+// @param       request query getProductRequest false "Request Body"
 // @Param        page query int false "Page number"
 // @Param        limit query int false "Items per page"
 // @Success      200 {object} getProductResp "Paginated Products"
 // @Router       /api/v1/shops/products/get-product [get]
 func (h handler) GetProduct(c *gin.Context) {
 	ctx := c.Request.Context()
-
+	fmt.Print("get product", c.Params, c.Query("ids"))
 	sc, req, err := h.processGetProductRequest(c)
 	if err != nil {
+		fmt.Print("err", req.IDs)
 		h.l.Errorf(ctx, "shop.delivery.http.getproduct: %v", err)
 		response.Error(c, err)
 		return
@@ -155,7 +158,7 @@ func (h handler) GetProduct(c *gin.Context) {
 		PagQuery:         pagQuery,
 	})
 	if err2 != nil {
-		h.l.Errorf(ctx, "shop.delivery.http.getProduct: %v", err)
+		h.l.Errorf(ctx, "shop.delivery.http.getProduct: %v", err2)
 		err := h.mapErrors(err)
 		response.Error(c, err)
 		return

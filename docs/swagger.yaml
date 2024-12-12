@@ -199,21 +199,6 @@ definitions:
       phone:
         type: string
     type: object
-  http.getProductRequest:
-    properties:
-      category_ids:
-        items:
-          type: string
-        type: array
-      ids:
-        items:
-          type: string
-        type: array
-      search:
-        type: string
-      shop_id:
-        type: string
-    type: object
   http.getProductResp:
     properties:
       products:
@@ -860,11 +845,24 @@ paths:
       description: Retrieve a paginated list of products with optional filters , at
         least 1 parameter request body must be provided
       parameters:
-      - description: Request Body
-        in: body
-        name: request
-        schema:
-          $ref: '#/definitions/http.getProductRequest'
+      - collectionFormat: csv
+        in: query
+        items:
+          type: string
+        name: category_ids
+        type: array
+      - collectionFormat: csv
+        in: query
+        items:
+          type: string
+        name: ids
+        type: array
+      - in: query
+        name: search
+        type: string
+      - in: query
+        name: shop_id
+        type: string
       - description: Page number
         in: query
         name: page

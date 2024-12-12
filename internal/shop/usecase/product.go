@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"github.com/pt010104/api-golang/internal/admins"
@@ -251,6 +252,8 @@ func (uc implUsecase) GetProduct(ctx context.Context, sc models.Scope, input sho
 		uc.l.Errorf(ctx, "shop.usecase.GetProduct: %v", err)
 		return shop.GetProductOutput{}, err
 	}
+	//print opt.IDs
+	fmt.Println("opt.IDs", opt.IDs)
 	categoryIDSet := make(map[string]struct{})
 	for _, p := range s {
 		for _, catID := range p.CategoryID {
