@@ -336,26 +336,26 @@ func (h handler) DistributeNewToken(c *gin.Context) {
 // @Param			session-id					header		string	true	"Session ID"					default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
 // @Param			media_id					media_id body		string	true	"MediaID"
 //
-// @Success		200							{object}	UpdateAvatarResp
+// @Success		200							{object}	UpdateResp
 // @Failure		400							{object}	response.Resp	"Bad Request"
 // @Failure		404							{object}	response.Resp	"User Not Found"
 // @Failure		500							{object}	response.Resp	"Internal Server Error"
 //
-// @Router			/api/v1/users/update-avater [post]
-func (h handler) UpdateAvatar(c *gin.Context) {
+// @Router			/api/v1/users [PUT]
+func (h handler) Update(c *gin.Context) {
 	ctx := c.Request.Context()
-	sc, req, err := h.processUpdateAvatarRequest(c)
+	sc, req, err := h.processupdateRequest(c)
 	if err != nil {
-		h.l.Errorf(ctx, "user.delivery.http.handler.UpdateAvatar.processUpdateAvatarRequest: %v", err)
+		h.l.Errorf(ctx, "user.delivery.http.handler.Update.processupdateRequest: %v", err)
 		response.Error(c, err)
 		return
 	}
-	u, err := h.uc.UpdateAvatar(ctx, sc, req.toInput())
+	u, err := h.uc.Update(ctx, sc, req.toInput())
 	fmt.Print("reqid", req.MediaID)
 	if err != nil {
-		h.l.Errorf(ctx, "user.delivery.http.handler.UpdateAvatar.uc.UpdateAvatar: %v", err)
+		h.l.Errorf(ctx, "user.delivery.http.handler.Update.uc.Update: %v", err)
 		response.Error(c, err)
 		return
 	}
-	response.OK(c, h.newUpdateAvatarResp(u))
+	response.OK(c, h.newDetailResp(u))
 }

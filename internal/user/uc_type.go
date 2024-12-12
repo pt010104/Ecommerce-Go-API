@@ -48,8 +48,9 @@ type DistributeNewTokenInput struct {
 type DistributeNewTokenOutput struct {
 	Token Token
 }
-type UpdateAvatarInput struct {
-	UserID  string
+type UpdateInput struct {
+	Email   string
+	Name    string
 	MediaID string
 }
 type DetailUserOutput struct {

@@ -869,6 +869,89 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/users": {
+            "put": {
+                "description": "Update user avatar",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update User avatar",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU",
+                        "description": "Bearer JWT token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "6707825d45804caaf8316957",
+                        "description": "User ID",
+                        "name": "x-client-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
+                        "description": "Session ID",
+                        "name": "session-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "MediaID",
+                        "name": "media_id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.UpdateResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "404": {
+                        "description": "User Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/users/distribute-token": {
             "post": {
                 "description": "Generate and distribute a new JWT token",
@@ -984,9 +1067,7 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {
-                            "type": "object"
-                        }
+                        "schema": {}
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1052,9 +1133,7 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {
-                            "type": "object"
-                        }
+                        "schema": {}
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1242,95 +1321,10 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {
-                            "type": "object"
-                        }
+                        "schema": {}
                     },
                     "400": {
                         "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Resp"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Resp"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/users/update-avater": {
-            "post": {
-                "description": "Update user avatar",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "Update User avatar",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "default": "\"*\"",
-                        "description": "Access-Control-Allow-Origin",
-                        "name": "Access-Control-Allow-Origin",
-                        "in": "header"
-                    },
-                    {
-                        "type": "string",
-                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU",
-                        "description": "Bearer JWT token",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "default": "6707825d45804caaf8316957",
-                        "description": "User ID",
-                        "name": "x-client-id",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
-                        "description": "Session ID",
-                        "name": "session-id",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "description": "MediaID",
-                        "name": "media_id",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/http.UpdateAvatarResp"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Resp"
-                        }
-                    },
-                    "404": {
-                        "description": "User Not Found",
                         "schema": {
                             "$ref": "#/definitions/response.Resp"
                         }
@@ -1378,9 +1372,7 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {
-                            "type": "object"
-                        }
+                        "schema": {}
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1443,9 +1435,7 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {
-                            "type": "object"
-                        }
+                        "schema": {}
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1758,17 +1748,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "http.Avatar_obj": {
-            "type": "object",
-            "properties": {
-                "media_id": {
-                    "type": "string"
-                },
-                "url": {
-                    "type": "string"
-                }
-            }
-        },
         "http.CreateCartItemResponse": {
             "type": "object",
             "properties": {
@@ -1848,14 +1827,6 @@ const docTemplate = `{
                 }
             }
         },
-        "http.UpdateAvatarResp": {
-            "type": "object",
-            "properties": {
-                "media_id": {
-                    "type": "string"
-                }
-            }
-        },
         "http.UpdateCartItemRequest": {
             "type": "object",
             "properties": {
@@ -1918,6 +1889,14 @@ const docTemplate = `{
                 }
             }
         },
+        "http.UpdateResp": {
+            "type": "object",
+            "properties": {
+                "media_id": {
+                    "type": "string"
+                }
+            }
+        },
         "http.address": {
             "type": "object",
             "properties": {
@@ -1928,6 +1907,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "street": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.avatar_obj": {
+            "type": "object",
+            "properties": {
+                "media_id": {
+                    "type": "string"
+                },
+                "url": {
                     "type": "string"
                 }
             }
@@ -2026,7 +2016,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "avatar": {
-                    "$ref": "#/definitions/http.Avatar_obj"
+                    "$ref": "#/definitions/http.avatar_obj"
                 },
                 "email": {
                     "type": "string"

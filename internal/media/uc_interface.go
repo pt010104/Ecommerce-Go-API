@@ -7,7 +7,7 @@ import (
 )
 
 type UseCase interface {
-	Upload(ctx context.Context, sc models.Scope, input UploadInput) error
+	Upload(ctx context.Context, sc models.Scope, input UploadInput) ([]models.Media, error)
 	Detail(ctx context.Context, sc models.Scope, id string) (models.Media, error)
 
 	ConsumeUploadMsg(ctx context.Context, sc models.Scope, input ConsumeUploadMsgInput) error

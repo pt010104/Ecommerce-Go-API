@@ -141,18 +141,25 @@ func (h handler) processDistributeNewTokenRequest(c *gin.Context) (distributeNew
 
 	return req, nil
 }
-func (h handler) processUpdateAvatarRequest(c *gin.Context) (models.Scope, UpdateAvatarReq, error) {
+func (h handler) processupdateRequest(c *gin.Context) (models.Scope, updateReq, error) {
 	ctx := c.Request.Context()
-	payload, ok := jwt.GetPayloadFromContext(ctx)
+
+	sc, ok := jwt.GetScopeFromContext(ctx)
 	if !ok {
-		h.l.Errorf(ctx, "survey.delivery.http.handler.processUpdateAvatarRequest: unauthorized")
-		return models.Scope{}, UpdateAvatarReq{}, pkgErrors.NewUnauthorizedHTTPError()
+		h.l.Errorf(ctx, "admin.http.delivery.hhtp.handler.processRequest: unauthorized")
+		return models.Scope{}, updateReq{}, pkgErrors.NewUnauthorizedHTTPError()
 	}
-	var req UpdateAvatarReq
+
+	var req updateReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		h.l.Errorf(ctx, "user.delivery.http.handler.processUpdateAvatarRequest: invalid request")
-		return models.Scope{}, UpdateAvatarReq{}, errWrongBody
+		h.l.Errorf(ctx, "user.delivery.http.handler.processupdateRequest: invalid request")
+		return models.Scope{}, updateReq{}, errWrongBody
 	}
-	sc := jwt.NewScope(payload)
+
+	if err := req.validate(); err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.processupdateRequest: invalid request %v", err)
+		return models.Scope{}, updateReq{}, errWrongBody
+	}
+
 	return sc, req, nil
 }

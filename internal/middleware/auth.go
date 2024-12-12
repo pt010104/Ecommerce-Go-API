@@ -7,7 +7,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/pt010104/api-golang/internal/models"
-	"github.com/pt010104/api-golang/internal/user"
 	"github.com/pt010104/api-golang/pkg/jwt"
 	"github.com/pt010104/api-golang/pkg/response"
 )
@@ -22,7 +21,7 @@ func (m Middleware) Auth() gin.HandlerFunc {
 		var wg sync.WaitGroup
 		var wgErr error
 		var k models.KeyToken
-		var u user.DetailUserOutput
+		var u models.User
 
 		wg.Add(1)
 		go func() {
@@ -39,7 +38,7 @@ func (m Middleware) Auth() gin.HandlerFunc {
 		go func() {
 			defer wg.Done()
 			var err error
-			u, err = m.userUC.Detail(ctx, models.Scope{}, userID)
+			u, err = m.userUC.GetModel(ctx, userID)
 			if err != nil {
 				wgErr = fmt.Errorf("middleware.Auth.user.usecase.DetailUser: %v", err)
 				return
@@ -53,7 +52,7 @@ func (m Middleware) Auth() gin.HandlerFunc {
 			return
 		}
 
-		role := u.User.Role
+		role := u.Role
 		keyString := k.SecretKey
 
 		tokenString := strings.ReplaceAll(c.GetHeader("Authorization"), "Bearer ", "")

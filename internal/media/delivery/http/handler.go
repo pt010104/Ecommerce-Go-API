@@ -30,7 +30,7 @@ func (h handler) Upload(c *gin.Context) {
 		return
 	}
 
-	err = h.uc.Upload(ctx, sc, req.toInput())
+	medias, err := h.uc.Upload(ctx, sc, req.toInput())
 	if err != nil {
 		h.l.Errorf(ctx, "media.delivery.http.Upload: %v", err)
 		err = h.mapErrors(err)
@@ -38,5 +38,5 @@ func (h handler) Upload(c *gin.Context) {
 		return
 	}
 
-	response.OK(c, nil)
+	response.OK(c, newListResponse(medias))
 }

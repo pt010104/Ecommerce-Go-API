@@ -6,6 +6,7 @@ import (
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/user"
+	"github.com/pt010104/api-golang/pkg/mongo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -30,30 +31,29 @@ func (impl implRepo) buildUserModel(context context.Context, opt user.CreateUser
 
 func (impl implRepo) buildUpdateUserModel(context context.Context, opt user.UpdateUserOption) (bson.M, models.User, error) {
 	setFields := bson.M{
+		"name":       opt.Name,
+		"email":      opt.Email,
 		"updated_at": time.Now(),
 	}
+	opt.Model.Name = opt.Name
+	opt.Model.Email = opt.Email
+	opt.Model.UpdatedAt = time.Now()
 
-	if opt.Email != "" {
-		setFields["email"] = opt.Email
-		opt.Model.Email = opt.Email
-	}
 	if opt.IsVerified {
 		setFields["is_verified"] = opt.IsVerified
 		opt.Model.IsVerified = opt.IsVerified
-	}
-	if opt.Name != "" {
-		setFields["name"] = opt.Name
-		opt.Model.Name = opt.Name
 	}
 
 	if opt.Password != "" {
 		setFields["password"] = opt.Password
 		opt.Model.Password = opt.Password
 	}
-	if opt.MediaID != primitive.NilObjectID {
+
+	if opt.MediaID != "" {
 		setFields["media_id"] = opt.MediaID
-		opt.Model.MediaID = opt.MediaID
+		opt.Model.MediaID = mongo.ObjectIDFromHexOrNil(opt.MediaID)
 	}
+
 	update := bson.M{}
 	if len(setFields) > 0 {
 		update["$set"] = setFields

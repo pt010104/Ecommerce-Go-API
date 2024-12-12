@@ -94,18 +94,23 @@ type detailResp struct {
 	Email string `json:"email"`
 	Name  string `json:"name"`
 
-	Avatar Avatar_obj `json:"avatar"`
+	Avatar *avatar_obj `json:"avatar,omitempty"`
 }
 
 func (h handler) newDetailResp(u user.DetailUserOutput) detailResp {
-	return detailResp{
-		ID:    u.User.ID.Hex(),
-		Email: u.User.Email,
-		Name:  u.User.Name,
-		Avatar: Avatar_obj{
+	var avatar *avatar_obj
+	if u.Avatar_URL != "" {
+		avatar = &avatar_obj{
 			MediaID: u.User.MediaID.Hex(),
 			URL:     u.Avatar_URL,
-		},
+		}
+	}
+
+	return detailResp{
+		ID:     u.User.ID.Hex(),
+		Email:  u.User.Email,
+		Name:   u.User.Name,
+		Avatar: avatar,
 	}
 }
 
@@ -131,7 +136,7 @@ func (r distributeNewTokenReq) toInput() user.DistributeNewTokenInput {
 	}
 }
 
-type Avatar_obj struct {
+type avatar_obj struct {
 	MediaID string `json:"media_id"`
 	URL     string `json:"url"`
 }
@@ -165,29 +170,27 @@ func (h handler) newDistributeNewTokenResp(output user.DistributeNewTokenOutput)
 	}
 }
 
-type UpdateAvatarReq struct {
-	MediaID string `json:"media_id" binding:"required"`
+type updateReq struct {
+	Name    string `json:"name" binding:"required"`
+	Email   string `json:"email" binding:"required"`
+	MediaID string `json:"media_id"`
 }
 
-func (r UpdateAvatarReq) toInput() user.UpdateAvatarInput {
-	return user.UpdateAvatarInput{
+func (r updateReq) toInput() user.UpdateInput {
+	return user.UpdateInput{
 		MediaID: r.MediaID,
+		Name:    r.Name,
+		Email:   r.Email,
 	}
 }
-func (r UpdateAvatarReq) validate() error {
-	if r.MediaID == "" || !mongo.IsObjectID(r.MediaID) {
+func (r updateReq) validate() error {
+	if r.MediaID != "" && !mongo.IsObjectID(r.MediaID) {
 		return errWrongBody
 	}
 
 	return nil
 }
 
-type UpdateAvatarResp struct {
+type UpdateResp struct {
 	MediaID string `json:"media_id"`
-}
-
-func (h handler) newUpdateAvatarResp(user models.User) UpdateAvatarResp {
-	return UpdateAvatarResp{
-		MediaID: user.MediaID.Hex(),
-	}
 }

@@ -261,53 +261,62 @@ func (uc implUsecase) VerifyEmail(ctx context.Context, email string) (token stri
 }
 
 func (uc implUsecase) Detail(ctx context.Context, sc models.Scope, id string) (user.DetailUserOutput, error) {
-	cachedUser, err := uc.redisRepo.DetailUser(ctx, id)
-	if err == nil {
-		avatar, err := uc.mediaUC.Detail(ctx, sc, cachedUser.MediaID.Hex())
+	var u models.User
+	u, err := uc.redisRepo.DetailUser(ctx, id)
+	if err != nil {
+		uc.l.Warnf(ctx, "user.usecase.Detail.redis.DetailUser: %v", err)
+		u, err = uc.repo.DetailUser(ctx, id)
 		if err != nil {
-			uc.l.Errorf(ctx, "user.usecase.Detail.Detail: %v", err)
-			return user.DetailUserOutput{
-				User: models.User{},
-			}, err
+			uc.l.Errorf(ctx, "user.usecase.Detail.DetailUser: %v", err)
+			return user.DetailUserOutput{}, err
 		}
 
-		return user.DetailUserOutput{
-			User:       cachedUser,
-			Avatar_URL: avatar.URL,
-		}, nil
+		go func() {
+			redisCtx := context.Background()
+			if err := uc.redisRepo.StoreUser(redisCtx, u); err != nil {
+				uc.l.Warnf(ctx, "user.usecase.Detail.redis.StoreUser: %v", err)
+			}
+		}()
 	}
 
-	if err == mongo.ErrNoDocuments {
-		return user.DetailUserOutput{
-
-			User: models.User{},
-		}, user.ErrUserNotFound
-	}
-	u, err := uc.repo.DetailUser(ctx, id)
-	if err != nil {
-		uc.l.Errorf(ctx, "user.usecase.Detail.DetailUser: %v", err)
-		return user.DetailUserOutput{
-			User: models.User{},
-		}, err
-	}
-
-	err = uc.redisRepo.StoreUser(ctx, u)
-	if err != nil {
-		uc.l.Warnf(ctx, "user.usecase.Detail.redis.StoreUser: %v", err)
-	}
-
-	avatar, err := uc.mediaUC.Detail(ctx, sc, u.MediaID.Hex())
-	if err != nil {
-		uc.l.Errorf(ctx, "user.usecase.Detail.Detail: %v", err)
-		return user.DetailUserOutput{
-			User: models.User{},
-		}, err
+	var avatar models.Media
+	if u.MediaID != primitive.NilObjectID {
+		avatar, err = uc.mediaUC.Detail(ctx, sc, u.MediaID.Hex())
+		if err != nil {
+			uc.l.Errorf(ctx, "user.usecase.Detail.Detail: %v", err)
+		}
 	}
 
 	return user.DetailUserOutput{
 		User:       u,
 		Avatar_URL: avatar.URL,
 	}, nil
+}
+func (uc implUsecase) GetModel(ctx context.Context, id string) (models.User, error) {
+	u, err := uc.redisRepo.DetailUser(ctx, id)
+	if err != nil {
+		uc.l.Warnf(ctx, "user.usecase.GetModel.redis.DetailUser: %v", err)
+		u, err = uc.repo.DetailUser(ctx, id)
+		if err != nil {
+			uc.l.Errorf(ctx, "user.usecase.GetModel.DetailUser: %v", err)
+			if err == mongo.ErrNoDocuments {
+				return models.User{}, user.ErrUserNotFound
+			}
+
+			return models.User{}, err
+		}
+
+		go func() {
+			redisCtx := context.Background()
+			if err := uc.redisRepo.StoreUser(redisCtx, u); err != nil {
+				uc.l.Warnf(ctx, "user.usecase.GetModel.redis.StoreUser: %v", err)
+			}
+		}()
+
+		return u, nil
+	}
+
+	return u, nil
 }
 
 func (uc implUsecase) LogOut(ctx context.Context, sc models.Scope) error {
@@ -361,7 +370,7 @@ func (uc implUsecase) ResetPassWord(ctx context.Context, input user.ResetPasswor
 		IsUsed: &isUsed,
 	})
 	if err != nil {
-		uc.l.Errorf(ctx, "user.usecase.ResetPassword.UpdateRequestToken: %v", err)
+		uc.l.Errorf(ctx, "user.usecase.ResetPassword.updateRequestToken: %v", err)
 		return err
 	}
 
@@ -398,7 +407,7 @@ func (uc implUsecase) VerifyUser(ctx context.Context, input user.VerifyUserInput
 		IsUsed: &isUsed,
 	})
 	if err != nil {
-		uc.l.Errorf(ctx, "user.usecase.ResetPassword.UpdateRequestToken: %v", err)
+		uc.l.Errorf(ctx, "user.usecase.ResetPassword.updateRequestToken: %v", err)
 		return err
 	}
 
@@ -474,6 +483,7 @@ func (uc implUsecase) DistributeNewToken(ctx context.Context, input user.Distrib
 	}, nil
 
 }
+
 func (uc implUsecase) DetailKeyToken(ctx context.Context, userID string, sessionID string) (models.KeyToken, error) {
 
 	key, err := uc.redisRepo.GetSecretKey(ctx, models.Scope{
@@ -494,57 +504,79 @@ func (uc implUsecase) DetailKeyToken(ctx context.Context, userID string, session
 		return models.KeyToken{}, err
 	}
 
-	cacheErr := uc.redisRepo.StoreSecretKey(models.Scope{
-		UserID:    userID,
-		SessionID: sessionID,
-	}, k.SecretKey, ctx)
-	if cacheErr != nil {
-		uc.l.Warnf(ctx, "user.usecase.DetailKeyToken.CacheUpdate", cacheErr)
-	}
+	go func() {
+		redisCtx := context.Background()
+		cacheErr := uc.redisRepo.StoreSecretKey(models.Scope{
+			UserID:    userID,
+			SessionID: sessionID,
+		}, k.SecretKey, redisCtx)
+		if cacheErr != nil {
+			uc.l.Warnf(ctx, "user.usecase.DetailKeyToken.CacheUpdate", cacheErr)
+		}
+	}()
 
 	return k, nil
 }
-func (uc implUsecase) UpdateAvatar(ctx context.Context, sc models.Scope, input user.UpdateAvatarInput) (models.User, error) {
-	//print input
-	//convert sc.UserID to primitive.ObjectID
 
-	_, err := primitive.ObjectIDFromHex(sc.UserID)
-	if err != nil {
-		uc.l.Errorf(ctx, "user.usecase.UpdateAvatar: %v", err)
-		return models.User{}, err
-	}
-	u, err := uc.repo.DetailUser(ctx, sc.UserID)
-	if err != nil {
-		uc.l.Errorf(ctx, "user.usecase.UpdateAvatar.DetailUser: %v", err)
-		return models.User{}, err
-	}
-	uc.l.Infof(ctx, "user.usecase.UpdateAvatar: %v", input)
-	_, err = uc.mediaUC.Detail(ctx, sc, input.MediaID)
-	if err != nil {
-		uc.l.Errorf(ctx, "user.usecase.UpdateAvatar.Detail: %v", err)
-		return models.User{}, err
-	}
-	mongoid, err := primitive.ObjectIDFromHex(input.MediaID)
-	if err != nil {
+func (uc implUsecase) Update(ctx context.Context, sc models.Scope, input user.UpdateInput) (user.DetailUserOutput, error) {
+	var u models.User
+	var avatar models.Media
+	var wg sync.WaitGroup
+	var wgErr error
 
-		uc.l.Errorf(ctx, "user.usecase.UpdateAvatar: %v", err)
-		return models.User{}, err
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var err error
+		u, err = uc.GetModel(ctx, sc.UserID)
+		if err != nil {
+			uc.l.Errorf(ctx, "user.usecase.Update.GetModel: %v", err)
+			wgErr = err
+			return
+		}
+	}()
+
+	if input.MediaID != "" {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			var err error
+			avatar, err = uc.mediaUC.Detail(ctx, sc, input.MediaID)
+			if err != nil {
+				uc.l.Errorf(ctx, "user.usecase.Update.repo.Detail: %v", err)
+				wgErr = err
+				return
+			}
+		}()
 	}
+
+	wg.Wait()
+	if wgErr != nil {
+		return user.DetailUserOutput{}, wgErr
+	}
+
 	nu, err := uc.repo.UpdateUser(ctx, user.UpdateUserOption{
-		Model: models.User{
-			ID: u.ID,
-		},
-		MediaID: mongoid,
+		Model:   u,
+		Email:   input.Email,
+		Name:    input.Name,
+		MediaID: input.MediaID,
 	})
 	if err != nil {
-		uc.l.Errorf(ctx, "user.usecase.UpdateAvatar.UpdateUser: %v", err)
-		return models.User{}, err
-	}
-	err = uc.redisRepo.StoreUser(ctx, nu)
-	if err != nil {
-		uc.l.Warnf(ctx, "user.usecase.Detail.redis.StoreUser: %v", err)
+		uc.l.Errorf(ctx, "user.usecase.Update.repo.UpdateUser: %v", err)
+		return user.DetailUserOutput{}, err
 	}
 
-	return nu, nil
+	go func() {
+		redisCtx := context.Background()
+		err = uc.redisRepo.StoreUser(redisCtx, nu)
+		if err != nil {
+			uc.l.Warnf(ctx, "user.usecase.Detail.redis.StoreUser: %v", err)
+		}
+	}()
+
+	return user.DetailUserOutput{
+		User:       nu,
+		Avatar_URL: avatar.URL,
+	}, nil
 
 }
