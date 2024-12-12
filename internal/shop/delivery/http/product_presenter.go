@@ -67,7 +67,7 @@ func (r createProductReq) validate() error {
 }
 
 type detailProductReq struct {
-	ID string `json:"id" binding:"required"`
+	ID string `uri:"id" binding:"required"`
 }
 type detailProductResp struct {
 	ID            string   `json:"id" binding:"required"`
@@ -103,15 +103,15 @@ type deleteProductRequest struct {
 }
 
 type listProductRequest struct {
-	IDs    []string `json:"ids"`
-	Search string   `json:"search"`
-	ShopID string   `json:"shop_id"`
+	IDs    []string `form:"ids"`
+	Search string   `form:"search"`
+	ShopID string   `form:"shop_id"`
 }
 type getProductRequest struct {
-	IDs     []string `json:"ids"`
-	Search  string   `json:"search"`
-	ShopID  string   `json:"shop_id"`
-	CateIDs []string `json:"category_ids"`
+	IDs     []string `form:"ids"`
+	Search  string   `form:"search"`
+	ShopID  string   `form:"shop_id"`
+	CateIDs []string `form:"category_ids"`
 }
 
 func (r listProductRequest) validate() error {
@@ -132,6 +132,17 @@ func (r getProductRequest) validate() error {
 				return errWrongBody
 			}
 		}
+	}
+	if len(r.CateIDs) > 0 {
+		for _, id := range r.CateIDs {
+			if !mongo.IsObjectID(id) {
+				return errWrongBody
+			}
+		}
+	}
+	if r.ShopID != "" && !mongo.IsObjectID(r.ShopID) {
+
+		return errWrongBody
 	}
 
 	return nil

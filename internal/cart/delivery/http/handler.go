@@ -72,7 +72,7 @@ func (h handler) Update(c *gin.Context) {
 }
 
 // @Summary List carts
-// @Description Retrieve a list of carts based on user ID and filters
+// @Description Retrieve a list of carts based on user ID and filters , if no query is passed , all cart of current user will be returned
 // @Tags Cart
 // @Accept json
 // @Produce json
@@ -80,7 +80,6 @@ func (h handler) Update(c *gin.Context) {
 // @Param			Authorization				header		string		true	"Bearer JWT token"				default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
 // @Param			x-client-id					header		string		true	"User ID"						default(6707825d45804caaf8316957)
 // @Param			session-id					header		string		true	"Session ID"					default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
-// @Param user_id query string true "User ID"
 // @Param ids query []string false "Cart IDs (optional)"
 // @Param shop_ids query []string false "Shop IDs (optional)"
 // @Success 200 {array} ListCartResponse

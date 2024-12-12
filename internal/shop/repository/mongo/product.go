@@ -134,6 +134,7 @@ func (repo implRepo) GetProduct(ctx context.Context, sc models.Scope, opt shop.G
 		repo.l.Errorf(ctx, "shop.repository.mongo.Get.buildProductQuery: %v", err)
 		return nil, paginator.Paginator{}, err
 	}
+	fmt.Println("filter is : ", filter)
 
 	cursor, err := col.Find(ctx, filter, options.Find().
 		SetSkip(opt.PagQuery.Offset()).
