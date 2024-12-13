@@ -8,7 +8,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type Repo interface {
+//go:generate mockery --name=Repository
+type Repository interface {
 	CreateUser(context context.Context, opt CreateUserOption) (models.User, error)
 	GetUser(ctx context.Context, opt GetUserOption) (models.User, error)
 	DetailUser(ctx context.Context, id string) (models.User, error)

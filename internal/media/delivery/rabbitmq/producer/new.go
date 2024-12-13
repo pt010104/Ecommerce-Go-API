@@ -8,6 +8,7 @@ import (
 	rmqPkg "github.com/pt010104/api-golang/pkg/rabbitmq"
 )
 
+//go:generate mockery --name=Producer
 type Producer interface {
 	PublishUploadMsg(ctx context.Context, msg rabbitmq.UploadMessage) error
 

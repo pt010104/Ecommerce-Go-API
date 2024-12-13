@@ -9,13 +9,13 @@ import (
 
 type implUsecase struct {
 	l         log.Logger
-	repo      user.Repo
+	repo      user.Repository
 	emailUC   email.UseCase
 	redisRepo user.Redis
 	mediaUC   media.UseCase
 }
 
-func New(l log.Logger, repo user.Repo, emailUC email.UseCase, redisRepo user.Redis, mediaUC media.UseCase) implUsecase {
+func New(l log.Logger, repo user.Repository, emailUC email.UseCase, redisRepo user.Redis, mediaUC media.UseCase) implUsecase {
 	return implUsecase{
 		l:         l,
 		repo:      repo,

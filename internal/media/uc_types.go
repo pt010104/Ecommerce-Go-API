@@ -9,6 +9,12 @@ type UploadInput struct {
 }
 
 type GetFilter struct {
+	IDs    []string
+	Status string
 	UserID primitive.ObjectID
 	ShopID primitive.ObjectID
+}
+
+type ListInput struct {
+	GetFilter
 }

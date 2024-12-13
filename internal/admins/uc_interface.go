@@ -6,6 +6,7 @@ import (
 	"github.com/pt010104/api-golang/internal/models"
 )
 
+//go:generate mockery --name=UseCase
 type UseCase interface {
 	CreateCategory(ctx context.Context, sc models.Scope, input CreateCategoryInput) (models.Category, error)
 	ListCategories(ctx context.Context, sc models.Scope, filter GetCategoriesFilter) ([]models.Category, error)
