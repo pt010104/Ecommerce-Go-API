@@ -1067,7 +1067,9 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {}
+                        "schema": {
+                            "type": "object"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1133,7 +1135,9 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {}
+                        "schema": {
+                            "type": "object"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1321,7 +1325,9 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {}
+                        "schema": {
+                            "type": "object"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1372,7 +1378,9 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {}
+                        "schema": {
+                            "type": "object"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1435,7 +1443,9 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {}
+                        "schema": {
+                            "type": "object"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1748,6 +1758,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "http.Avatar_obj": {
+            "type": "object",
+            "properties": {
+                "media_id": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
         "http.CreateCartItemResponse": {
             "type": "object",
             "properties": {
@@ -2046,6 +2067,9 @@ const docTemplate = `{
                 "address": {
                     "$ref": "#/definitions/http.address"
                 },
+                "avatar_obj": {
+                    "$ref": "#/definitions/http.Avatar_obj"
+                },
                 "avg_rate": {
                     "type": "number"
                 },
@@ -2105,6 +2129,9 @@ const docTemplate = `{
             "properties": {
                 "address": {
                     "$ref": "#/definitions/http.address"
+                },
+                "avatar_obj": {
+                    "$ref": "#/definitions/http.Avatar_obj"
                 },
                 "avg_rate": {
                     "type": "number"

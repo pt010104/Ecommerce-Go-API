@@ -1,4 +1,11 @@
 definitions:
+  http.Avatar_obj:
+    properties:
+      media_id:
+        type: string
+      url:
+        type: string
+    type: object
   http.CreateCartItemResponse:
     properties:
       product_id:
@@ -196,6 +203,8 @@ definitions:
     properties:
       address:
         $ref: '#/definitions/http.address'
+      avatar_obj:
+        $ref: '#/definitions/http.Avatar_obj'
       avg_rate:
         type: number
       created_at:
@@ -235,6 +244,8 @@ definitions:
     properties:
       address:
         $ref: '#/definitions/http.address'
+      avatar_obj:
+        $ref: '#/definitions/http.Avatar_obj'
       avg_rate:
         type: number
       created_at:
@@ -1142,7 +1153,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -1187,7 +1199,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -1312,7 +1325,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -1346,7 +1360,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -1389,7 +1404,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:

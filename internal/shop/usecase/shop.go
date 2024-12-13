@@ -54,21 +54,51 @@ func (uc implUsecase) Get(ctx context.Context, sc models.Scope, input shop.GetSh
 		return shop.GetShopOutput{}, err
 	}
 
+	var shop1 []shop.Shop_obj
+
+	for _, v := range s {
+
+		avatar, err := uc.userUC.Detail(ctx, sc, v.UserID.Hex())
+		if err != nil {
+			uc.l.Errorf(ctx, "shop.usecase.Get: %v", err)
+			return shop.GetShopOutput{}, err
+		}
+
+		shop1 = append(shop1, shop.Shop_obj{
+			Shop: v,
+			Avatar: shop.Avatar_obj{
+				MediaID: avatar.User.MediaID.Hex(),
+				URL:     avatar.Avatar_URL,
+			},
+		})
+
+	}
+
 	return shop.GetShopOutput{
-		Shops: s,
+		Shops: shop1,
 		Pag:   pag,
 	}, nil
 }
 
-func (uc implUsecase) Detail(ctx context.Context, sc models.Scope, id string) (models.Shop, error) {
+func (uc implUsecase) Detail(ctx context.Context, sc models.Scope, id string) (shop.DetailShopOutput, error) {
 	s, err := uc.repo.DetailShop(ctx, sc, id)
 	if err != nil {
 		uc.l.Errorf(ctx, "shop.usecase.Detail: %v", err)
-		return models.Shop{}, err
+		return shop.DetailShopOutput{}, err
 	}
 
-	return s, nil
+	avatar, err := uc.userUC.Detail(ctx, sc, s.UserID.Hex())
+	if err != nil {
+		uc.l.Errorf(ctx, "shop.usecase.Detail: %v", err)
+		return shop.DetailShopOutput{}, err
+	}
+	return shop.DetailShopOutput{
+		S:       s,
+		MediaID: avatar.User.MediaID.Hex(),
+		URL:     avatar.Avatar_URL,
+	}, nil
 }
+
 func (uc implUsecase) Delete(ctx context.Context, sc models.Scope) error {
 	err := uc.repo.DeleteShop(ctx, sc)
 	if err != nil {

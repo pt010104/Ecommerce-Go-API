@@ -31,6 +31,10 @@ func (r registerRequest) toInput() shop.CreateShop {
 	}
 }
 
+type Avatar_obj struct {
+	MediaID string `json:"media_id"`
+	URL     string `json:"url"`
+}
 type address struct {
 	City     string `json:"city"`
 	Street   string `json:"street"`
@@ -88,15 +92,16 @@ type listMetaResponse struct {
 }
 
 type getShopRespItem struct {
-	ID         string    `json:"id"`
-	UserID     string    `json:"user_id"`
-	Name       string    `json:"name"`
-	Phone      string    `json:"phone"`
-	Address    address   `json:"address"`
-	Followers  []string  `json:"followers,omitempty"`
-	AvgRate    float64   `json:"avg_rate"`
-	IsVerified *bool     `json:"is_verified,omitempty"`
-	CreatedAt  time.Time `json:"created_at"`
+	ID         string     `json:"id"`
+	UserID     string     `json:"user_id"`
+	Name       string     `json:"name"`
+	Phone      string     `json:"phone"`
+	Address    address    `json:"address"`
+	Followers  []string   `json:"followers,omitempty"`
+	AvgRate    float64    `json:"avg_rate"`
+	IsVerified *bool      `json:"is_verified,omitempty"`
+	CreatedAt  time.Time  `json:"created_at"`
+	Avatar_obj Avatar_obj `json:"avatar_obj"`
 }
 
 type getShopResp struct {
@@ -108,19 +113,23 @@ func (h handler) newGetShopsResp(ucOutput shop.GetShopOutput) getShopResp {
 	var items []getShopRespItem
 	for _, s := range ucOutput.Shops {
 		shopItem := getShopRespItem{
-			ID:    s.ID.Hex(),
-			Name:  s.Name,
-			Phone: s.Phone,
+			ID:    s.Shop.ID.Hex(),
+			Name:  s.Shop.Name,
+			Phone: s.Shop.Phone,
 			Address: address{
-				City:     s.City,
-				Street:   s.Street,
-				District: s.District,
+				City:     s.Shop.City,
+				Street:   s.Shop.Street,
+				District: s.Shop.District,
 			},
-			AvgRate:    s.AvgRate,
-			Followers:  mongo.HexFromObjectIDsOrNil(s.Followers),
-			UserID:     s.UserID.Hex(),
-			IsVerified: &s.IsVerified,
-			CreatedAt:  s.CreatedAt,
+			AvgRate:    s.Shop.AvgRate,
+			Followers:  mongo.HexFromObjectIDsOrNil(s.Shop.Followers),
+			UserID:     s.Shop.UserID.Hex(),
+			IsVerified: &s.Shop.IsVerified,
+			CreatedAt:  s.Shop.CreatedAt,
+			Avatar_obj: Avatar_obj{
+				MediaID: s.Avatar.MediaID,
+				URL:     s.Avatar.URL,
+			},
 		}
 
 		items = append(items, shopItem)
@@ -135,30 +144,35 @@ func (h handler) newGetShopsResp(ucOutput shop.GetShopOutput) getShopResp {
 }
 
 type getDetailResp struct {
-	ID         string    `json:"id"`
-	Name       string    `json:"name"`
-	Phone      string    `json:"phone"`
-	Address    address   `json:"address"`
-	Followers  []string  `json:"followers,omitempty"`
-	AvgRate    float64   `json:"avg_rate"`
-	IsVerified bool      `json:"is_verified"`
-	CreatedAt  time.Time `json:"created_at"`
+	ID         string     `json:"id"`
+	Name       string     `json:"name"`
+	Phone      string     `json:"phone"`
+	Address    address    `json:"address"`
+	Followers  []string   `json:"followers,omitempty"`
+	AvgRate    float64    `json:"avg_rate"`
+	IsVerified bool       `json:"is_verified"`
+	CreatedAt  time.Time  `json:"created_at"`
+	Avatar_obj Avatar_obj `json:"avatar_obj"`
 }
 
-func (h handler) newDetailResponse(s models.Shop) getDetailResp {
+func (h handler) newDetailResponse(s shop.DetailShopOutput) getDetailResp {
 	return getDetailResp{
-		ID:    s.ID.Hex(),
-		Name:  s.Name,
-		Phone: s.Phone,
+		ID:    s.S.ID.Hex(),
+		Name:  s.S.Name,
+		Phone: s.S.Phone,
 		Address: address{
-			City:     s.City,
-			Street:   s.Street,
-			District: s.District,
+			City:     s.S.City,
+			Street:   s.S.Street,
+			District: s.S.District,
 		},
-		AvgRate:    s.AvgRate,
-		Followers:  mongo.HexFromObjectIDsOrNil(s.Followers),
-		IsVerified: s.IsVerified,
-		CreatedAt:  s.CreatedAt,
+		AvgRate:    s.S.AvgRate,
+		Followers:  mongo.HexFromObjectIDsOrNil(s.S.Followers),
+		IsVerified: s.S.IsVerified,
+		CreatedAt:  s.S.CreatedAt,
+		Avatar_obj: Avatar_obj{
+			MediaID: s.MediaID,
+			URL:     s.URL,
+		},
 	}
 }
 

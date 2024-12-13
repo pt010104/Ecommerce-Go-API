@@ -37,7 +37,21 @@ type UpdateInput struct {
 	Phone      string
 	IsVerified bool
 }
+type Avatar_obj struct {
+	MediaID string
+	URL     string
+}
+type Shop_obj struct {
+	Shop   models.Shop
+	Avatar Avatar_obj
+}
 type GetShopOutput struct {
-	Shops []models.Shop
-	Pag   paginator.Paginator
+	Shops []Shop_obj
+
+	Pag paginator.Paginator
+}
+type DetailShopOutput struct {
+	S       models.Shop
+	MediaID string
+	URL     string
 }
