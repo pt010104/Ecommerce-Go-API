@@ -281,7 +281,7 @@ func (uc implUsecase) Detail(ctx context.Context, sc models.Scope, id string) (u
 
 	var avatar models.Media
 	if u.MediaID != primitive.NilObjectID {
-		avatar, err = uc.mediaUC.Detail(ctx, sc, u.MediaID.Hex())
+		avatar, err = uc.mediaUC.Detail(ctx, models.Scope{}, u.MediaID.Hex())
 		if err != nil {
 			uc.l.Errorf(ctx, "user.usecase.Detail.Detail: %v", err)
 		}
