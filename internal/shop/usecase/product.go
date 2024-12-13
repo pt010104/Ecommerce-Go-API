@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/pt010104/api-golang/internal/admins"
+
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
 
@@ -22,6 +23,19 @@ func (uc implUsecase) CreateProduct(ctx context.Context, sc models.Scope, input 
 	if err1 != nil {
 		uc.l.Errorf(ctx, "shop.product.usecase.createproduct.createinventory", err1)
 		return models.Product{}, models.Inventory{}, err1
+	}
+	if input.MediaID != "" {
+
+		_, err := uc.mediaUC.Detail(ctx, sc, input.MediaID)
+		if err != nil {
+			uc.l.Errorf(ctx, "shop.product.usecase.createproduct.detailmedia", err)
+			return models.Product{}, models.Inventory{}, err
+		}
+	}
+	media_id, err := primitive.ObjectIDFromHex(input.MediaID)
+	if err != nil {
+		uc.l.Errorf(ctx, "invalid MediaID format: %v", err)
+		return models.Product{}, models.Inventory{}, err
 	}
 
 	shopID, err := primitive.ObjectIDFromHex(sc.ShopID)
@@ -45,6 +59,7 @@ func (uc implUsecase) CreateProduct(ctx context.Context, sc models.Scope, input 
 		InventoryID: inven.ID,
 		ShopID:      shopID,
 		CategoryID:  categoryIDs,
+		MediaID:     media_id,
 	})
 	if err != nil {
 		uc.l.Errorf(ctx, "shop.usecase.product.createproduct: ", err)
@@ -64,6 +79,7 @@ func (uc *implUsecase) DetailProduct(ctx context.Context, sc models.Scope, produ
 		err           error
 		mu            sync.Mutex
 		wg            sync.WaitGroup
+		avatar        *models.Media
 	)
 
 	u, err = uc.repo.Detailproduct(ctx, productID)
@@ -78,7 +94,7 @@ func (uc *implUsecase) DetailProduct(ctx context.Context, sc models.Scope, produ
 
 	errCh := make(chan error, 3)
 
-	wg.Add(3)
+	wg.Add(4)
 
 	go func() {
 		defer wg.Done()
@@ -89,6 +105,21 @@ func (uc *implUsecase) DetailProduct(ctx context.Context, sc models.Scope, produ
 		}
 		mu.Lock()
 		inventory = inv
+		mu.Unlock()
+	}()
+	go func() {
+		defer wg.Done()
+		if u.MediaID != primitive.NilObjectID {
+			avatar1, err := uc.mediaUC.Detail(ctx, sc, u.MediaID.Hex())
+			if err != nil {
+				errCh <- err
+				return
+			}
+			avatar = &avatar1
+		}
+
+		mu.Lock()
+
 		mu.Unlock()
 	}()
 
@@ -129,15 +160,21 @@ func (uc *implUsecase) DetailProduct(ctx context.Context, sc models.Scope, produ
 	for _, cat := range category {
 		categoryNames = append(categoryNames, cat.Name)
 	}
+	var mediaID, url string
 
+	if avatar != nil {
+		mediaID = avatar.ID.Hex()
+		url = avatar.URL
+	}
 	output := shop.DetailProductOutput{
 		ID:           u.ID.Hex(),
 		Name:         u.Name,
 		CategoryName: categoryNames,
 		Category:     category,
 		Inventory:    inventory,
-
-		Shop: shopDetail,
+		MediaID:      mediaID,
+		URL:          url,
+		Shop:         shopDetail,
 
 		Price: u.Price,
 	}
@@ -282,11 +319,18 @@ func (uc implUsecase) GetProduct(ctx context.Context, sc models.Scope, input sho
 				cates = append(cates, cate)
 			}
 		}
+		avatar, err := uc.mediaUC.Detail(ctx, models.Scope{}, p.MediaID.Hex())
 
+		if err != nil {
+			uc.l.Errorf(ctx, "shop.usecase.GetProduct: %v", err)
+			return shop.GetProductOutput{}, err
+		}
 		item := shop.ProductOutPutItem{
-			P:     p,
-			Inven: (p.InventoryID).Hex(),
-			Cate:  cates,
+			P:       p,
+			Inven:   (p.InventoryID).Hex(),
+			Cate:    cates,
+			MediaID: avatar.ID.Hex(),
+			URL:     avatar.URL,
 		}
 		list = append(list, item)
 	}

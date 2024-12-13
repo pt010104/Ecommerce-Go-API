@@ -57,7 +57,7 @@ func (srv HTTPServer) mapHandlers() error {
 	emailUC := emailUC.New(srv.l)
 	mediaUC := mediaUC.New(srv.l, mediaRepo, prod, srv.cloudinary)
 	userUC := userUC.New(srv.l, userRepo, emailUC, redisRepo, mediaUC)
-	shopUC := shopUC.New(srv.l, shopRepo, nil, userUC)
+	shopUC := shopUC.New(srv.l, shopRepo, nil, userUC, mediaUC)
 	adminUC := adminUC.New(adminRepo, srv.l, shopUC)
 	shopUC.SetAdminUC(adminUC)
 	cartUC := cartUC.New(srv.l, cartRepo, shopUC)

@@ -6,6 +6,13 @@ definitions:
       url:
         type: string
     type: object
+  http.AvatarProduct_obj:
+    properties:
+      media_id:
+        type: string
+      url:
+        type: string
+    type: object
   http.CreateCartItemResponse:
     properties:
       product_id:
@@ -111,13 +118,6 @@ definitions:
       street:
         type: string
     type: object
-  http.avatar_obj:
-    properties:
-      media_id:
-        type: string
-      url:
-        type: string
-    type: object
   http.categoryObject:
     properties:
       id:
@@ -131,6 +131,8 @@ definitions:
         items:
           type: string
         type: array
+      media_id:
+        type: string
       name:
         type: string
       price:
@@ -151,6 +153,8 @@ definitions:
     type: object
   http.detailProductResp:
     properties:
+      avatar:
+        $ref: '#/definitions/internal_shop_delivery_http.avatar_obj'
       category_id:
         items:
           type: string
@@ -184,7 +188,7 @@ definitions:
   http.detailResp:
     properties:
       avatar:
-        $ref: '#/definitions/http.avatar_obj'
+        $ref: '#/definitions/internal_user_delivery_http.avatar_obj'
       email:
         type: string
       id:
@@ -280,6 +284,8 @@ definitions:
     type: object
   http.listProductItem:
     properties:
+      avatar:
+        $ref: '#/definitions/http.AvatarProduct_obj'
       category_objects:
         items:
           $ref: '#/definitions/http.categoryObject'
@@ -355,6 +361,20 @@ definitions:
       name:
         type: string
       shop_id:
+        type: string
+    type: object
+  internal_shop_delivery_http.avatar_obj:
+    properties:
+      media_id:
+        type: string
+      url:
+        type: string
+    type: object
+  internal_user_delivery_http.avatar_obj:
+    properties:
+      media_id:
+        type: string
+      url:
         type: string
     type: object
   response.Resp:

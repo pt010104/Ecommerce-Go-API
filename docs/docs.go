@@ -1758,6 +1758,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "http.AvatarProduct_obj": {
+            "type": "object",
+            "properties": {
+                "media_id": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
         "http.Avatar_obj": {
             "type": "object",
             "properties": {
@@ -1932,17 +1943,6 @@ const docTemplate = `{
                 }
             }
         },
-        "http.avatar_obj": {
-            "type": "object",
-            "properties": {
-                "media_id": {
-                    "type": "string"
-                },
-                "url": {
-                    "type": "string"
-                }
-            }
-        },
         "http.categoryObject": {
             "type": "object",
             "properties": {
@@ -1970,6 +1970,9 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                },
+                "media_id": {
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"
@@ -2001,6 +2004,9 @@ const docTemplate = `{
                 "shop_name"
             ],
             "properties": {
+                "avatar": {
+                    "$ref": "#/definitions/internal_shop_delivery_http.avatar_obj"
+                },
                 "category_id": {
                     "type": "array",
                     "items": {
@@ -2037,7 +2043,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "avatar": {
-                    "$ref": "#/definitions/http.avatar_obj"
+                    "$ref": "#/definitions/internal_user_delivery_http.avatar_obj"
                 },
                 "email": {
                     "type": "string"
@@ -2185,6 +2191,9 @@ const docTemplate = `{
         "http.listProductItem": {
             "type": "object",
             "properties": {
+                "avatar": {
+                    "$ref": "#/definitions/http.AvatarProduct_obj"
+                },
                 "category_objects": {
                     "type": "array",
                     "items": {
@@ -2300,6 +2309,28 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "shop_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_shop_delivery_http.avatar_obj": {
+            "type": "object",
+            "properties": {
+                "media_id": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_user_delivery_http.avatar_obj": {
+            "type": "object",
+            "properties": {
+                "media_id": {
+                    "type": "string"
+                },
+                "url": {
                     "type": "string"
                 }
             }

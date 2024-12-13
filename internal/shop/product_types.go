@@ -13,14 +13,16 @@ type CreateProductInput struct {
 	ReorderLevel    *uint
 	ReorderQuantity *uint
 	CategoryID      []string
+	MediaID         string
 }
 type DetailProductOutput struct {
 	ID           string
 	Name         string
 	CategoryName []string
 	Category     []models.Category
-
-	Shop models.Shop
+	MediaID      string
+	URL          string
+	Shop         models.Shop
 
 	Inventory models.Inventory
 	Price     float32
@@ -35,9 +37,11 @@ type ListProductInput struct {
 	ShopID     string
 }
 type ProductOutPutItem struct {
-	P     models.Product
-	Inven string
-	Cate  []models.Category
+	P       models.Product
+	Inven   string
+	Cate    []models.Category
+	MediaID string
+	URL     string
 }
 type ListProductOutput struct {
 	Products []ProductOutPutItem
