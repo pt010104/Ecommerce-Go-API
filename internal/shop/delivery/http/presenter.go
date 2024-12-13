@@ -92,16 +92,16 @@ type listMetaResponse struct {
 }
 
 type getShopRespItem struct {
-	ID         string     `json:"id"`
-	UserID     string     `json:"user_id"`
-	Name       string     `json:"name"`
-	Phone      string     `json:"phone"`
-	Address    address    `json:"address"`
-	Followers  []string   `json:"followers,omitempty"`
-	AvgRate    float64    `json:"avg_rate"`
-	IsVerified *bool      `json:"is_verified,omitempty"`
-	CreatedAt  time.Time  `json:"created_at"`
-	Avatar_obj Avatar_obj `json:"avatar_obj"`
+	ID         string      `json:"id"`
+	UserID     string      `json:"user_id"`
+	Name       string      `json:"name"`
+	Phone      string      `json:"phone"`
+	Address    address     `json:"address"`
+	Followers  []string    `json:"followers,omitempty"`
+	AvgRate    float64     `json:"avg_rate"`
+	IsVerified *bool       `json:"is_verified,omitempty"`
+	CreatedAt  time.Time   `json:"created_at"`
+	Avatar_obj *Avatar_obj `json:"avatar_obj,omitempty"`
 }
 
 type getShopResp struct {
@@ -126,10 +126,13 @@ func (h handler) newGetShopsResp(ucOutput shop.GetShopOutput) getShopResp {
 			UserID:     s.Shop.UserID.Hex(),
 			IsVerified: &s.Shop.IsVerified,
 			CreatedAt:  s.Shop.CreatedAt,
-			Avatar_obj: Avatar_obj{
+		}
+
+		if s.Avatar.URL != "" {
+			shopItem.Avatar_obj = &Avatar_obj{
 				MediaID: s.Avatar.MediaID,
 				URL:     s.Avatar.URL,
-			},
+			}
 		}
 
 		items = append(items, shopItem)

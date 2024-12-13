@@ -58,7 +58,7 @@ func (uc implUsecase) Get(ctx context.Context, sc models.Scope, input shop.GetSh
 
 	for _, v := range s {
 
-		avatar, err := uc.userUC.Detail(ctx, sc, v.UserID.Hex())
+		avatar, err := uc.userUC.Detail(ctx, models.Scope{}, v.UserID.Hex())
 		if err != nil {
 			uc.l.Errorf(ctx, "shop.usecase.Get: %v", err)
 			return shop.GetShopOutput{}, err
