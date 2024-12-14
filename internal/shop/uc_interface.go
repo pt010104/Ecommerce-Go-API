@@ -32,4 +32,5 @@ type UseCase interface {
 	DeleteProduct(ctx context.Context, sc models.Scope, ud []string) error
 	SetAdminUC(adminUC admins.UseCase)
 	GetProduct(ctx context.Context, sc models.Scope, a GetProductOption) (b GetProductOutput, e error)
+	UpdateProduct(ctx context.Context, sc models.Scope, input UpdateProductOption) (models.Product, error)
 }

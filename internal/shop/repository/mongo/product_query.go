@@ -18,7 +18,13 @@ func (repo implRepo) buildProductDetailQuery(ctx context.Context, ID primitive.O
 
 	return filter, nil
 }
+func (repo implRepo) buildProductDetailUpdateQuery(ctx context.Context, ID string) (bson.M, error) {
+	filter := bson.M{}
+	filter = mongo.BuildQueryWithSoftDelete(filter)
+	filter["_id"] = mongo.ObjectIDFromHexOrNil(ID)
 
+	return filter, nil
+}
 func (repo implRepo) buildProductQuery(sc models.Scope, opt shop.GetProductFilter) (bson.M, error) {
 	filter := bson.M{}
 

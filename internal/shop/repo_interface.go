@@ -33,4 +33,5 @@ type Repository interface {
 	ValidateCategoryIDs(ctx context.Context, categoryIDs []primitive.ObjectID) error
 	IsValidProductID(ctx context.Context, productID primitive.ObjectID) bool
 	GetProduct(ctx context.Context, sc models.Scope, opt GetProductOption) ([]models.Product, paginator.Paginator, error)
+	UpdateProduct(ctx context.Context, sc models.Scope, option UpdateProductOption) (models.Product, error)
 }

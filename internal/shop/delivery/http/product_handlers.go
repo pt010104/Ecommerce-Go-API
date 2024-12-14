@@ -147,3 +147,24 @@ func (h handler) GetProduct(c *gin.Context) {
 	response.OK(c, h.getProductResp(o))
 
 }
+
+func (h handler) UpdateProduct(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	sc, req, err := h.processUpdateProductRequest(c)
+	if err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.UpdateProduct: %v", err)
+		response.Error(c, err)
+		return
+	}
+
+	p, err2 := h.uc.UpdateProduct(ctx, sc, req.toInput())
+	if err2 != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.delete: %v", err2)
+		err := h.mapErrors(err2)
+		response.Error(c, err)
+		return
+	}
+	response.OK(c, h.newUpdateProductResponse(p))
+
+}

@@ -355,3 +355,31 @@ func (uc implUsecase) GetProduct(ctx context.Context, sc models.Scope, input sho
 func (uc implUsecase) IsValidProductID(ctx context.Context, productID primitive.ObjectID) bool {
 	return uc.repo.IsValidProductID(ctx, productID)
 }
+func (uc implUsecase) UpdateProduct(ctx context.Context, sc models.Scope, input shop.UpdateProductOption) (models.Product, error) {
+	shop1, err := uc.repo.DetailShop(ctx, models.Scope{}, sc.ShopID)
+	if err != nil {
+		uc.l.Errorf(ctx, "shop.usecase.UpdateProduct.repoDetailShop: %v", err)
+		return models.Product{}, err
+	}
+	user, err := uc.userUC.Detail(ctx, models.Scope{}, shop1.UserID.Hex())
+
+	if err != nil {
+		uc.l.Errorf(ctx, "shop.usecase.UpdateProduct.userUC.Detail: %v", err)
+		return models.Product{}, err
+	}
+	if user.User.ID.Hex() != sc.UserID {
+
+		return models.Product{}, shop.ErrNoPermissionToUpdate
+	}
+	p, err := uc.repo.UpdateProduct(ctx, sc, input)
+	if err != nil {
+		uc.l.Errorf(ctx, "shop.usecase.UpdateProduct.repoUpdateProduct: %v", err)
+		return models.Product{}, err
+	}
+	p1, err1 := uc.repo.Detailproduct(ctx, p.ID)
+	if err1 != nil {
+		uc.l.Errorf(ctx, "shop.usecase.UpdateProduct.repoDetailProduct: %v", err1)
+		return models.Product{}, err1
+	}
+	return p1, nil
+}

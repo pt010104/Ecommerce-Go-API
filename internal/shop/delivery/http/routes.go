@@ -26,6 +26,6 @@ func MapProductRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) 
 	r.POST("delete", h.DeleteProduct)
 	r.POST("", h.CreateProduct)
 	r.GET("/:id", h.DetailProduct)
-
+	r.POST("update", h.UpdateProduct)
 	r.GET("get-product", h.GetProduct)
 }

@@ -3,6 +3,7 @@ package http
 import (
 	"fmt"
 
+	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/pkg/mongo"
 	"github.com/pt010104/api-golang/pkg/paginator"
@@ -267,4 +268,91 @@ func (h handler) getProductResp(output shop.GetProductOutput) getProductResp {
 		Items:      list,
 		ShopObject: shopObject,
 	}
+}
+
+type UpdateProductReq struct {
+	ID              string   `json:"id" binding:"required"`
+	Name            string   `json:"name"`
+	Price           float32  `json:"price"`
+	StockLevel      uint     `json:"stock_level"`
+	ReorderLevel    uint     `json:"reorder_level"`
+	ReorderQuantity uint     `json:"reorder_quantity"`
+	CategoryIDs     []string `json:"category_ids"`
+	MediaIDs        []string `json:"media_ids"`
+}
+
+func (r UpdateProductReq) toInput() shop.UpdateProductOption {
+	return shop.UpdateProductOption{
+		ID:              mongo.ObjectIDFromHexOrNil(r.ID),
+		Name:            r.Name,
+		Price:           r.Price,
+		StockLevel:      r.StockLevel,
+		ReorderLevel:    r.ReorderLevel,
+		ReorderQuantity: r.ReorderQuantity,
+		CategoryID:      mongo.ObjectIDsFromHexOrNil(r.CategoryIDs),
+		MediaIDs:        mongo.ObjectIDsFromHexOrNil(r.MediaIDs),
+	}
+}
+func (r UpdateProductReq) validate() error {
+	if r.ID == "" || !mongo.IsObjectID(r.ID) {
+		return errWrongBody
+	}
+	if len(r.CategoryIDs) > 0 {
+		for _, id := range r.CategoryIDs {
+			if !mongo.IsObjectID(id) {
+				return errWrongBody
+			}
+		}
+
+	}
+	if len(r.MediaIDs) > 0 {
+		for _, id := range r.MediaIDs {
+			if !mongo.IsObjectID(id) {
+				return errWrongBody
+
+			}
+		}
+
+	}
+	return nil
+}
+
+type updateProductResp struct {
+	ID            string       `json:"id" binding:"required"`
+	Name          string       `json:"name,omitempty"`          // Empty strings won't show
+	CategoryName  []string     `json:"category_name,omitempty"` // Empty slices won't show
+	CategoryID    []string     `json:"category_id,omitempty"`
+	ShopName      string       `json:"shop_name,omitempty"`
+	ShopID        string       `json:"shop_id,omitempty"`
+	InventoryName string       `json:"inventory_name,omitempty"`
+	Price         float32      `json:"price,omitempty"` // Zero values won't show
+	Avatar        []avatar_obj `json:"avatar,omitempty"`
+}
+
+func (h handler) newUpdateProductResponse(p models.Product) updateProductResp {
+
+	categoryIDs := make([]string, len(p.CategoryID))
+	for i, category := range p.CategoryID {
+		categoryIDs[i] = category.Hex()
+	}
+
+	var images []avatar_obj
+	for _, media := range p.MediaIDs {
+		images = append(images, avatar_obj{
+			MediaID: media.Hex(),
+			URL:     media.Hex(),
+		})
+	}
+	return updateProductResp{
+		ID:            p.ID.Hex(),
+		Name:          p.Name,
+		CategoryName:  []string{},
+		CategoryID:    categoryIDs,
+		ShopName:      p.ShopID.Hex(),
+		ShopID:        p.ShopID.Hex(),
+		InventoryName: p.InventoryID.Hex(),
+		Price:         p.Price,
+		Avatar:        images,
+	}
+
 }

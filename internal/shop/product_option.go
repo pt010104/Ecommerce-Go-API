@@ -1,6 +1,9 @@
 package shop
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"github.com/pt010104/api-golang/internal/models"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type CreateProductOption struct {
 	Name        string
@@ -16,4 +19,16 @@ type GetProductFilter struct {
 	IDs     []string
 	Search  string
 	ShopID  string
+}
+type UpdateProductOption struct {
+	Name            string
+	ID              primitive.ObjectID
+	Price           float32
+	Model           models.Product
+	Alias           string
+	StockLevel      uint
+	ReorderLevel    uint
+	ReorderQuantity uint
+	CategoryID      []primitive.ObjectID
+	MediaIDs        []primitive.ObjectID
 }

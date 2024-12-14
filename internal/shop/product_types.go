@@ -49,3 +49,13 @@ type GetProductOutput struct {
 	Pag      paginator.Paginator
 	Shop     models.Shop
 }
+type UpdateProductInput struct {
+	Name            string
+	ID              string
+	Price           float32
+	StockLevel      uint
+	ReorderLevel    *uint
+	ReorderQuantity *uint
+	CategoryID      []string
+	MediaIDs        []string
+}

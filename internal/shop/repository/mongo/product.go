@@ -3,6 +3,7 @@ package mongo
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
@@ -170,4 +171,51 @@ func (repo implRepo) IsValidProductID(ctx context.Context, productID primitive.O
 	var product models.Product
 	err := col.FindOne(ctx, filter).Decode(&product)
 	return err == nil
+}
+func (repo implRepo) UpdateProduct(ctx context.Context, sc models.Scope, option shop.UpdateProductOption) (models.Product, error) {
+	col := repo.getProductCollection()
+	filter, err := repo.buildProductDetailQuery(ctx, option.ID)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repo.Update.buildshopdetailquery,", err)
+		return models.Product{}, err
+	}
+	fmt.Print("filter is : ", filter)
+	option.Model.ID = option.ID
+	updateData := bson.M{}
+	if option.Name != "" {
+		updateData["name"] = option.Name
+		option.Model.Name = option.Name
+	}
+	if option.Alias != "" {
+		updateData["alias"] = option.Alias
+		option.Model.Alias = option.Alias
+	}
+
+	if len(option.CategoryID) > 0 {
+		updateData["categoryid"] = option.CategoryID
+		option.Model.CategoryID = option.CategoryID
+	}
+	if len(option.MediaIDs) > 0 {
+		updateData["media_ids"] = option.MediaIDs
+		option.Model.MediaIDs = option.MediaIDs
+	}
+	if option.Price != 0 {
+		updateData["price"] = option.Price
+		option.Model.Price = option.Price
+	}
+
+	updateData["updated_at"] = time.Now()
+
+	update := bson.M{}
+	if len(updateData) > 0 {
+		update["$set"] = updateData
+	}
+
+	_, err = col.UpdateOne(ctx, filter, update)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repo.Update.FindOneAndUpdate:", err)
+		return models.Product{}, err
+	}
+
+	return option.Model, nil
 }
