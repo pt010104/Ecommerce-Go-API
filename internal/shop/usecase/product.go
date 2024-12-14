@@ -88,7 +88,7 @@ func (uc *implUsecase) DetailProduct(ctx context.Context, sc models.Scope, produ
 		mu            sync.Mutex
 		wg            sync.WaitGroup
 
-		avatars []models.Media
+		medias []models.Media
 	)
 
 	u, err = uc.repo.Detailproduct(ctx, productID)
@@ -117,29 +117,20 @@ func (uc *implUsecase) DetailProduct(ctx context.Context, sc models.Scope, produ
 		inventory = inv
 		mu.Unlock()
 	}()
+
 	go func() {
 		defer wg.Done()
-		var medias_string []string
-		if u.MediaIDs != nil {
-			for _, id := range u.MediaIDs {
-				medias_string = append(medias_string, id.Hex())
-				fmt.Print("medias_string", id.Hex())
-			}
-			avatar1, err := uc.mediaUC.List(ctx, sc, media.ListInput{
+		if len(u.MediaIDs) > 0 {
+			medias, err = uc.mediaUC.List(ctx, sc, media.ListInput{
 				GetFilter: media.GetFilter{
-					IDs: medias_string,
+					IDs: mongo.HexFromObjectIDsOrNil(u.MediaIDs),
 				},
 			})
 			if err != nil {
 				errCh <- err
 				return
 			}
-			avatars = avatar1
 		}
-
-		mu.Lock()
-
-		mu.Unlock()
 	}()
 
 	go func() {
@@ -186,7 +177,7 @@ func (uc *implUsecase) DetailProduct(ctx context.Context, sc models.Scope, produ
 		CategoryName: categoryNames,
 		Category:     category,
 		Inventory:    inventory,
-		Avatars:      avatars,
+		Medias:       medias,
 		Shop:         shopDetail,
 
 		Price: u.Price,

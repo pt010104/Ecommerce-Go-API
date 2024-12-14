@@ -29,7 +29,7 @@ func (r implRepository) buildQuery(ctx context.Context, sc models.Scope, opt med
 	}
 
 	if len(opt.IDs) > 0 {
-		filter["_id"] = bson.M{"$in": opt.IDs}
+		filter["_id"] = bson.M{"$in": mongo.ObjectIDsFromHexOrNil(opt.IDs)}
 	}
 
 	if opt.Status != "" {

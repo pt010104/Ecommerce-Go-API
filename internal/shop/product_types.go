@@ -20,11 +20,10 @@ type DetailProductOutput struct {
 	Name         string
 	CategoryName []string
 	Category     []models.Category
-	Avatars      []models.Media
+	Medias       []models.Media
 	Shop         models.Shop
-
-	Inventory models.Inventory
-	Price     float32
+	Inventory    models.Inventory
+	Price        float32
 }
 type GetProductOption struct {
 	GetProductFilter

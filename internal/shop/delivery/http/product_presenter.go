@@ -102,7 +102,7 @@ func (h handler) newDetailProductResponse(p shop.DetailProductOutput) detailProd
 	}
 
 	var images []avatar_obj
-	for _, media := range p.Avatars {
+	for _, media := range p.Medias {
 		images = append(images, avatar_obj{
 			MediaID: media.ID.Hex(),
 			URL:     media.URL,
