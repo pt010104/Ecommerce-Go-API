@@ -319,13 +319,13 @@ func (r UpdateProductReq) validate() error {
 
 type updateProductResp struct {
 	ID            string       `json:"id" binding:"required"`
-	Name          string       `json:"name,omitempty"`          // Empty strings won't show
-	CategoryName  []string     `json:"category_name,omitempty"` // Empty slices won't show
+	Name          string       `json:"name,omitempty"`
+	CategoryName  []string     `json:"category_name,omitempty"`
 	CategoryID    []string     `json:"category_id,omitempty"`
 	ShopName      string       `json:"shop_name,omitempty"`
 	ShopID        string       `json:"shop_id,omitempty"`
 	InventoryName string       `json:"inventory_name,omitempty"`
-	Price         float32      `json:"price,omitempty"` // Zero values won't show
+	Price         float32      `json:"price,omitempty"`
 	Avatar        []avatar_obj `json:"avatar,omitempty"`
 }
 
