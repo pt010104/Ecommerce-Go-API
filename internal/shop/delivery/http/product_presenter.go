@@ -16,7 +16,7 @@ type createProductReq struct {
 	ReorderLevel    *uint    `json:"reorder_level" binding:"required" `
 	ReorderQuantity *uint    `json:"reorder_quantity" binding:"required"`
 	CategoryIDs     []string `json:"category_ids" binding:"required"`
-	MediaID         string   `json:"media_id"`
+	MediaIDs        []string `json:"media_ids"`
 }
 
 func (r createProductReq) toInput() shop.CreateProductInput {
@@ -28,7 +28,7 @@ func (r createProductReq) toInput() shop.CreateProductInput {
 		ReorderLevel:    r.ReorderLevel,
 		ReorderQuantity: r.ReorderQuantity,
 		CategoryID:      r.CategoryIDs,
-		MediaID:         r.MediaID,
+		MediaIDs:        r.MediaIDs,
 	}
 }
 func (r createProductReq) validate() error {
@@ -64,11 +64,12 @@ func (r createProductReq) validate() error {
 			return errWrongBody
 		}
 	}
-	if r.MediaID != "" {
-		if _, err := primitive.ObjectIDFromHex(r.MediaID); err != nil {
-			fmt.Errorf("wrong media id")
-
-			return errWrongBody
+	if len(r.MediaIDs) > 0 {
+		for _, id := range r.MediaIDs {
+			if _, err := primitive.ObjectIDFromHex(id); err != nil {
+				fmt.Errorf("wrong ids")
+				return errWrongBody
+			}
 		}
 	}
 
@@ -83,21 +84,29 @@ type avatar_obj struct {
 	URL     string `json:"url"`
 }
 type detailProductResp struct {
-	ID            string      `json:"id" binding:"required"`
-	Name          string      `json:"name" binding:"required"`
-	CategoryName  []string    `json:"category_name" binding:"required"`
-	CategoryID    []string    `json:"category_id" binding:"required"`
-	ShopName      string      `json:"shop_name" binding:"required"`
-	ShopID        string      `json:"shop_id" binding:"required"`
-	InventoryName string      `json:"inventory_name" binding:"required"`
-	Price         float32     `json:"price" binding:"required"`
-	Avatar        *avatar_obj `json:"avatar,omitempty"`
+	ID            string       `json:"id" binding:"required"`
+	Name          string       `json:"name" binding:"required"`
+	CategoryName  []string     `json:"category_name" binding:"required"`
+	CategoryID    []string     `json:"category_id" binding:"required"`
+	ShopName      string       `json:"shop_name" binding:"required"`
+	ShopID        string       `json:"shop_id" binding:"required"`
+	InventoryName string       `json:"inventory_name" binding:"required"`
+	Price         float32      `json:"price" binding:"required"`
+	Avatar        []avatar_obj `json:"avatar,omitempty"`
 }
 
 func (h handler) newDetailProductResponse(p shop.DetailProductOutput) detailProductResp {
 	categoryIDs := make([]string, len(p.Category))
 	for i, category := range p.Category {
 		categoryIDs[i] = category.ID.Hex()
+	}
+
+	var images []avatar_obj
+	for _, media := range p.Avatars {
+		images = append(images, avatar_obj{
+			MediaID: media.ID.Hex(),
+			URL:     media.URL,
+		})
 	}
 	return detailProductResp{
 		ID:            p.ID,
@@ -108,11 +117,9 @@ func (h handler) newDetailProductResponse(p shop.DetailProductOutput) detailProd
 		ShopID:        p.Shop.ID.Hex(),
 		InventoryName: p.Inventory.ID.Hex(),
 		Price:         p.Price,
-		Avatar: &avatar_obj{
-			MediaID: p.MediaID,
-			URL:     p.URL,
-		},
+		Avatar:        images,
 	}
+
 }
 
 type deleteProductRequest struct {
@@ -198,13 +205,13 @@ type AvatarProduct_obj struct {
 	URL     string `json:"url"`
 }
 type listProductItem struct {
-	ID              string             `json:"id"`
-	Name            string             `json:"name"`
-	ShopID          string             `json:"shop_id"`
-	InventoryID     string             `json:"inventory_id"`
-	Price           float32            `json:"price"`
-	CategoryObjects []categoryObject   `json:"category_objects"`
-	Avatar          *AvatarProduct_obj `json:"avatar,omitempty"`
+	ID              string           `json:"id"`
+	Name            string           `json:"name"`
+	ShopID          string           `json:"shop_id"`
+	InventoryID     string           `json:"inventory_id"`
+	Price           float32          `json:"price"`
+	CategoryObjects []categoryObject `json:"category_objects"`
+	Avatar          []avatar_obj     `json:"avatar,omitempty"`
 }
 
 type shopObject struct {
@@ -217,44 +224,6 @@ type listProductResp struct {
 	ShopObject shopObject        `json:"shop_object"`
 }
 
-func (h handler) listProductResp(output shop.ListProductOutput) listProductResp {
-	var list []listProductItem
-
-	for _, s := range output.Products {
-		var categories []categoryObject
-		for _, category := range s.Cate {
-			categories = append(categories, categoryObject{
-				ID:   category.ID.Hex(),
-				Name: category.Name,
-			})
-		}
-
-		item := listProductItem{
-			ID:              s.P.ID.Hex(),
-			Name:            s.P.Name,
-			InventoryID:     s.Inven,
-			Price:           s.P.Price,
-			CategoryObjects: categories,
-			ShopID:          s.P.ShopID.Hex(),
-			Avatar: &AvatarProduct_obj{
-				MediaID: s.MediaID,
-				URL:     s.URL,
-			},
-		}
-		list = append(list, item)
-	}
-
-	shopObject := shopObject{
-		ID:   output.Shop.ID.Hex(),
-		Name: output.Shop.Name,
-	}
-
-	return listProductResp{
-
-		Products:   list,
-		ShopObject: shopObject,
-	}
-}
 func (h handler) getProductResp(output shop.GetProductOutput) getProductResp {
 	var list []listProductItem
 
@@ -267,6 +236,13 @@ func (h handler) getProductResp(output shop.GetProductOutput) getProductResp {
 			})
 		}
 
+		var image []avatar_obj
+		for _, media := range s.Images {
+			image = append(image, avatar_obj{
+				MediaID: media.ID.Hex(),
+				URL:     media.URL,
+			})
+		}
 		item := listProductItem{
 			ID:              s.P.ID.Hex(),
 			Name:            s.P.Name,
@@ -274,10 +250,7 @@ func (h handler) getProductResp(output shop.GetProductOutput) getProductResp {
 			Price:           s.P.Price,
 			CategoryObjects: categories,
 			ShopID:          s.P.ShopID.Hex(),
-			Avatar: &AvatarProduct_obj{
-				MediaID: s.MediaID,
-				URL:     s.URL,
-			},
+			Avatar:          image,
 		}
 		list = append(list, item)
 	}

@@ -13,15 +13,14 @@ type CreateProductInput struct {
 	ReorderLevel    *uint
 	ReorderQuantity *uint
 	CategoryID      []string
-	MediaID         string
+	MediaIDs        []string
 }
 type DetailProductOutput struct {
 	ID           string
 	Name         string
 	CategoryName []string
 	Category     []models.Category
-	MediaID      string
-	URL          string
+	Avatars      []models.Media
 	Shop         models.Shop
 
 	Inventory models.Inventory
@@ -37,11 +36,10 @@ type ListProductInput struct {
 	ShopID     string
 }
 type ProductOutPutItem struct {
-	P       models.Product
-	Inven   string
-	Cate    []models.Category
-	MediaID string
-	URL     string
+	P      models.Product
+	Inven  string
+	Cate   []models.Category
+	Images []models.Media
 }
 type ListProductOutput struct {
 	Products []ProductOutPutItem

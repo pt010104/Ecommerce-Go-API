@@ -15,7 +15,7 @@ type Handler interface {
 	GetShopIDByUserID(c *gin.Context)
 	CreateProduct(c *gin.Context)
 	DetailProduct(c *gin.Context)
-	ListProduct(c *gin.Context)
+
 	DeleteProduct(c *gin.Context)
 	GetProduct(c *gin.Context)
 }

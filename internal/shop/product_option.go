@@ -9,7 +9,7 @@ type CreateProductOption struct {
 	ShopID      primitive.ObjectID
 	CategoryID  []primitive.ObjectID
 	Alias       string
-	MediaID     primitive.ObjectID
+	MediaIDs    []primitive.ObjectID
 }
 type GetProductFilter struct {
 	CateIDs []string

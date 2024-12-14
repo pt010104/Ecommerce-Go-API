@@ -85,26 +85,7 @@ func (h handler) DetailProduct(c *gin.Context) {
 
 	response.OK(c, h.newDetailProductResponse(product))
 }
-func (h handler) ListProduct(c *gin.Context) {
-	ctx := c.Request.Context()
 
-	sc, req, err := h.processListProductRequest(c)
-	if err != nil {
-		h.l.Errorf(ctx, "shop.delivery.http.listproduct: %v", err)
-		response.Error(c, err)
-		return
-	}
-
-	o, err2 := h.uc.ListProduct(ctx, sc, req.toInput())
-	if err2 != nil {
-		h.l.Errorf(ctx, "shop.delivery.http.listProduct: %v", err)
-		err := h.mapErrors(err)
-		response.Error(c, err)
-		return
-	}
-	response.OK(c, h.listProductResp(o))
-
-}
 func (h handler) DeleteProduct(c *gin.Context) {
 	ctx := c.Request.Context()
 

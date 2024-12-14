@@ -45,11 +45,6 @@ func (repo implRepo) ValidateCategoryIDs(ctx context.Context, categoryIDs []prim
 }
 func (repo implRepo) CreateProduct(ctx context.Context, sc models.Scope, opt shop.CreateProductOption) (models.Product, error) {
 	colP := repo.getProductCollection()
-	err1 := repo.ValidateCategoryIDs(ctx, opt.CategoryID)
-	if err1 != nil {
-		repo.l.Errorf(ctx, "shop.repo.product.validatecateIDS:", err1)
-		return models.Product{}, shop.ErrNonExistCategory
-	}
 	p, err := repo.buildProductModel(opt, ctx)
 	if err != nil {
 		repo.l.Errorf(ctx, "shop.repo.product.build:", err)
