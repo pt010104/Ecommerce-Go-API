@@ -22,28 +22,6 @@ func (repo implRepo) getProductCollection() mongo.Collection {
 	return *repo.database.Collection(productCollection)
 }
 
-const (
-	CategoryCollection = "categories"
-)
-
-func (repo implRepo) getCategoryCollection() mongo.Collection {
-	return *repo.database.Collection(CategoryCollection)
-}
-func (repo implRepo) ValidateCategoryIDs(ctx context.Context, categoryIDs []primitive.ObjectID) error {
-	colC := repo.getCategoryCollection()
-
-	filter := bson.M{"_id": bson.M{"$in": categoryIDs}}
-	count, err := colC.CountDocuments(ctx, filter)
-	if err != nil {
-		return err
-	}
-
-	if count != int64(len(categoryIDs)) {
-		return fmt.Errorf("some category IDs are invalid")
-	}
-
-	return nil
-}
 func (repo implRepo) CreateProduct(ctx context.Context, sc models.Scope, opt shop.CreateProductOption) (models.Product, error) {
 	colP := repo.getProductCollection()
 	p, err := repo.buildProductModel(opt, ctx)
@@ -87,6 +65,7 @@ func (repo implRepo) ListProduct(ctx context.Context, sc models.Scope, opt shop.
 		repo.l.Errorf(ctx, "shop.repository.mongo.buildProductQuery: %v", err)
 		return []models.Product{}, err
 	}
+
 	cursor, err := col.Find(ctx, filter)
 	if err != nil {
 		repo.l.Errorf(ctx, "shop.repository.mongo.ListProduct.Find: %v", err)
@@ -102,7 +81,6 @@ func (repo implRepo) ListProduct(ctx context.Context, sc models.Scope, opt shop.
 	}
 
 	return products, nil
-
 }
 
 func (repo implRepo) Delete(ctx context.Context, sc models.Scope, ids []string) (err error) {

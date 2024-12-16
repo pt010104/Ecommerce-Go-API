@@ -2,132 +2,168 @@ package usecase
 
 import (
 	"context"
+	"sync"
 
 	"github.com/pt010104/api-golang/internal/cart"
 	"github.com/pt010104/api-golang/internal/models"
-	"github.com/pt010104/api-golang/internal/shop"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"github.com/pt010104/api-golang/pkg/mongo"
+	"github.com/pt010104/api-golang/pkg/util"
 )
 
-func (uc implUseCase) Create(sc models.Scope, ctx context.Context, input cart.CreateCartInput, inputItem cart.CreateCartItemInput) (models.Cart, error) {
-
-	pidPrimitive, err := primitive.ObjectIDFromHex(inputItem.ProductID)
+func (uc implUseCase) Update(ctx context.Context, sc models.Scope, input cart.UpdateInput) (cart.UpdateOutput, error) {
+	err := uc.validateCartItem(ctx, sc, input.NewItemList)
 	if err != nil {
-		uc.l.Errorf(ctx, "cart.Usecase.Create.ObjecrIDFromHeX.inputItem.ProductID")
-		return models.Cart{}, err
-	}
-	p, err1 := uc.shopUc.DetailProduct(ctx, sc, pidPrimitive)
-	if err1 != nil {
-		uc.l.Errorf(ctx, "cart.Usecase.DetailProduct")
-		return models.Cart{}, err1
+		uc.l.Errorf(ctx, "cart.Usecase.Update.validateCartItem", err)
+		return cart.UpdateOutput{}, err
 	}
 
-	if (p.Inventory.StockLevel) < 1 {
-		return models.Cart{}, cart.ErrNotEnoughQuantity
+	var data getDataOutput
+	if len(input.NewItemList) > 0 {
+		data, err = uc.getDataCartItems(ctx, sc, input.NewItemList)
+		if err != nil {
+			uc.l.Errorf(ctx, "cart.Usecase.Update.getDataCartItems", err)
+			return cart.UpdateOutput{}, err
+		}
 	}
-	uidPrimitive, err := primitive.ObjectIDFromHex(sc.UserID)
-	if err != nil {
-		uc.l.Errorf(ctx, "cart.Usecase.Create.ObjecrIDFromHeX.Sc.UserID")
-		return models.Cart{}, err
-	}
-	shopidPrimitive, err := primitive.ObjectIDFromHex(input.ShopID)
-	if err != nil {
-		uc.l.Errorf(ctx, "cart.Usecase.Create.ObjecrIDFromHeX.input.ShopID")
-		return models.Cart{}, err
-	}
-	cart, err := uc.repo.Create(cart.CreateCartOption{
-		UserID: uidPrimitive,
-		ShopID: shopidPrimitive,
-	},
-		cart.CreateCartItemOption{
-			ProductID: pidPrimitive,
-			Quantity:  inputItem.Quantity,
+
+	var shopIDsSet = util.RemoveDuplicates(data.ShopIDs)
+	carts, err := uc.repo.ListCart(ctx, sc, cart.ListOption{
+		CartFilter: cart.CartFilter{
+			ShopIDs: shopIDsSet,
 		},
-		ctx,
-	)
-	if err != nil {
-		uc.l.Errorf(ctx, "cart.Usecase.Repo.Create")
-		return models.Cart{}, err
-	}
-	return cart, nil
-}
-
-func (uc implUseCase) Update(ctx context.Context, opt cart.UpdateCartOption) (models.Cart, error) {
-
-	if len(opt.NewItemList) == 0 {
-		return models.Cart{}, cart.ErrEmptyItemList
-	}
-	var ids []string
-	for _, item := range opt.NewItemList {
-
-		ids = append(ids, item.ProductID.Hex())
-	}
-	listProduct, err := uc.shopUc.ListProduct(ctx, models.Scope{}, shop.GetProductFilter{
-		IDs: ids,
 	})
 	if err != nil {
-		uc.l.Errorf(ctx, "cart.Usecase.Update.ListProduct", err)
-		return models.Cart{}, err
-	}
-	if len(listProduct.Products) != len(opt.NewItemList) {
-		return models.Cart{}, cart.ErrInvalidProductID
-	}
-	for _, item := range opt.NewItemList {
-
-		if item.Quantity <= 0 {
-			return models.Cart{}, cart.ErrInvalidQuantity
-		}
-
-		if !uc.shopUc.IsValidProductID(ctx, item.ProductID) {
-			return models.Cart{}, cart.ErrInvalidProductID
-		}
-	}
-	existingCart, err := uc.repo.Get(ctx, opt.ID)
-	uc.l.Debugf(ctx, "existingCart", opt.ID)
-	if err != nil {
-		if err.Error() == "mongo: no documents in result" {
-			return models.Cart{}, cart.ErrCartNotFound
-		}
-		return models.Cart{}, err
+		uc.l.Errorf(ctx, "cart.Usecase.Update.ListCart", err)
+		return cart.UpdateOutput{}, err
 	}
 
-	if existingCart.UserID != opt.UserID {
-		return models.Cart{}, cart.ErrUserMismatch
+	if len(input.NewItemList) > 0 && len(carts) != len(shopIDsSet) {
+		uc.l.Errorf(ctx, "cart.Usecase.Update.ListCart", cart.ErrCartNotFound)
+		return cart.UpdateOutput{}, cart.ErrCartNotFound
 	}
 
-	updatedCart, err := uc.repo.Update(ctx, opt)
-	if err != nil {
-		return models.Cart{}, err
+	var wg sync.WaitGroup
+	var wgErr error
+	var Mutex sync.Mutex
+	var updatedCarts []models.Cart
+
+	wg.Add(len(carts))
+	for _, c := range carts {
+		go func(c models.Cart) {
+			defer wg.Done()
+			for i, item := range data.CartItems {
+				if item.Quantity == 0 {
+					data.CartItems = append(data.CartItems[:i], data.CartItems[i+1:]...)
+				}
+			}
+
+			updatedCart, err := uc.repo.Update(ctx, sc, cart.UpdateCartOption{
+				Model:       c,
+				NewItemList: data.CartItems,
+			})
+			if err != nil {
+				uc.l.Errorf(ctx, "cart.Usecase.Update.Update", err)
+				wgErr = err
+				return
+			}
+			Mutex.Lock()
+			updatedCarts = append(updatedCarts, updatedCart)
+			Mutex.Unlock()
+		}(c)
 	}
-	uc.l.Debugf(ctx, "updatedCart", updatedCart)
-	return updatedCart, nil
+
+	wg.Wait()
+	if wgErr != nil {
+		uc.l.Errorf(ctx, "cart.Usecase.Update.Update", wgErr)
+		return cart.UpdateOutput{}, wgErr
+	}
+
+	return cart.UpdateOutput{
+		Carts: updatedCarts,
+		Shops: data.Shops,
+	}, nil
 }
-func (uc implUseCase) ListCart(sc models.Scope, ctx context.Context, opt cart.GetCartFilter) ([]models.Cart, error) {
-	carts, err := uc.repo.ListCart(sc, ctx, opt)
-	uc.l.Debugf(ctx, "carts", carts)
-	uc.l.Debugf(ctx, "opt", opt)
+
+func (uc implUseCase) Add(ctx context.Context, sc models.Scope, input cart.CreateCartInput) error {
+	err := uc.validateCartItem(ctx, sc, []cart.CartItemInput{
+		{
+			ProductID: input.ProductID,
+			Quantity:  input.Quantity,
+		},
+	})
 	if err != nil {
-		uc.l.Errorf(ctx, "cart.Usecase.ListCart", err)
-		return nil, err
-	}
-	return carts, nil
-}
-func (uc implUseCase) GetCart(sc models.Scope, ctx context.Context, id string) (models.Cart, error) {
-	mongoid, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		uc.l.Errorf(ctx, "cart.Usecase.GetCart.ObjectIDFromHex", err)
-		return models.Cart{}, err
+		uc.l.Errorf(ctx, "cart.Usecase.Add.validateCartItem: %v", err)
+		return err
 	}
 
-	cart1, err := uc.repo.Get(ctx, mongoid)
+	data, err := uc.getDataCartItems(ctx, sc, []cart.CartItemInput{
+		{
+			ProductID: input.ProductID,
+			Quantity:  input.Quantity,
+		},
+	})
 	if err != nil {
-		uc.l.Errorf(ctx, "cart.Usecase.GetCart", err)
-		return models.Cart{}, err
-	}
-	if cart1.UserID.Hex() != sc.UserID {
-
-		return models.Cart{}, cart.ErrUserMismatch
+		uc.l.Errorf(ctx, "cart.Usecase.Add.getDataCartItems: %v", err)
+		return err
 	}
 
-	return cart1, nil
+	existingCart, err := uc.repo.GetOne(ctx, sc, cart.GetOneOption{
+		CartFilter: cart.CartFilter{
+			ShopIDs: []string{data.ShopIDs[0]},
+		},
+	})
+	if err == mongo.ErrNoDocuments {
+		_, err = uc.repo.Create(ctx, sc, cart.CreateCartOption{
+			ShopID: data.ShopIDs[0],
+			CartItemList: []models.CartItem{
+				{
+					ProductID: data.CartItems[0].ProductID,
+					Quantity:  input.Quantity,
+				},
+			},
+		})
+		if err != nil {
+			uc.l.Errorf(ctx, "cart.Usecase.Add.Create: %v", err)
+			return err
+		}
+
+		return nil
+	} else if err != nil {
+		uc.l.Errorf(ctx, "cart.Usecase.Add.GetOne: %v", err)
+		return err
+	}
+
+	var found bool
+	var newItems []models.CartItem
+	for _, item := range existingCart.Items {
+		if item.ProductID == data.CartItems[0].ProductID {
+			item.Quantity += input.Quantity
+			found = true
+		}
+
+		if err := uc.checkStock(ctx, sc, data.ProductMap[item.ProductID.Hex()].Inventory, item.Quantity); err != nil {
+			uc.l.Errorf(ctx, "cart.Usecase.Add.checkStock", err)
+			return err
+		}
+
+		newItems = append(newItems, item)
+	}
+
+	if !found {
+		newItems = append(newItems, models.CartItem{
+			ProductID: data.CartItems[0].ProductID,
+			Quantity:  input.Quantity,
+		})
+	}
+
+	_, err = uc.repo.Update(ctx, sc, cart.UpdateCartOption{
+		Model:       existingCart,
+		NewItemList: newItems,
+	})
+	if err != nil {
+		uc.l.Errorf(ctx, "cart.Usecase.Add.Update", err)
+		return err
+	}
+
+	return nil
 }

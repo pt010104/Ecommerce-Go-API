@@ -27,8 +27,6 @@ func (h handler) mapErrors(e error) error {
 		return ErrNonExistCategory
 	case shop.ErrShopDoesNotExist:
 		return errShopDoesNotExist
-	case shop.ErrNoPermissionToDelete:
-		return ErrNoPermissionToDelete
 	case shop.ErrNoPermissionToDeleteProduct:
 		return ErrNoPermissionToDeleteProduct
 	case admins.ErrNoPermission:

@@ -18,9 +18,9 @@ func (repo implRepo) buildInventoryDetailQuery(ctx context.Context, ID primitive
 }
 
 func (repo implRepo) buildInventoryQuery(ctx context.Context, sc models.Scope, IDs []primitive.ObjectID) (bson.M, error) {
-	filter, err := mongo.BuildScopeQuery(ctx, repo.l, sc)
+	filter, err := mongo.BuildShopScopeQuery(ctx, repo.l, sc)
 	if err != nil {
-		repo.l.Errorf(ctx, "shop.repository.mongo.buildGetInventoryQuery.BuildScopeQuery: %v", err)
+		repo.l.Errorf(ctx, "shop.repository.mongo.buildGetInventoryQuery.BuildShopScopeQuery: %v", err)
 		return bson.M{}, err
 	}
 

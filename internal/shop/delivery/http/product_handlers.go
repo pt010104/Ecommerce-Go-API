@@ -152,7 +152,7 @@ func (h handler) GetProduct(c *gin.Context) {
 		return
 	}
 
-	o, err2 := h.uc.GetProduct(ctx, sc, shop.GetProductOption{
+	o, err2 := h.uc.GetProduct(ctx, sc, shop.GetProductInput{
 		GetProductFilter: req.toInput(),
 		PagQuery:         pagQuery,
 	})

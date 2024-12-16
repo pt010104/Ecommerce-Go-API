@@ -12,7 +12,7 @@ type CreateProductInput struct {
 	StockLevel      uint
 	ReorderLevel    *uint
 	ReorderQuantity *uint
-	CategoryID      []string
+	CategoryIDs     []string
 	MediaIDs        []string
 }
 type DetailProductOutput struct {
@@ -30,15 +30,13 @@ type GetProductOption struct {
 	PagQuery paginator.PaginatorQuery
 }
 type ListProductInput struct {
-	CateIDs    []string
-	ProductIDs []string
-	ShopID     string
+	GetProductFilter
 }
 type ProductOutPutItem struct {
-	P      models.Product
-	Inven  string
-	Cate   []models.Category
-	Images []models.Media
+	P         models.Product
+	Inventory models.Inventory
+	Cate      []models.Category
+	Images    []models.Media
 }
 type ListProductOutput struct {
 	Products []ProductOutPutItem

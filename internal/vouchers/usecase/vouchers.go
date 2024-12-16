@@ -6,13 +6,10 @@ import (
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/internal/vouchers"
-	"github.com/pt010104/api-golang/pkg/util"
 )
 
 func (uc implUsecase) CreateVoucher(ctx context.Context, sc models.Scope, input vouchers.CreateVoucherInput) (models.Voucher, error) {
 	role := sc.Role
-
-	util.PrintJson(input)
 
 	if err := uc.validateCreateVoucher(ctx, input); err != nil {
 		uc.l.Errorf(ctx, "vouchers.usecase.CreateVoucher.validateCreateVoucher: %v", err)

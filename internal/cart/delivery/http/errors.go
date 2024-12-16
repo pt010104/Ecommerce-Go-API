@@ -16,6 +16,7 @@ var (
 	ErrInvalidPasswordFormat = pkgErrors.NewHTTPError(120007, "password must contain number and digits")
 	ErrInvalidEmailFormat    = pkgErrors.NewHTTPError(120007, "invalid email")
 	ErrInvalidNameFormat     = pkgErrors.NewHTTPError(120007, "invalid name")
+	ErrStockNotEnough        = pkgErrors.NewHTTPError(120008, "not enough stock")
 )
 
 func (h handler) mapErrors(e error) error {
@@ -24,6 +25,8 @@ func (h handler) mapErrors(e error) error {
 		return errWrongBody
 	case cart.ErrUserMismatch:
 		return ErrMismatchedUser
+	case cart.ErrNotEnoughStock:
+		return ErrStockNotEnough
 	}
 
 	return e

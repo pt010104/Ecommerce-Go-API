@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	"sync"
 
 	"github.com/pt010104/api-golang/internal/admins"
@@ -11,6 +10,8 @@ import (
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/pkg/mongo"
+	"github.com/pt010104/api-golang/pkg/paginator"
+	"github.com/pt010104/api-golang/pkg/util"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -25,8 +26,10 @@ func (uc implUsecase) CreateProduct(ctx context.Context, sc models.Scope, input 
 		uc.l.Errorf(ctx, "shop.product.usecase.createproduct.createinventory", err1)
 		return models.Product{}, models.Inventory{}, err1
 	}
-	cateIDS := mongo.ObjectIDsFromHexOrNil(input.CategoryID)
-	err := uc.repo.ValidateCategoryIDs(ctx, cateIDS)
+
+	_, err := uc.adminUC.ListCategories(ctx, sc, admins.GetCategoriesFilter{
+		IDs: input.CategoryIDs,
+	})
 	if err != nil {
 		uc.l.Errorf(ctx, "shop.product.usecase.createproduct.validatecategoryids", err)
 		return models.Product{}, models.Inventory{}, shop.ErrNonExistCategory
@@ -52,21 +55,12 @@ func (uc implUsecase) CreateProduct(ctx context.Context, sc models.Scope, input 
 		return models.Product{}, models.Inventory{}, err
 	}
 
-	categoryIDs := make([]primitive.ObjectID, len(input.CategoryID))
-	for i, id := range input.CategoryID {
-		categoryID, err := primitive.ObjectIDFromHex(id)
-		if err != nil {
-			uc.l.Errorf(ctx, "invalid CategoryID format: %v", err)
-			return models.Product{}, models.Inventory{}, err
-		}
-		categoryIDs[i] = categoryID
-	}
 	p, err := uc.repo.CreateProduct(ctx, sc, shop.CreateProductOption{
 		Name:        input.Name,
 		Price:       input.Price,
 		InventoryID: inven.ID,
 		ShopID:      shopID,
-		CategoryID:  categoryIDs,
+		CategoryID:  mongo.ObjectIDsFromHexOrNil(input.CategoryIDs),
 		MediaIDs:    media_ids,
 	})
 	if err != nil {
@@ -186,20 +180,34 @@ func (uc *implUsecase) DetailProduct(ctx context.Context, sc models.Scope, produ
 	return output, nil
 }
 
-func (uc implUsecase) ListProduct(ctx context.Context, sc models.Scope, opt shop.GetProductFilter) (shop.ListProductOutput, error) {
+func (uc implUsecase) ListProduct(ctx context.Context, sc models.Scope, input shop.ListProductInput) (shop.ListProductOutput, error) {
 	var (
-		products []models.Product
-		s        models.Shop
+		products    []models.Product
+		s           models.Shop
+		inventories []models.Inventory
+		categories  []models.Category
 	)
+
+	err := validateProductInput(ctx, sc, input.GetProductFilter)
+	if err != nil {
+		uc.l.Errorf(ctx, "shop.usecase.ListProduct.validateProductInput: %v", err)
+		return shop.ListProductOutput{}, err
+	}
 
 	var wg sync.WaitGroup
 	var wgErr error
 	wg.Add(2)
 
+	input.IDs = util.RemoveDuplicates(input.IDs)
+
 	go func() {
 		defer wg.Done()
 		var err error
-		products, err = uc.repo.ListProduct(ctx, sc, opt)
+		products, err = uc.repo.ListProduct(ctx, sc, shop.GetProductFilter{
+			IDs:    input.IDs,
+			ShopID: input.ShopID,
+			Search: input.Search,
+		})
 		if err != nil {
 			uc.l.Errorf(ctx, "shop.usecase.ListProduct.repo.ListProduct: %v", err)
 			wgErr = err
@@ -210,7 +218,7 @@ func (uc implUsecase) ListProduct(ctx context.Context, sc models.Scope, opt shop
 	go func() {
 		defer wg.Done()
 		var err error
-		s, err = uc.repo.DetailShop(ctx, models.Scope{}, opt.ShopID)
+		s, err = uc.repo.DetailShop(ctx, models.Scope{}, input.ShopID)
 		if err != nil {
 			uc.l.Errorf(ctx, "shop.usecase.ListProduct.repo.DetailShop: %v", err)
 			wgErr = err
@@ -224,8 +232,10 @@ func (uc implUsecase) ListProduct(ctx context.Context, sc models.Scope, opt shop
 		return shop.ListProductOutput{}, wgErr
 	}
 
+	var inventoryIDs []string
 	categoryIDSet := make(map[string]struct{})
 	for _, p := range products {
+		inventoryIDs = append(inventoryIDs, p.InventoryID.Hex())
 		for _, catID := range p.CategoryID {
 			categoryIDSet[catID.Hex()] = struct{}{}
 		}
@@ -236,17 +246,48 @@ func (uc implUsecase) ListProduct(ctx context.Context, sc models.Scope, opt shop
 		categoryIDs = append(categoryIDs, id)
 	}
 
-	categories, err := uc.adminUC.ListCategories(ctx, models.Scope{}, admins.GetCategoriesFilter{
-		IDs: categoryIDs,
-	})
-	if err != nil {
-		uc.l.Errorf(ctx, "shop.usecase.ListProduct.adminUC.ListCategories: %v", err)
-		return shop.ListProductOutput{}, err
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+		var err error
+		inventoryIDs = util.RemoveDuplicates(inventoryIDs)
+		inventories, err = uc.repo.ListInventory(ctx, models.Scope{}, mongo.ObjectIDsFromHexOrNil(inventoryIDs))
+		if err != nil {
+			uc.l.Errorf(ctx, "shop.usecase.ListProduct.repo.ListInventory: %v", err)
+			wgErr = err
+			return
+		}
+
+	}()
+
+	go func() {
+		defer wg.Done()
+		var err error
+		categories, err = uc.adminUC.ListCategories(ctx, models.Scope{}, admins.GetCategoriesFilter{
+			IDs: categoryIDs,
+		})
+		if err != nil {
+			uc.l.Errorf(ctx, "shop.usecase.ListProduct.adminUC.ListCategories: %v", err)
+			wgErr = err
+			return
+		}
+	}()
+
+	wg.Wait()
+
+	if wgErr != nil {
+		return shop.ListProductOutput{}, wgErr
 	}
 
 	categoryMap := make(map[string]models.Category)
 	for _, cate := range categories {
 		categoryMap[cate.ID.Hex()] = cate
+	}
+
+	inventoryMap := make(map[primitive.ObjectID]models.Inventory)
+	for _, inv := range inventories {
+		inventoryMap[inv.ID] = inv
 	}
 
 	var productsOutPut []shop.ProductOutPutItem
@@ -259,9 +300,9 @@ func (uc implUsecase) ListProduct(ctx context.Context, sc models.Scope, opt shop
 		}
 
 		item := shop.ProductOutPutItem{
-			P:     p,
-			Inven: p.InventoryID.Hex(),
-			Cate:  cates,
+			P:         p,
+			Inventory: inventoryMap[p.InventoryID],
+			Cate:      cates,
 		}
 
 		productsOutPut = append(productsOutPut, item)
@@ -282,21 +323,56 @@ func (uc implUsecase) DeleteProduct(ctx context.Context, sc models.Scope, udList
 	}
 	return nil
 }
-func (uc implUsecase) GetProduct(ctx context.Context, sc models.Scope, input shop.GetProductOption) (shop.GetProductOutput, error) {
-	opt := shop.GetProductOption{
-		GetProductFilter: input.GetProductFilter,
-		PagQuery:         input.PagQuery,
-	}
 
-	s, pag, err := uc.repo.GetProduct(ctx, sc, opt)
+func (uc implUsecase) GetProduct(ctx context.Context, sc models.Scope, input shop.GetProductInput) (shop.GetProductOutput, error) {
+	var (
+		s           []models.Product
+		pag         paginator.Paginator
+		categories  []models.Category
+		inventories []models.Inventory
+		shop1       models.Shop
+		wg          sync.WaitGroup
+		wgErr       error
+	)
+
+	err := validateProductInput(ctx, sc, input.GetProductFilter)
 	if err != nil {
-		uc.l.Errorf(ctx, "shop.usecase.GetProduct: %v", err)
+		uc.l.Errorf(ctx, "shop.usecase.GetProduct.validateProductInput: %v", err)
 		return shop.GetProductOutput{}, err
 	}
 
-	fmt.Println("opt.IDs", opt.IDs)
+	opt := shop.GetProductOption{
+		GetProductFilter: shop.GetProductFilter{
+			ShopID:  input.ShopID,
+			IDs:     input.IDs,
+			CateIDs: input.CateIDs,
+			Search:  input.Search,
+		},
+		PagQuery: input.PagQuery,
+	}
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var err error
+		s, pag, err = uc.repo.GetProduct(ctx, sc, opt)
+		if err != nil {
+			uc.l.Errorf(ctx, "shop.usecase.GetProduct.repo.GetProduct: %v", err)
+			wgErr = err
+			return
+		}
+	}()
+
+	wg.Wait()
+
+	if wgErr != nil {
+		return shop.GetProductOutput{}, wgErr
+	}
+
+	var inventoryIDs []string
 	categoryIDSet := make(map[string]struct{})
 	for _, p := range s {
+		inventoryIDs = append(inventoryIDs, p.InventoryID.Hex())
 		for _, catID := range p.CategoryID {
 			categoryIDSet[catID.Hex()] = struct{}{}
 		}
@@ -307,14 +383,60 @@ func (uc implUsecase) GetProduct(ctx context.Context, sc models.Scope, input sho
 		categoryIDs = append(categoryIDs, id)
 	}
 
-	categories, err := uc.adminUC.ListCategories(ctx, models.Scope{}, admins.GetCategoriesFilter{
-		IDs: categoryIDs,
-	})
+	wg.Add(3)
+
+	go func() {
+		defer wg.Done()
+		var err error
+		categories, err = uc.adminUC.ListCategories(ctx, models.Scope{}, admins.GetCategoriesFilter{
+			IDs: categoryIDs,
+		})
+		if err != nil {
+			uc.l.Errorf(ctx, "shop.usecase.GetProduct.adminUC.ListCategories: %v", err)
+			wgErr = err
+			return
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		var err error
+		inventoryIDs = util.RemoveDuplicates(inventoryIDs)
+		inventories, err = uc.repo.ListInventory(ctx, models.Scope{}, mongo.ObjectIDsFromHexOrNil(inventoryIDs))
+		if err != nil {
+			uc.l.Errorf(ctx, "shop.usecase.GetProduct.repo.ListInventory: %v", err)
+			wgErr = err
+			return
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		var err error
+		shop1, err = uc.repo.DetailShop(ctx, models.Scope{}, opt.ShopID)
+		if err != nil {
+			uc.l.Errorf(ctx, "shop.usecase.GetProduct.repo.DetailShop: %v", err)
+			wgErr = err
+			return
+		}
+	}()
+
+	wg.Wait()
+
+	if wgErr != nil {
+		return shop.GetProductOutput{}, wgErr
+	}
 
 	categoryMap := make(map[string]models.Category)
 	for _, cate := range categories {
 		categoryMap[cate.ID.Hex()] = cate
 	}
+
+	inventoryMap := make(map[primitive.ObjectID]models.Inventory)
+	for _, inv := range inventories {
+		inventoryMap[inv.ID] = inv
+	}
+
 	var list []shop.ProductOutPutItem
 	for _, p := range s {
 		var cates []models.Category
@@ -332,29 +454,21 @@ func (uc implUsecase) GetProduct(ctx context.Context, sc models.Scope, input sho
 			return shop.GetProductOutput{}, err
 		}
 		item := shop.ProductOutPutItem{
-			P:      p,
-			Inven:  (p.InventoryID).Hex(),
-			Cate:   cates,
-			Images: avatar,
+			P:         p,
+			Inventory: inventoryMap[p.InventoryID],
+			Cate:      cates,
+			Images:    avatar,
 		}
 		list = append(list, item)
 	}
-	var shop1 models.Shop
-	shop1, err1 := uc.repo.DetailShop(ctx, models.Scope{}, opt.ShopID)
-	if err1 != nil {
-		uc.l.Errorf(ctx, "shop.usecase.ListProduct.repo.DetailShop: %v", err1)
 
-		return shop.GetProductOutput{}, err1
-	}
 	return shop.GetProductOutput{
 		Products: list,
 		Pag:      pag,
 		Shop:     shop1,
 	}, nil
 }
-func (uc implUsecase) IsValidProductID(ctx context.Context, productID primitive.ObjectID) bool {
-	return uc.repo.IsValidProductID(ctx, productID)
-}
+
 func (uc implUsecase) UpdateProduct(ctx context.Context, sc models.Scope, input shop.UpdateProductOption) (models.Product, error) {
 	shop1, err := uc.repo.DetailShop(ctx, models.Scope{}, sc.ShopID)
 	if err != nil {

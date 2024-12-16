@@ -55,3 +55,8 @@ type DetailShopOutput struct {
 	MediaID string
 	URL     string
 }
+
+type GetProductInput struct {
+	GetProductFilter
+	PagQuery paginator.PaginatorQuery
+}

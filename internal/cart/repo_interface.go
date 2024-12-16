@@ -4,12 +4,11 @@ import (
 	"context"
 
 	"github.com/pt010104/api-golang/internal/models"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Repo interface {
-	Create(opt CreateCartOption, opt2 CreateCartItemOption, ctx context.Context) (models.Cart, error)
-	Get(ctx context.Context, ID primitive.ObjectID) (models.Cart, error)
-	Update(ctx context.Context, opt UpdateCartOption) (models.Cart, error)
-	ListCart(sc models.Scope, ctx context.Context, opt GetCartFilter) ([]models.Cart, error)
+	Create(ctx context.Context, sc models.Scope, opt CreateCartOption) (models.Cart, error)
+	GetOne(ctx context.Context, sc models.Scope, opt GetOneOption) (models.Cart, error)
+	Update(ctx context.Context, sc models.Scope, opt UpdateCartOption) (models.Cart, error)
+	ListCart(ctx context.Context, sc models.Scope, opt ListOption) ([]models.Cart, error)
 }

@@ -28,7 +28,7 @@ func (r createProductReq) toInput() shop.CreateProductInput {
 		StockLevel:      r.StockLevel,
 		ReorderLevel:    r.ReorderLevel,
 		ReorderQuantity: r.ReorderQuantity,
-		CategoryID:      r.CategoryIDs,
+		CategoryIDs:     r.CategoryIDs,
 		MediaIDs:        r.MediaIDs,
 	}
 }
@@ -201,15 +201,17 @@ type categoryObject struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
 }
-type AvatarProduct_obj struct {
-	MediaID string `json:"media_id"`
-	URL     string `json:"url"`
+type inventoryObject struct {
+	ID         string `json:"id"`
+	Name       string `json:"name"`
+	StockLevel int    `json:"stock_level"`
 }
+
 type listProductItem struct {
 	ID              string           `json:"id"`
 	Name            string           `json:"name"`
 	ShopID          string           `json:"shop_id"`
-	InventoryID     string           `json:"inventory_id"`
+	InventoryObject inventoryObject  `json:"inventory_object"`
 	Price           float32          `json:"price"`
 	CategoryObjects []categoryObject `json:"category_objects"`
 	Avatar          []avatar_obj     `json:"avatar,omitempty"`
@@ -245,9 +247,12 @@ func (h handler) getProductResp(output shop.GetProductOutput) getProductResp {
 			})
 		}
 		item := listProductItem{
-			ID:              s.P.ID.Hex(),
-			Name:            s.P.Name,
-			InventoryID:     s.Inven,
+			ID:   s.P.ID.Hex(),
+			Name: s.P.Name,
+			InventoryObject: inventoryObject{
+				ID:         s.Inventory.ID.Hex(),
+				StockLevel: int(s.Inventory.StockLevel),
+			},
 			Price:           s.P.Price,
 			CategoryObjects: categories,
 			ShopID:          s.P.ShopID.Hex(),
@@ -272,13 +277,13 @@ func (h handler) getProductResp(output shop.GetProductOutput) getProductResp {
 
 type UpdateProductReq struct {
 	ID              string   `json:"id" binding:"required"`
-	Name            string   `json:"name"`
-	Price           float32  `json:"price"`
-	StockLevel      uint     `json:"stock_level"`
-	ReorderLevel    uint     `json:"reorder_level"`
-	ReorderQuantity uint     `json:"reorder_quantity"`
-	CategoryIDs     []string `json:"category_ids"`
-	MediaIDs        []string `json:"media_ids"`
+	Name            string   `json:"name" binding:"required"`
+	Price           float32  `json:"price" binding:"required"`
+	StockLevel      uint     `json:"stock_level" binding:"required"`
+	ReorderLevel    uint     `json:"reorder_level" binding:"required"`
+	ReorderQuantity uint     `json:"reorder_quantity" binding:"required"`
+	CategoryIDs     []string `json:"category_ids" binding:"required"`
+	MediaIDs        []string `json:"media_ids" binding:"required"`
 }
 
 func (r UpdateProductReq) toInput() shop.UpdateProductOption {

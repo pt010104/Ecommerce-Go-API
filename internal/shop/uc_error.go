@@ -4,7 +4,6 @@ import "errors"
 
 var (
 	ErrInvalidInput                = errors.New("invalid input")
-	ErrNoPermissionToDelete        = errors.New("You dont have permission to delete this shop")
 	ErrInvalidPhone                = errors.New("invalid phone")
 	ErrShopExist                   = errors.New("shop exist")
 	ErrShopDoesNotExist            = errors.New("shop doesnot exist")
@@ -12,4 +11,5 @@ var (
 	ErrNonExistCategory            = errors.New("category doesnt exist")
 	ErrNoPermissionToDeleteProduct = errors.New("no permission to delete product")
 	ErrProductNotFound             = errors.New("can find product in this shop")
+	ErrRequireField                = errors.New("require field")
 )
