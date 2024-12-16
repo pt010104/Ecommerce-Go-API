@@ -2,6 +2,7 @@ package cart
 
 import (
 	"github.com/pt010104/api-golang/internal/models"
+	"github.com/pt010104/api-golang/pkg/paginator"
 )
 
 type CreateCartInput struct {
@@ -29,4 +30,19 @@ type UpdateInput struct {
 type UpdateOutput struct {
 	Carts []models.Cart
 	Shops []models.Shop
+}
+type ProductItem struct {
+	ProductID string
+	Medias    []models.Media
+	Quantity  int
+}
+
+type GetCartItem struct {
+	Products []ProductItem
+
+	Cart models.Cart
+}
+type GetCartOutput struct {
+	CartOutPut []GetCartItem
+	Paginator  paginator.Paginator
 }

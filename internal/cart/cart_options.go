@@ -2,6 +2,7 @@ package cart
 
 import (
 	"github.com/pt010104/api-golang/internal/models"
+	"github.com/pt010104/api-golang/pkg/paginator"
 )
 
 type CreateCartOption struct {
@@ -28,4 +29,8 @@ type ListOption struct {
 
 type GetOneOption struct {
 	CartFilter
+}
+type GetOption struct {
+	CartFilter
+	PagQuery paginator.PaginatorQuery
 }

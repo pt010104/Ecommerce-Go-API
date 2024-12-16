@@ -7,7 +7,9 @@ import (
 
 	"github.com/pt010104/api-golang/internal/cart"
 	"github.com/pt010104/api-golang/internal/models"
+	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/pkg/mongo"
+
 	"github.com/pt010104/api-golang/pkg/util"
 )
 
@@ -179,4 +181,56 @@ func (uc implUseCase) Add(ctx context.Context, sc models.Scope, input cart.Creat
 	}
 
 	return nil
+}
+func (uc implUseCase) GetCart(ctx context.Context, sc models.Scope, opt cart.GetOption) (cart.GetCartOutput, error) {
+
+	carts, pag, err := uc.repo.GetCart(ctx, sc, opt)
+	if err != nil {
+		uc.l.Errorf(ctx, "cart.usecase.GetCart: %v", err)
+		return cart.GetCartOutput{}, err
+	}
+
+	var productItem cart.ProductItem
+	var productItems []cart.ProductItem
+	var getCartItems []cart.GetCartItem
+	var cartProductMap = make(map[string][]string)
+	for _, v := range carts {
+		for _, item := range v.Items {
+
+			cartProductMap[v.ID.Hex()] = append(cartProductMap[v.ID.Hex()], item.ProductID.Hex())
+		}
+	}
+	for _, v := range cartProductMap {
+
+		productDetails, err := uc.shopUc.GetProduct(ctx, models.Scope{}, shop.GetProductInput{
+			GetProductFilter: shop.GetProductFilter{
+				IDs: v,
+			},
+		})
+
+		if err != nil {
+			uc.l.Errorf(ctx, "cart.usecase.GetCart: %v", err)
+			return cart.GetCartOutput{}, err
+		}
+		for _, product := range productDetails.Products {
+			productItem = cart.ProductItem{
+				ProductID: product.P.ID.Hex(),
+				Medias:    product.Images,
+			}
+			productItems = append(productItems, productItem)
+		}
+
+	}
+	for _, v := range carts {
+		getCartItems = append(getCartItems, cart.GetCartItem{
+			Cart:     v,
+			Products: productItems,
+		})
+	}
+
+	return cart.GetCartOutput{
+		CartOutPut: getCartItems,
+		Paginator:  pag,
+	}, nil
+
 }

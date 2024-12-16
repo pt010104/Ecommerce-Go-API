@@ -190,3 +190,8 @@ func (r addToCartRequest) toInput() cart.CreateCartInput {
 		Quantity:  r.Quantity,
 	}
 }
+
+type GetCartReq struct {
+	IDs     []string `form:"ids"`
+	ShopIDs []string `form:"shop_ids"`
+}
