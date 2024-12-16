@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"github.com/pt010104/api-golang/internal/cart"
@@ -140,8 +141,20 @@ func (uc implUseCase) Add(ctx context.Context, sc models.Scope, input cart.Creat
 			item.Quantity += input.Quantity
 			found = true
 		}
+		//print existingCart.Items
+		p, err := uc.shopUc.DetailProduct(ctx, models.Scope{}, item.ProductID)
+		if err != nil {
+			uc.l.Errorf(ctx, "cart.Usecase.Add.DetailProduct", err)
 
-		if err := uc.checkStock(ctx, sc, data.ProductMap[item.ProductID.Hex()].Inventory, item.Quantity); err != nil {
+			return err
+		}
+		fmt.Println(existingCart.Items)
+		inven, err := uc.shopUc.DetailInventory(ctx, p.Inventory.ID)
+		if err != nil {
+			uc.l.Errorf(ctx, "cart.Usecase.Add.DetailInventory", err)
+			return err
+		}
+		if err := uc.checkStock(ctx, sc, inven, item.Quantity); err != nil {
 			uc.l.Errorf(ctx, "cart.Usecase.Add.checkStock", err)
 			return err
 		}
