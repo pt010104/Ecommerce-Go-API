@@ -334,8 +334,7 @@ func (h handler) DistributeNewToken(c *gin.Context) {
 // @Param			Authorization				header		string	true	"Bearer JWT token"				default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
 // @Param			x-client-id					header		string	true	"User ID"						default(6707825d45804caaf8316957)
 // @Param			session-id					header		string	true	"Session ID"					default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
-// @Param			media_id					media_id body		string	true	"MediaID"
-//
+// @Param	    updateReq body updateReq true "Update user avatar request"
 // @Success		200							{object}	UpdateResp
 // @Failure		400							{object}	response.Resp	"Bad Request"
 // @Failure		404							{object}	response.Resp	"User Not Found"

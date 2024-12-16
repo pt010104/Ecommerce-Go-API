@@ -171,8 +171,8 @@ func (h handler) newDistributeNewTokenResp(output user.DistributeNewTokenOutput)
 }
 
 type updateReq struct {
-	Name    string `json:"name" binding:"required"`
-	Email   string `json:"email" binding:"required"`
+	Name    string `json:"name"`
+	Email   string `json:"email"`
 	MediaID string `json:"media_id"`
 }
 
