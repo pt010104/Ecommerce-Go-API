@@ -29,7 +29,7 @@ func (m Middleware) AuthShop() gin.HandlerFunc {
 			return
 		}
 
-		scope.ShopID = shop.ID.Hex()
+		scope.ShopID = shop.S.ID.Hex()
 
 		ctx = jwt.SetScopeToContext(ctx, scope)
 

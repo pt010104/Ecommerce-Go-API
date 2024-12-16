@@ -1,23 +1,32 @@
 package cart
 
-import ()
+import (
+	"github.com/pt010104/api-golang/internal/models"
+)
 
 type CreateCartInput struct {
-	UserID string
-	ShopID string
-	Item   []CreateCartItemInput
-}
-type CreateCartItemInput struct {
 	ProductID string
 	Quantity  int
 }
+
+type CartItemInput struct {
+	ProductID string
+	Quantity  int
+}
+
 type CreateCartOutput struct {
-	ID     string
-	UserID string
-	ShopID string
-	Item   []CreateCartItemOutput
+	cart models.Cart
 }
 type CreateCartItemOutput struct {
 	ProductID string
 	Quantity  int
+}
+
+type UpdateInput struct {
+	NewItemList []CartItemInput
+}
+
+type UpdateOutput struct {
+	Carts []models.Cart
+	Shops []models.Shop
 }

@@ -16,4 +16,6 @@ type Product struct {
 	Alias       string               `bson:"alias"`
 	CreatedAt   time.Time            `bson:"created_at"`
 	UpdatedAt   time.Time            `bson:"updated_at"`
+	MediaIDs    []primitive.ObjectID `bson:"media_ids"`
+	Thumbnail   primitive.ObjectID   `bson:"thumbnail"`
 }

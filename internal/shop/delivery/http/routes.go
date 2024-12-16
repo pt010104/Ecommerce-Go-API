@@ -11,21 +11,21 @@ func MapRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
 }
 
 func MapShopRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
-	r.Use(mw.Auth())
 
+	r.Use(mw.Auth())
 	r.GET("/:id", h.Detail)
-	r.POST("", h.Create)
 	r.GET("", h.Get)
+	r.POST("", h.Create)
+
 	r.DELETE("", h.Delete)
 	r.PATCH("", h.Update)
 	r.GET("get-shop-id-by-user-id/:id", h.GetShopIDByUserID)
 }
 
 func MapProductRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
+
 	r.Use(mw.Auth(), mw.AuthShop())
-	r.POST("delete", h.DeleteProduct)
+	r.DELETE("", h.DeleteProduct)
 	r.POST("", h.CreateProduct)
-	r.GET("/:id", h.DetailProduct)
-	r.GET("list-product", h.ListProduct)
-	r.GET("get-product", h.GetProduct)
+	r.PUT("", h.UpdateProduct)
 }

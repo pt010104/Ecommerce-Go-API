@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/pkg/paginator"
 	"github.com/pt010104/api-golang/pkg/response"
@@ -75,7 +76,7 @@ func (h handler) Create(c *gin.Context) {
 func (h handler) Get(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	sc, req, err := h.processGetRequest(c)
+	req, err := h.processGetRequest(c)
 	if err != nil {
 		h.l.Errorf(ctx, "shop.delivery.http.Get: %v", err)
 		response.Error(c, err)
@@ -91,7 +92,7 @@ func (h handler) Get(c *gin.Context) {
 
 	pagQuery.Adjust()
 
-	s, err := h.uc.Get(ctx, sc, shop.GetShopInput{
+	s, err := h.uc.Get(ctx, models.Scope{}, shop.GetShopInput{
 		PagQuery:       pagQuery,
 		GetShopsFilter: req.toInput(),
 	})
@@ -126,14 +127,14 @@ func (h handler) Get(c *gin.Context) {
 func (h handler) Detail(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	sc, id, err := h.processDetailRequest(c)
+	id, err := h.processDetailRequest(c)
 	if err != nil {
 		h.l.Errorf(ctx, "shop.delivery.http.Detail: %v", err)
 		response.Error(c, err)
 		return
 	}
 
-	shop, err := h.uc.Detail(ctx, sc, id)
+	shop, err := h.uc.Detail(ctx, models.Scope{}, id)
 	if err != nil {
 		h.l.Errorf(ctx, "shop.delivery.http.Detail: %v", err)
 		err := h.mapErrors(err)

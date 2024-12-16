@@ -6,6 +6,7 @@ import (
 	"github.com/pt010104/api-golang/internal/models"
 )
 
+//go:generate mockery --name=UseCase
 type UseCase interface {
 	CreateUser(ctx context.Context, input CreateUserInput) (models.User, error)
 	SignIn(ctx context.Context, input SignInType) (SignInOutput, error)

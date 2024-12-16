@@ -85,26 +85,25 @@ func (h handler) DetailProduct(c *gin.Context) {
 
 	response.OK(c, h.newDetailProductResponse(product))
 }
-func (h handler) ListProduct(c *gin.Context) {
-	ctx := c.Request.Context()
 
-	sc, req, err := h.processListProductRequest(c)
-	if err != nil {
-		h.l.Errorf(ctx, "shop.delivery.http.listproduct: %v", err)
-		response.Error(c, err)
-		return
-	}
-
-	o, err2 := h.uc.ListProduct(ctx, sc, req.toInput())
-	if err2 != nil {
-		h.l.Errorf(ctx, "shop.delivery.http.listProduct: %v", err)
-		err := h.mapErrors(err)
-		response.Error(c, err)
-		return
-	}
-	response.OK(c, h.listProductResp(o))
-
-}
+// @Summary		delete product by their id
+// @Schemes		http https
+// @Description	delete product by id
+// @Tags			Products
+// @Accept			json
+// @Produce		json
+//
+// @Param			Access-Control-Allow-Origin	header		string		false	"Access-Control-Allow-Origin"	default("*")
+// @Param			Authorization				header		string		true	"Bearer JWT token"				default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
+// @Param			x-client-id					header		string		true	"User ID"						default(6707825d45804caaf8316957)
+// @Param			session-id					header		string		true	"Session ID"					default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
+// @Param			request body deleteProductRequest true "Request Body"
+//
+// @Success		200							{object}	response.Resp	"Success"
+// @Failure		400							{object}	response.Resp	"Bad Request"
+// @Failure		500							{object}	response.Resp	"Internal Server Error"
+//
+// @Router			/api/v1/shops/products/delete [DELETE]
 func (h handler) DeleteProduct(c *gin.Context) {
 	ctx := c.Request.Context()
 
@@ -138,7 +137,7 @@ func (h handler) DeleteProduct(c *gin.Context) {
 // @Router       /api/v1/shops/products/get-product [get]
 func (h handler) GetProduct(c *gin.Context) {
 	ctx := c.Request.Context()
-	fmt.Print("get product", c.Params, c.Query("ids"))
+
 	sc, req, err := h.processGetProductRequest(c)
 	if err != nil {
 		fmt.Print("err", req.IDs)
@@ -153,7 +152,7 @@ func (h handler) GetProduct(c *gin.Context) {
 		return
 	}
 
-	o, err2 := h.uc.GetProduct(ctx, sc, shop.GetProductOption{
+	o, err2 := h.uc.GetProduct(ctx, sc, shop.GetProductInput{
 		GetProductFilter: req.toInput(),
 		PagQuery:         pagQuery,
 	})
@@ -164,5 +163,44 @@ func (h handler) GetProduct(c *gin.Context) {
 		return
 	}
 	response.OK(c, h.getProductResp(o))
+
+}
+
+// @Summary		Update product
+// @Schemes		http https
+// @Description	Update product BY ID , only ID is required , other fields are optional
+// @Tags			Products
+// @Accept			json
+// @Produce		json
+//
+// @Param			Access-Control-Allow-Origin	header		string		false	"Access-Control-Allow-Origin"	default("*")
+// @Param			Authorization				header		string		true	"Bearer JWT token"				default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
+// @Param			x-client-id					header		string		true	"User ID"						default(6707825d45804caaf8316957)
+// @Param			session-id					header		string		true	"Session ID"					default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
+// @Param			request body UpdateProductReq true "Request Body"
+//
+// @Success		200							{object}	updateProductResp	"Success"
+// @Failure		400							{object}	response.Resp	"Bad Request"
+// @Failure		500							{object}	response.Resp	"Internal Server Error"
+//
+// @Router			/api/v1/shops/products/update [Post]
+func (h handler) UpdateProduct(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	sc, req, err := h.processUpdateProductRequest(c)
+	if err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.UpdateProduct: %v", err)
+		response.Error(c, err)
+		return
+	}
+
+	p, err2 := h.uc.UpdateProduct(ctx, sc, req.toInput())
+	if err2 != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.delete: %v", err2)
+		err := h.mapErrors(err2)
+		response.Error(c, err)
+		return
+	}
+	response.OK(c, h.newUpdateProductResponse(p))
 
 }

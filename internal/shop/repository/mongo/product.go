@@ -3,6 +3,7 @@ package mongo
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
@@ -21,35 +22,8 @@ func (repo implRepo) getProductCollection() mongo.Collection {
 	return *repo.database.Collection(productCollection)
 }
 
-const (
-	CategoryCollection = "categories"
-)
-
-func (repo implRepo) getCategoryCollection() mongo.Collection {
-	return *repo.database.Collection(CategoryCollection)
-}
-func (repo implRepo) ValidateCategoryIDs(ctx context.Context, categoryIDs []primitive.ObjectID) error {
-	colC := repo.getCategoryCollection()
-
-	filter := bson.M{"_id": bson.M{"$in": categoryIDs}}
-	count, err := colC.CountDocuments(ctx, filter)
-	if err != nil {
-		return err
-	}
-
-	if count != int64(len(categoryIDs)) {
-		return fmt.Errorf("some category IDs are invalid")
-	}
-
-	return nil
-}
 func (repo implRepo) CreateProduct(ctx context.Context, sc models.Scope, opt shop.CreateProductOption) (models.Product, error) {
 	colP := repo.getProductCollection()
-	err1 := repo.ValidateCategoryIDs(ctx, opt.CategoryID)
-	if err1 != nil {
-		repo.l.Errorf(ctx, "shop.repo.product.validatecateIDS:", err1)
-		return models.Product{}, shop.ErrNonExistCategory
-	}
 	p, err := repo.buildProductModel(opt, ctx)
 	if err != nil {
 		repo.l.Errorf(ctx, "shop.repo.product.build:", err)
@@ -91,6 +65,7 @@ func (repo implRepo) ListProduct(ctx context.Context, sc models.Scope, opt shop.
 		repo.l.Errorf(ctx, "shop.repository.mongo.buildProductQuery: %v", err)
 		return []models.Product{}, err
 	}
+
 	cursor, err := col.Find(ctx, filter)
 	if err != nil {
 		repo.l.Errorf(ctx, "shop.repository.mongo.ListProduct.Find: %v", err)
@@ -106,7 +81,6 @@ func (repo implRepo) ListProduct(ctx context.Context, sc models.Scope, opt shop.
 	}
 
 	return products, nil
-
 }
 
 func (repo implRepo) Delete(ctx context.Context, sc models.Scope, ids []string) (err error) {
@@ -175,4 +149,51 @@ func (repo implRepo) IsValidProductID(ctx context.Context, productID primitive.O
 	var product models.Product
 	err := col.FindOne(ctx, filter).Decode(&product)
 	return err == nil
+}
+func (repo implRepo) UpdateProduct(ctx context.Context, sc models.Scope, option shop.UpdateProductOption) (models.Product, error) {
+	col := repo.getProductCollection()
+	filter, err := repo.buildProductDetailQuery(ctx, option.ID)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repo.Update.buildshopdetailquery,", err)
+		return models.Product{}, err
+	}
+	fmt.Print("filter is : ", filter)
+	option.Model.ID = option.ID
+	updateData := bson.M{}
+	if option.Name != "" {
+		updateData["name"] = option.Name
+		option.Model.Name = option.Name
+	}
+	if option.Alias != "" {
+		updateData["alias"] = option.Alias
+		option.Model.Alias = option.Alias
+	}
+
+	if len(option.CategoryID) > 0 {
+		updateData["categoryid"] = option.CategoryID
+		option.Model.CategoryID = option.CategoryID
+	}
+	if len(option.MediaIDs) > 0 {
+		updateData["media_ids"] = option.MediaIDs
+		option.Model.MediaIDs = option.MediaIDs
+	}
+	if option.Price != 0 {
+		updateData["price"] = option.Price
+		option.Model.Price = option.Price
+	}
+
+	updateData["updated_at"] = time.Now()
+
+	update := bson.M{}
+	if len(updateData) > 0 {
+		update["$set"] = updateData
+	}
+
+	_, err = col.UpdateOne(ctx, filter, update)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repo.Update.FindOneAndUpdate:", err)
+		return models.Product{}, err
+	}
+
+	return option.Model, nil
 }

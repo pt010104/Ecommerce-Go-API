@@ -57,7 +57,7 @@ func (srv HTTPServer) mapHandlers() error {
 	emailUC := emailUC.New(srv.l)
 	mediaUC := mediaUC.New(srv.l, mediaRepo, prod, srv.cloudinary)
 	userUC := userUC.New(srv.l, userRepo, emailUC, redisRepo, mediaUC)
-	shopUC := shopUC.New(srv.l, shopRepo, nil)
+	shopUC := shopUC.New(srv.l, shopRepo, nil, userUC, mediaUC)
 	adminUC := adminUC.New(adminRepo, srv.l, shopUC)
 	shopUC.SetAdminUC(adminUC)
 	cartUC := cartUC.New(srv.l, cartRepo, shopUC)
@@ -70,7 +70,7 @@ func (srv HTTPServer) mapHandlers() error {
 	voucherH := voucherHTTP.New(srv.l, voucherUC)
 	cartH := cartHTTP.New(srv.l, cartUC)
 	mediaH := mediaHTTP.New(srv.l, mediaUC)
-	mw := middleware.New(srv.l, userRepo, shopUC, userUC)
+	mw := middleware.New(srv.l, shopUC, userUC)
 
 	//Routes
 	api := srv.gin.Group("/api/v1")
@@ -81,6 +81,9 @@ func (srv HTTPServer) mapHandlers() error {
 	voucherHTTP.MapRouters(api.Group("/vouchers"), voucherH, mw)
 	cartHTTP.MapRouters(api.Group("/carts"), cartH, mw)
 	mediaHTTP.MapRouters(api.Group("/media"), mediaH, mw)
+
+	//Public routes
+	shopHTTP.MapPublicRoutes(api.Group("/shops/products"), shopH)
 
 	return nil
 }

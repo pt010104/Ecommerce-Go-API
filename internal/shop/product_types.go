@@ -12,32 +12,31 @@ type CreateProductInput struct {
 	StockLevel      uint
 	ReorderLevel    *uint
 	ReorderQuantity *uint
-	CategoryID      []string
+	CategoryIDs     []string
+	MediaIDs        []string
 }
 type DetailProductOutput struct {
 	ID           string
 	Name         string
 	CategoryName []string
 	Category     []models.Category
-
-	Shop models.Shop
-
-	Inventory models.Inventory
-	Price     float32
+	Medias       []models.Media
+	Shop         models.Shop
+	Inventory    models.Inventory
+	Price        float32
 }
 type GetProductOption struct {
 	GetProductFilter
 	PagQuery paginator.PaginatorQuery
 }
 type ListProductInput struct {
-	CateIDs    []string
-	ProductIDs []string
-	ShopID     string
+	GetProductFilter
 }
 type ProductOutPutItem struct {
-	P     models.Product
-	Inven string
-	Cate  []models.Category
+	P         models.Product
+	Inventory models.Inventory
+	Cate      []models.Category
+	Images    []models.Media
 }
 type ListProductOutput struct {
 	Products []ProductOutPutItem
@@ -47,4 +46,14 @@ type GetProductOutput struct {
 	Products []ProductOutPutItem
 	Pag      paginator.Paginator
 	Shop     models.Shop
+}
+type UpdateProductInput struct {
+	Name            string
+	ID              string
+	Price           float32
+	StockLevel      uint
+	ReorderLevel    *uint
+	ReorderQuantity *uint
+	CategoryID      []string
+	MediaIDs        []string
 }

@@ -12,7 +12,7 @@ type Middleware struct {
 	userUC user.UseCase
 }
 
-func New(l log.Logger, userRepo user.Repo, shopUC shop.UseCase, userUC user.UseCase) Middleware {
+func New(l log.Logger, shopUC shop.UseCase, userUC user.UseCase) Middleware {
 	return Middleware{
 		l:      l,
 		shopUC: shopUC,

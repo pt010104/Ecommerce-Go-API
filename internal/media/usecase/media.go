@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"slices"
 
 	"github.com/pt010104/api-golang/internal/media"
 	"github.com/pt010104/api-golang/internal/models"
@@ -46,4 +47,26 @@ func (uc implUsecase) Detail(ctx context.Context, sc models.Scope, id string) (m
 	}
 
 	return m, nil
+}
+
+func (uc implUsecase) List(ctx context.Context, sc models.Scope, input media.ListInput) ([]models.Media, error) {
+	if len(input.IDs) == 0 {
+		return []models.Media{}, nil
+	}
+
+	if input.Status != "" && !slices.Contains(validStatus, input.Status) {
+		return nil, media.ErrInvalidStatus
+	} else {
+		input.Status = models.MediaStatusUploaded
+	}
+
+	medias, err := uc.repo.List(ctx, sc, media.ListOption{
+		GetFilter: input.GetFilter,
+	})
+	if err != nil {
+		uc.l.Errorf(ctx, "media.usecase.List.repo.List: %v", err)
+		return nil, err
+	}
+
+	return medias, nil
 }

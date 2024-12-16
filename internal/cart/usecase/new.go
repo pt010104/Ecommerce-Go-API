@@ -12,8 +12,8 @@ type implUseCase struct {
 	shopUc shop.UseCase
 }
 
-func New(l log.Logger, repo cart.Repo, shopUc shop.UseCase) implUseCase {
-	return implUseCase{
+func New(l log.Logger, repo cart.Repo, shopUc shop.UseCase) cart.UseCase {
+	return &implUseCase{
 		l:      l,
 		repo:   repo,
 		shopUc: shopUc,

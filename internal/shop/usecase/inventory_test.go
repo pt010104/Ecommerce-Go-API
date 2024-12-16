@@ -144,11 +144,6 @@ func TestCreateInventory(t *testing.T) {
 }
 
 func TestDetailInventory(t *testing.T) {
-	scope := models.Scope{
-		UserID:    "test",
-		SessionID: "test",
-		Role:      0,
-	}
 
 	type mockRepoDetail struct {
 		isCalled bool
@@ -200,14 +195,14 @@ func TestDetailInventory(t *testing.T) {
 			uc, deps := initUseCase(t)
 
 			if tc.mockRepo.isCalled {
-				deps.repo.EXPECT().DetailInventory(ctx, scope, tc.mockRepo.ID).
+				deps.repo.EXPECT().DetailInventory(ctx, tc.mockRepo.ID).
 					Return(
 						tc.mockRepo.output,
 						tc.mockRepo.err,
 					)
 			}
 
-			res, err := uc.DetailInventory(ctx, scope, tc.ID)
+			res, err := uc.DetailInventory(ctx, tc.ID)
 			if err != nil {
 				require.Equal(t, tc.wantErr, err)
 			} else {
@@ -402,7 +397,7 @@ func TestUpdateInventory(t *testing.T) {
 			uc, deps := initUseCase(t)
 
 			if tc.mockRepo.mockRepoDetail.isCalled {
-				deps.repo.EXPECT().DetailInventory(ctx, scope, tc.mockRepo.ID).
+				deps.repo.EXPECT().DetailInventory(ctx, tc.mockRepo.ID).
 					Return(
 						tc.mockRepo.mockRepoDetail.output,
 						tc.mockRepo.mockRepoDetail.err,

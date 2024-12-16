@@ -7,8 +7,6 @@ import (
 )
 
 type UseCase interface {
-	Create(sc models.Scope, ctx context.Context, input CreateCartInput, inputItem CreateCartItemInput) (models.Cart, error)
-	Update(ctx context.Context, opt UpdateCartOption) (models.Cart, error)
-	ListCart(sc models.Scope, ctx context.Context, opt GetCartFilter) ([]models.Cart, error)
-	GetCart(sc models.Scope, ctx context.Context, id string) (models.Cart, error)
+	Update(ctx context.Context, sc models.Scope, opt UpdateInput) (UpdateOutput, error)
+	Add(ctx context.Context, sc models.Scope, input CreateCartInput) error
 }

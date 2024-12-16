@@ -72,3 +72,28 @@ func (r implRepository) Detail(ctx context.Context, sc models.Scope, id string) 
 
 	return m, nil
 }
+
+func (r implRepository) List(ctx context.Context, sc models.Scope, opt media.ListOption) ([]models.Media, error) {
+	col := r.getCollection(sc)
+
+	filter, err := r.buildQuery(ctx, sc, opt.GetFilter)
+	if err != nil {
+		r.l.Errorf(ctx, "media.repository.mongo.List.buildQuery: %v", err)
+		return nil, err
+	}
+
+	var medias []models.Media
+	cursor, err := col.Find(ctx, filter)
+	if err != nil {
+		r.l.Errorf(ctx, "media.repository.mongo.List.Find: %v", err)
+		return nil, err
+	}
+
+	err = cursor.All(ctx, &medias)
+	if err != nil {
+		r.l.Errorf(ctx, "media.repository.mongo.List.All: %v", err)
+		return nil, err
+	}
+
+	return medias, nil
+}

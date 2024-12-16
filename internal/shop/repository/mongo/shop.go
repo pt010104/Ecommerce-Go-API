@@ -163,6 +163,7 @@ func (repo implRepo) UpdateShop(ctx context.Context, sc models.Scope, option sho
 		updateData["is_verified"] = option.IsVerified
 		option.Model.IsVerified = option.IsVerified
 	}
+
 	updateData["updated_at"] = time.Now()
 
 	update := bson.M{}

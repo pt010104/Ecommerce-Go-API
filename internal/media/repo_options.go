@@ -14,3 +14,7 @@ type UpdateOption struct {
 	Status string
 	URL    string
 }
+
+type ListOption struct {
+	GetFilter
+}

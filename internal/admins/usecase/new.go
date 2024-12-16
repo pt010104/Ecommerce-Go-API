@@ -8,12 +8,12 @@ import (
 )
 
 type implUsecase struct {
-	repo   admins.Repo
+	repo   admins.Repository
 	l      log.Logger
 	shopUc shop.UseCase
 }
 
-func New(repo admins.Repo, l log.Logger, shopUC shop.UseCase) implUsecase {
+func New(repo admins.Repository, l log.Logger, shopUC shop.UseCase) implUsecase {
 	return implUsecase{
 		repo:   repo,
 		l:      l,
