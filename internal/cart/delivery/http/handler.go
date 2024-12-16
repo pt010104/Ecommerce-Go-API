@@ -38,6 +38,18 @@ func (h handler) Update(c *gin.Context) {
 	response.OK(c, h.updateResponse(o))
 }
 
+// @Summary Add a cart
+// @Description ADD a product to user cart . Auto group by shop ID
+// @Tags Cart
+// @Accept json
+// @Produce json
+// @Param			Access-Control-Allow-Origin	header		string		false	"Access-Control-Allow-Origin"	default("*")
+// @Param			Authorization				header		string		true	"Bearer JWT token"				default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
+// @Param			x-client-id					header		string		true	"User ID"						default(6707825d45804caaf8316957)
+// @Param			session-id					header		string		true	"Session ID"					default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
+// @Param request body addToCartRequest  true "Add to cart request"
+// @Success 200
+// @Router /carts/add [post]
 func (h handler) Add(c *gin.Context) {
 	ctx := c.Request.Context()
 

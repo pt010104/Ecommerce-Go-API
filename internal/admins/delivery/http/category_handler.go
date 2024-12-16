@@ -10,11 +10,9 @@ import (
 // @Description Create a new category
 // @Accept json
 // @Produce json
-// @Param category body CategoryRequest true "Category data"
+// @Param category body createCategoryReq true "Category data"
 // @Success 200 {object} CategoryResponse
-// @Failure 400 {object} ErrorResponse
 // @Router /api/v1/admin/categories [post]
-
 func (h handler) CreateCategory(c *gin.Context) {
 	ctx := c.Request.Context()
 
@@ -33,5 +31,5 @@ func (h handler) CreateCategory(c *gin.Context) {
 		return
 	}
 	h.l.Debugf(ctx, "role:", sc.Role)
-	response.OK(c, u)
+	response.OK(c, h.newCategoryResponse(u))
 }
