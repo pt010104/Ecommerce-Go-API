@@ -1,8 +1,6 @@
 package http
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
 	"github.com/pt010104/api-golang/internal/models"
 	pkgErrors "github.com/pt010104/api-golang/pkg/errors"
@@ -93,24 +91,18 @@ func (h handler) processDeleteProductRequest(c *gin.Context) (models.Scope, dele
 func (h handler) processGetProductRequest(c *gin.Context) (models.Scope, getProductRequest, error) {
 	ctx := c.Request.Context()
 
-	sc, ok := jwt.GetScopeFromContext(ctx)
-	if !ok {
-		h.l.Errorf(ctx, "survey.delivery.http.handler.processGetRequest: unauthorized")
-		return models.Scope{}, getProductRequest{}, pkgErrors.NewUnauthorizedHTTPError()
-	}
-
 	var req getProductRequest
 	if err := c.ShouldBindQuery(&req); err != nil {
 		h.l.Errorf(ctx, "shop.delivery.http.handler.processGetRequest: invalid request")
 		return models.Scope{}, req, errWrongQuery
 	}
-	fmt.Print("req", req.IDs)
+
 	if err := req.validate(); err != nil {
 		h.l.Errorf(ctx, "shop.delivery.http.handler.processGetRequest: invalid request")
 		return models.Scope{}, req, errWrongBody
 	}
 
-	return sc, req, nil
+	return models.Scope{}, req, nil
 
 }
 func (h handler) processUpdateProductRequest(c *gin.Context) (models.Scope, UpdateProductReq, error) {

@@ -137,7 +137,7 @@ func (h handler) DeleteProduct(c *gin.Context) {
 // @Router       /api/v1/shops/products/get-product [get]
 func (h handler) GetProduct(c *gin.Context) {
 	ctx := c.Request.Context()
-	fmt.Print("get product", c.Params, c.Query("ids"))
+
 	sc, req, err := h.processGetProductRequest(c)
 	if err != nil {
 		fmt.Print("err", req.IDs)
