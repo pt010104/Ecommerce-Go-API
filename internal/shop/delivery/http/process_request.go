@@ -33,50 +33,34 @@ func (h handler) processCreateRequest(c *gin.Context) (models.Scope, registerReq
 
 }
 
-func (h handler) processGetRequest(c *gin.Context) (models.Scope, getShopRequest, error) {
+func (h handler) processGetRequest(c *gin.Context) (getShopRequest, error) {
 	ctx := c.Request.Context()
-
-	payload, ok := jwt.GetPayloadFromContext(ctx)
-	if !ok {
-		h.l.Errorf(ctx, "survey.delivery.http.handler.processDetailRequest: unauthorized")
-		return models.Scope{}, getShopRequest{}, pkgErrors.NewUnauthorizedHTTPError()
-	}
 
 	var req getShopRequest
 	if err := c.ShouldBindQuery(&req); err != nil {
 		h.l.Errorf(ctx, "shop.delivery.http.handler.processGetRequest: invalid request")
-		return models.Scope{}, req, errWrongQuery
+		return req, errWrongQuery
 	}
 
 	if err := req.validate(); err != nil {
 		h.l.Errorf(ctx, "shop.delivery.http.handler.processGetRequest: invalid request")
-		return models.Scope{}, req, err
+		return req, err
 	}
 
-	sc := jwt.NewScope(payload)
-
-	return sc, req, nil
+	return req, nil
 
 }
 
-func (h handler) processDetailRequest(c *gin.Context) (models.Scope, string, error) {
+func (h handler) processDetailRequest(c *gin.Context) (string, error) {
 	ctx := c.Request.Context()
-
-	payload, ok := jwt.GetPayloadFromContext(ctx)
-	if !ok {
-		h.l.Errorf(ctx, "survey.delivery.http.handler.processDetailRequest: unauthorized")
-		return models.Scope{}, "", pkgErrors.NewUnauthorizedHTTPError()
-	}
 
 	id := c.Param("id")
 	if id == "" {
 		h.l.Errorf(ctx, "shop.delivery.http.handler.processDetailRequest: invalid request")
-		return models.Scope{}, "", errWrongBody
+		return "", errWrongBody
 	}
 
-	sc := jwt.NewScope(payload)
-
-	return sc, id, nil
+	return id, nil
 }
 func (h handler) processDeleteShopRequest(c *gin.Context) (models.Scope, error) {
 	ctx := c.Request.Context()

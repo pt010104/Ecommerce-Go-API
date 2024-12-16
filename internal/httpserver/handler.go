@@ -82,5 +82,8 @@ func (srv HTTPServer) mapHandlers() error {
 	cartHTTP.MapRouters(api.Group("/carts"), cartH, mw)
 	mediaHTTP.MapRouters(api.Group("/media"), mediaH, mw)
 
+	//Public routes
+	shopHTTP.MapPublicRoutes(api.Group("/shops/products"), shopH)
+
 	return nil
 }
