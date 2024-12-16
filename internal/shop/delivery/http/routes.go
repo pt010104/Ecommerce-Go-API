@@ -23,6 +23,7 @@ func MapShopRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
 }
 
 func MapProductRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
+
 	r.Use(mw.Auth(), mw.AuthShop())
 	r.DELETE("", h.DeleteProduct)
 	r.POST("", h.CreateProduct)

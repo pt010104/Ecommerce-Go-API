@@ -355,7 +355,7 @@ func (uc implUsecase) GetProduct(ctx context.Context, sc models.Scope, input sho
 	go func() {
 		defer wg.Done()
 		var err error
-		s, pag, err = uc.repo.GetProduct(ctx, sc, opt)
+		s, pag, err = uc.repo.GetProduct(ctx, models.Scope{}, opt)
 		if err != nil {
 			uc.l.Errorf(ctx, "shop.usecase.GetProduct.repo.GetProduct: %v", err)
 			wgErr = err
