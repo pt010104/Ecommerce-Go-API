@@ -1,0 +1,2627 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/api/v1/admin/categories": {
+            "post": {
+                "description": "Create a new category",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Create Category",
+                "parameters": [
+                    {
+                        "description": "Category data",
+                        "name": "category",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.createCategoryReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.CategoryResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/verify-shop": {
+            "post": {
+                "description": "Verify a shop by ID list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Verify shop",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU",
+                        "description": "Bearer JWT token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "6707825d45804caaf8316957",
+                        "description": "User ID",
+                        "name": "x-client-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
+                        "description": "Session ID",
+                        "name": "session-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "List of Shop IDs to verify",
+                        "name": "ids",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Verification successful",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/http.verifyShopResp"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/media": {
+            "post": {
+                "description": "Upload one or multiple media files",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Media"
+                ],
+                "summary": "Upload media files",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
+                        "description": "Bearer JWT token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "6707825d45804caaf8316957",
+                        "description": "User ID",
+                        "name": "x-client-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
+                        "description": "Session ID",
+                        "name": "session-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Media files to upload",
+                        "name": "files",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/shops": {
+            "get": {
+                "description": "Get shop by Search, IDs,...",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Shop"
+                ],
+                "summary": "Get shop",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU",
+                        "description": "Bearer JWT token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "6707825d45804caaf8316957",
+                        "description": "User ID",
+                        "name": "x-client-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
+                        "description": "Session ID",
+                        "name": "session-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "IDs",
+                        "name": "ids",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Is Verified",
+                        "name": "is_verified",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.getShopResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a shop",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Shop"
+                ],
+                "summary": "Create a shop",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU",
+                        "description": "Bearer JWT token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "6707825d45804caaf8316957",
+                        "description": "User ID",
+                        "name": "x-client-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
+                        "description": "Session ID",
+                        "name": "session-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Name",
+                        "name": "name",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Phone",
+                        "name": "phone",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "City",
+                        "name": "city",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Street",
+                        "name": "street",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "District",
+                        "name": "district",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.registerResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a shop",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Shop"
+                ],
+                "summary": "Delete a shop",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU",
+                        "description": "Bearer JWT token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "6707825d45804caaf8316957",
+                        "description": "User ID",
+                        "name": "x-client-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
+                        "description": "Session ID",
+                        "name": "session-id",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Update a shop",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Shop"
+                ],
+                "summary": "Update a shop",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU",
+                        "description": "Bearer JWT token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "6707825d45804caaf8316957",
+                        "description": "User ID",
+                        "name": "x-client-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
+                        "description": "Session ID",
+                        "name": "session-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "IDs",
+                        "name": "ids",
+                        "in": "body",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.updateResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/shops/create-product": {
+            "post": {
+                "description": "Create a new product in the shop",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Shop"
+                ],
+                "summary": "Create a product",
+                "parameters": [
+                    {
+                        "description": "Request Body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.createProductReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success Response",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/shops/get-shop-id-by-user-id/{id}": {
+            "get": {
+                "description": "Get shop ID by user ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Shop"
+                ],
+                "summary": "Get shop ID by user ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU",
+                        "description": "Bearer JWT token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "6707825d45804caaf8316957",
+                        "description": "User ID",
+                        "name": "x-client-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
+                        "description": "Session ID",
+                        "name": "session-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Shop ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/shops/products/delete": {
+            "delete": {
+                "description": "delete product by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "delete product by their id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU",
+                        "description": "Bearer JWT token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "6707825d45804caaf8316957",
+                        "description": "User ID",
+                        "name": "x-client-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
+                        "description": "Session ID",
+                        "name": "session-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Request Body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.deleteProductRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/shops/products/get-product": {
+            "get": {
+                "description": "Retrieve a paginated list of products with optional filters , at least 1 parameter request body must be provided",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Get products with pagination",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "name": "category_ids",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "name": "ids",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "shop_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated Products",
+                        "schema": {
+                            "$ref": "#/definitions/http.getProductResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/shops/products/update": {
+            "post": {
+                "description": "Update product BY ID , only ID is required , other fields are optional",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Update product",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU",
+                        "description": "Bearer JWT token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "6707825d45804caaf8316957",
+                        "description": "User ID",
+                        "name": "x-client-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
+                        "description": "Session ID",
+                        "name": "session-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Request Body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.UpdateProductReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/http.updateProductResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/shops/products/{id}": {
+            "get": {
+                "description": "Get shop detail by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "get shop detail by their id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU",
+                        "description": "Bearer JWT token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "6707825d45804caaf8316957",
+                        "description": "User ID",
+                        "name": "x-client-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
+                        "description": "Session ID",
+                        "name": "session-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/http.detailProductResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/shops/{id}": {
+            "get": {
+                "description": "Get shop detail by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Shop"
+                ],
+                "summary": "Get shop detail",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU",
+                        "description": "Bearer JWT token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "6707825d45804caaf8316957",
+                        "description": "User ID",
+                        "name": "x-client-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
+                        "description": "Session ID",
+                        "name": "session-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Shop ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.getDetailResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users": {
+            "put": {
+                "description": "Update user avatar",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update User avatar",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU",
+                        "description": "Bearer JWT token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "6707825d45804caaf8316957",
+                        "description": "User ID",
+                        "name": "x-client-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
+                        "description": "Session ID",
+                        "name": "session-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Update user avatar request",
+                        "name": "updateReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.updateReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.UpdateResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "404": {
+                        "description": "User Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/distribute-token": {
+            "post": {
+                "description": "Generate and distribute a new JWT token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Distribute New Token",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU",
+                        "description": "Bearer JWT token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Verification token",
+                        "name": "token",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "6707825d45804caaf8316957",
+                        "description": "User ID",
+                        "name": "x-client-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
+                        "description": "Session ID",
+                        "name": "session-id",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.distributeNewTokenResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/forget-password": {
+            "post": {
+                "description": "Initiate a password reset request",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Forget Password Request",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "description": "Email",
+                        "name": "email",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {}
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/reset-password": {
+            "post": {
+                "description": "Reset user's password using a valid reset token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Reset Password",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Reset token",
+                        "name": "token",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "6707825d45804caaf8316957",
+                        "description": "User ID",
+                        "name": "x-client-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "New password",
+                        "name": "password",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {}
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/sign-in": {
+            "post": {
+                "description": "Authenticate user and provide a JWT token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "User Sign In",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
+                        "description": "Session ID",
+                        "name": "session-id",
+                        "in": "header"
+                    },
+                    {
+                        "description": "Email",
+                        "name": "email",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Password",
+                        "name": "password",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.signInResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/sign-up": {
+            "post": {
+                "description": "Create a new user account",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "User Sign Up",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "description": "Name",
+                        "name": "Name",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Email",
+                        "name": "Email",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Password",
+                        "name": "Password",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.signUpResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/signout": {
+            "post": {
+                "description": "Sign out the current user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "User Sign Out",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {}
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/verify-request": {
+            "post": {
+                "description": "Verify the validity of a password reset request",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Verify Email",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "description": "Email",
+                        "name": "email",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {}
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "404": {
+                        "description": "Request Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/verify-user": {
+            "post": {
+                "description": "Complete user account verification",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Verify User Account",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Verification token",
+                        "name": "token",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "6707825d45804caaf8316957",
+                        "description": "User ID",
+                        "name": "x-client-id",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {}
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/{id}": {
+            "get": {
+                "description": "Retrieve detailed information about a specific user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get User Details",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU",
+                        "description": "Bearer JWT token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "6707825d45804caaf8316957",
+                        "description": "User ID",
+                        "name": "x-client-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
+                        "description": "Session ID",
+                        "name": "session-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.detailResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "404": {
+                        "description": "User Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/carts": {
+            "get": {
+                "description": "Retrieve a list of carts based on user ID and filters , if no query is passed , all cart of current user will be returned",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "List carts",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU",
+                        "description": "Bearer JWT token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "6707825d45804caaf8316957",
+                        "description": "User ID",
+                        "name": "x-client-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
+                        "description": "Session ID",
+                        "name": "session-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "Cart IDs (optional)",
+                        "name": "ids",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "Shop IDs (optional)",
+                        "name": "shop_ids",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/carts/add": {
+            "post": {
+                "description": "ADD a product to user cart . Auto group by shop ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Add a cart",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU",
+                        "description": "Bearer JWT token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "6707825d45804caaf8316957",
+                        "description": "User ID",
+                        "name": "x-client-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
+                        "description": "Session ID",
+                        "name": "session-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Add to cart request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.addToCartRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/carts/update-cart": {
+            "post": {
+                "description": "Update an existing cart with new product details , pass all the item in the cart , once the update api is called , the cart will be replaced with the new items",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Update a cart",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU",
+                        "description": "Bearer JWT token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "6707825d45804caaf8316957",
+                        "description": "User ID",
+                        "name": "x-client-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
+                        "description": "Session ID",
+                        "name": "session-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Cart update request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.UpdateCartRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.updateCartResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "http.Avatar_obj": {
+            "type": "object",
+            "properties": {
+                "media_id": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.CartItemReq": {
+            "type": "object",
+            "required": [
+                "product_id",
+                "quantity"
+            ],
+            "properties": {
+                "product_id": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "integer"
+                }
+            }
+        },
+        "http.CategoryResponse": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.UpdateCartRequest": {
+            "type": "object",
+            "required": [
+                "items"
+            ],
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.CartItemReq"
+                    }
+                }
+            }
+        },
+        "http.UpdateProductReq": {
+            "type": "object",
+            "required": [
+                "category_ids",
+                "id",
+                "media_ids",
+                "name",
+                "price",
+                "reorder_level",
+                "reorder_quantity",
+                "stock_level"
+            ],
+            "properties": {
+                "category_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "media_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "reorder_level": {
+                    "type": "integer"
+                },
+                "reorder_quantity": {
+                    "type": "integer"
+                },
+                "stock_level": {
+                    "type": "integer"
+                }
+            }
+        },
+        "http.UpdateResp": {
+            "type": "object",
+            "properties": {
+                "media_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.addToCartRequest": {
+            "type": "object",
+            "required": [
+                "product_id",
+                "quantity"
+            ],
+            "properties": {
+                "product_id": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "integer"
+                }
+            }
+        },
+        "http.address": {
+            "type": "object",
+            "properties": {
+                "city": {
+                    "type": "string"
+                },
+                "district": {
+                    "type": "string"
+                },
+                "street": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.categoryObject": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.createCategoryReq": {
+            "type": "object",
+            "required": [
+                "description",
+                "name"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.createProductReq": {
+            "type": "object",
+            "required": [
+                "category_ids",
+                "name",
+                "price",
+                "reorder_level",
+                "reorder_quantity",
+                "stock_level"
+            ],
+            "properties": {
+                "category_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "media_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "reorder_level": {
+                    "type": "integer"
+                },
+                "reorder_quantity": {
+                    "type": "integer"
+                },
+                "stock_level": {
+                    "type": "integer"
+                }
+            }
+        },
+        "http.deleteProductRequest": {
+            "type": "object",
+            "properties": {
+                "ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "http.detailProductResp": {
+            "type": "object",
+            "required": [
+                "category_id",
+                "category_name",
+                "id",
+                "inventory_name",
+                "name",
+                "price",
+                "shop_id",
+                "shop_name"
+            ],
+            "properties": {
+                "avatar": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/internal_shop_delivery_http.avatar_obj"
+                    }
+                },
+                "category_id": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "category_name": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "inventory_name": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "shop_id": {
+                    "type": "string"
+                },
+                "shop_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.detailResp": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "$ref": "#/definitions/internal_user_delivery_http.avatar_obj"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.distributeNewTokenResp": {
+            "type": "object",
+            "properties": {
+                "new_access_token": {
+                    "type": "string"
+                },
+                "new_refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.getDetailResp": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "$ref": "#/definitions/http.address"
+                },
+                "avatar_obj": {
+                    "$ref": "#/definitions/http.Avatar_obj"
+                },
+                "avg_rate": {
+                    "type": "number"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "followers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_verified": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.getProductResp": {
+            "type": "object",
+            "properties": {
+                "products": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.listProductItem"
+                    }
+                },
+                "shop_object": {
+                    "$ref": "#/definitions/http.shopObject"
+                }
+            }
+        },
+        "http.getShopResp": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.getShopRespItem"
+                    }
+                },
+                "meta": {
+                    "$ref": "#/definitions/http.listMetaResponse"
+                }
+            }
+        },
+        "http.getShopRespItem": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "$ref": "#/definitions/http.address"
+                },
+                "avatar_obj": {
+                    "$ref": "#/definitions/http.Avatar_obj"
+                },
+                "avg_rate": {
+                    "type": "number"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "followers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_verified": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.inventoryObject": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "stock_level": {
+                    "type": "integer"
+                }
+            }
+        },
+        "http.listMetaResponse": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "current_page": {
+                    "type": "integer"
+                },
+                "per_page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "http.listProductItem": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/internal_shop_delivery_http.avatar_obj"
+                    }
+                },
+                "category_objects": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.categoryObject"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "inventory_object": {
+                    "$ref": "#/definitions/http.inventoryObject"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "shop_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.productResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "integer"
+                }
+            }
+        },
+        "http.registerResponse": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "$ref": "#/definitions/http.address"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.shopObject": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.shopResponse": {
+            "type": "object",
+            "properties": {
+                "avt_url": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "products": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.productResponse"
+                    }
+                }
+            }
+        },
+        "http.signInResp": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "session_id": {
+                    "type": "string"
+                },
+                "token": {
+                    "$ref": "#/definitions/user.Token"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.signUpResponse": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.updateCartResponse": {
+            "type": "object",
+            "properties": {
+                "shops": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.shopResponse"
+                    }
+                }
+            }
+        },
+        "http.updateProductResp": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "avatar": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/internal_shop_delivery_http.avatar_obj"
+                    }
+                },
+                "category_id": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "category_name": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "inventory_name": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "shop_id": {
+                    "type": "string"
+                },
+                "shop_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.updateReq": {
+            "type": "object",
+            "required": [
+                "email",
+                "name"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "media_id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.updateResp": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "$ref": "#/definitions/http.address"
+                },
+                "avg_rate": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.verifyShopResp": {
+            "type": "object",
+            "properties": {
+                "is_verified": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "shop_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_shop_delivery_http.avatar_obj": {
+            "type": "object",
+            "properties": {
+                "media_id": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_user_delivery_http.avatar_obj": {
+            "type": "object",
+            "properties": {
+                "media_id": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.Resp": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "error_code": {
+                    "type": "integer"
+                },
+                "errors": {},
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.Token": {
+            "type": "object",
+            "properties": {
+                "accessToken": {
+                    "type": "string"
+                },
+                "refreshToken": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

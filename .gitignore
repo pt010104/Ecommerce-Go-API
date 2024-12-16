@@ -20,5 +20,3 @@ coverage.out
 .env
 
 deploy.sh
-
-docs
