@@ -51,7 +51,7 @@ func (uc implUsecase) Detail(ctx context.Context, sc models.Scope, id string) (m
 
 func (uc implUsecase) List(ctx context.Context, sc models.Scope, input media.ListInput) ([]models.Media, error) {
 	if len(input.IDs) == 0 {
-		return nil, media.ErrRequireField
+		return []models.Media{}, nil
 	}
 
 	if input.Status != "" && !slices.Contains(validStatus, input.Status) {
