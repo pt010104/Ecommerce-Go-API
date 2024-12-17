@@ -4,6 +4,7 @@ import (
 	"github.com/pt010104/api-golang/internal/cart"
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/pkg/mongo"
+	"github.com/pt010104/api-golang/pkg/paginator"
 )
 
 type CartItemReq struct {
@@ -231,16 +232,24 @@ type GetCartItemResponse struct {
 	Quantity  int         `json:"quantity"`
 	MediaS    []Media_Obj `json:"medias"`
 }
-type getCartResponse struct {
+type getCartResponseItem struct {
 	ID     string                `json:"id"`
 	UserID string                `json:"user_id"`
 	ShopID string                `json:"shop_id"`
 	Item   []GetCartItemResponse `json:"item"`
 }
+type getCartResponse struct {
+	Item []getCartResponseItem `json:"item"`
+	Meta listMetaResponse      `json:"meta"`
+}
+type listMetaResponse struct {
+	paginator.PaginatorResponse
+}
 
 func (h handler) newGetResponse(carts cart.GetCartOutput) []getCartResponse {
 
 	var res []getCartResponse
+
 	for _, cart := range carts.CartOutPut {
 		var items []GetCartItemResponse
 		for _, item := range cart.Products {
@@ -257,11 +266,19 @@ func (h handler) newGetResponse(carts cart.GetCartOutput) []getCartResponse {
 				MediaS:    medias,
 			})
 		}
+
 		res = append(res, getCartResponse{
-			ID:     cart.Cart.ID.Hex(),
-			UserID: cart.Cart.UserID.Hex(),
-			ShopID: cart.Cart.ShopID.Hex(),
-			Item:   items,
+			Item: []getCartResponseItem{
+				{
+					ID:     cart.Cart.ID.Hex(),
+					UserID: cart.Cart.UserID.Hex(),
+					ShopID: cart.Cart.ShopID.Hex(),
+					Item:   items,
+				},
+			},
+			Meta: listMetaResponse{
+				PaginatorResponse: carts.Paginator.ToResponse(),
+			},
 		})
 	}
 	return res

@@ -235,7 +235,7 @@ definitions:
           $ref: '#/definitions/http.getShopRespItem'
         type: array
       meta:
-        $ref: '#/definitions/http.listMetaResponse'
+        $ref: '#/definitions/internal_shop_delivery_http.listMetaResponse'
     type: object
   http.getShopRespItem:
     properties:
@@ -269,19 +269,6 @@ definitions:
       name:
         type: string
       stock_level:
-        type: integer
-    type: object
-  http.listMetaResponse:
-    properties:
-      count:
-        type: integer
-      current_page:
-        type: integer
-      per_page:
-        type: integer
-      total:
-        type: integer
-      total_pages:
         type: integer
     type: object
   http.listProductItem:
@@ -441,6 +428,19 @@ definitions:
         type: string
       url:
         type: string
+    type: object
+  internal_shop_delivery_http.listMetaResponse:
+    properties:
+      count:
+        type: integer
+      current_page:
+        type: integer
+      per_page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
     type: object
   internal_user_delivery_http.avatar_obj:
     properties:

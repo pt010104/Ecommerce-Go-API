@@ -2290,7 +2290,7 @@ const docTemplate = `{
                     }
                 },
                 "meta": {
-                    "$ref": "#/definitions/http.listMetaResponse"
+                    "$ref": "#/definitions/internal_shop_delivery_http.listMetaResponse"
                 }
             }
         },
@@ -2342,26 +2342,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "stock_level": {
-                    "type": "integer"
-                }
-            }
-        },
-        "http.listMetaResponse": {
-            "type": "object",
-            "properties": {
-                "count": {
-                    "type": "integer"
-                },
-                "current_page": {
-                    "type": "integer"
-                },
-                "per_page": {
-                    "type": "integer"
-                },
-                "total": {
-                    "type": "integer"
-                },
-                "total_pages": {
                     "type": "integer"
                 }
             }
@@ -2606,6 +2586,26 @@ const docTemplate = `{
                 },
                 "url": {
                     "type": "string"
+                }
+            }
+        },
+        "internal_shop_delivery_http.listMetaResponse": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "current_page": {
+                    "type": "integer"
+                },
+                "per_page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
                 }
             }
         },
