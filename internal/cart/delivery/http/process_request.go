@@ -78,3 +78,26 @@ func (h handler) processaddToCartRequest(c *gin.Context) (models.Scope, addToCar
 // 	return sc, req, nil
 
 // }
+
+func (h handler) processGetCartRequest(c *gin.Context) (models.Scope, GetCartReq, error) {
+	ctx := c.Request.Context()
+
+	sc, ok := jwt.GetScopeFromContext(ctx)
+	if !ok {
+		h.l.Errorf(ctx, "cart.delivery.http.handler.processGetCartRequest: unauthorized")
+		return models.Scope{}, GetCartReq{}, pkgErrors.NewUnauthorizedHTTPError()
+	}
+
+	var req GetCartReq
+	if err := c.ShouldBindQuery(&req); err != nil {
+		h.l.Errorf(ctx, "cart.delivery.http.handler.processGetCartRequest: invalid request")
+		return models.Scope{}, req, errWrongBody
+	}
+
+	if err := req.validate(); err != nil {
+		h.l.Errorf(ctx, "cart.delivery.http.handler.processGetCartRequest: invalid request")
+		return models.Scope{}, req, err
+	}
+
+	return sc, req, nil
+}

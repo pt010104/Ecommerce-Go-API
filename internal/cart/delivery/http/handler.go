@@ -104,3 +104,24 @@ func (h handler) List(c *gin.Context) {
 
 	// response.OK(c, h.newListResponse(cart))
 }
+
+func (h handler) Get(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	sc, req, err := h.processGetCartRequest(c)
+	if err != nil {
+		h.l.Errorf(ctx, "cart.delivery.http.Get: %v", err)
+		response.Error(c, err)
+		return
+	}
+
+	o, err := h.uc.GetCart(ctx, sc, req.toInput())
+	if err != nil {
+		h.l.Errorf(ctx, "cart.delivery.http.Get: %v", err)
+		err := h.mapErrors(err)
+		response.Error(c, err)
+		return
+	}
+
+	response.OK(c, h.newGetResponse(o))
+}

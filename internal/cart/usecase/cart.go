@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"fmt"
+	"sort"
 	"sync"
 
 	"github.com/pt010104/api-golang/internal/cart"
@@ -194,43 +195,49 @@ func (uc implUseCase) GetCart(ctx context.Context, sc models.Scope, opt cart.Get
 	var productItems []cart.ProductItem
 	var getCartItems []cart.GetCartItem
 	var cartProductMap = make(map[string][]string)
+	var cartProductQuantityMap = make(map[string]map[string]int)
 	for _, v := range carts {
 		for _, item := range v.Items {
 
 			cartProductMap[v.ID.Hex()] = append(cartProductMap[v.ID.Hex()], item.ProductID.Hex())
+			//print product id and quantity
+			fmt.Print("cart id : ", v.ID.Hex())
+			fmt.Println(item.ProductID.Hex(), item.Quantity)
+
+			cartProductQuantityMap[v.ID.Hex()] = make(map[string]int)
+			cartProductQuantityMap[v.ID.Hex()][item.ProductID.Hex()] = item.Quantity
+
 		}
 	}
-	for _, v := range cartProductMap {
-
-		productDetails, err := uc.shopUc.GetProduct(ctx, models.Scope{}, shop.GetProductInput{
+	for _, v := range carts {
+		listProducts, err := uc.shopUc.ListProduct(ctx, models.Scope{}, shop.ListProductInput{
 			GetProductFilter: shop.GetProductFilter{
-				IDs: v,
+				IDs: cartProductMap[v.ID.Hex()],
 			},
 		})
-
 		if err != nil {
 			uc.l.Errorf(ctx, "cart.usecase.GetCart: %v", err)
 			return cart.GetCartOutput{}, err
 		}
-		for _, product := range productDetails.Products {
-			productItem = cart.ProductItem{
-				ProductID: product.P.ID.Hex(),
-				Medias:    product.Images,
-			}
+
+		for _, p := range listProducts.Products {
+			productItem.ProductID = p.P.ID.Hex()
+			productItem.Medias = p.Images
+			productItem.Quantity = cartProductQuantityMap[v.ID.Hex()][p.P.ID.Hex()]
 			productItems = append(productItems, productItem)
 		}
-
-	}
-	for _, v := range carts {
 		getCartItems = append(getCartItems, cart.GetCartItem{
-			Cart:     v,
+			Cart: v,
+
 			Products: productItems,
 		})
-	}
 
+	}
+	sort.Slice(getCartItems, func(i, j int) bool {
+		return getCartItems[i].Cart.CreatedAt.After(getCartItems[j].Cart.CreatedAt)
+	})
 	return cart.GetCartOutput{
 		CartOutPut: getCartItems,
 		Paginator:  pag,
 	}, nil
-
 }

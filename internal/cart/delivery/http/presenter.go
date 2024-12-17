@@ -195,3 +195,75 @@ type GetCartReq struct {
 	IDs     []string `form:"ids"`
 	ShopIDs []string `form:"shop_ids"`
 }
+
+func (r GetCartReq) validate() error {
+	if len(r.IDs) > 0 {
+		for _, id := range r.IDs {
+			if !mongo.IsObjectID(id) {
+				return errWrongBody
+			}
+		}
+	}
+	if len(r.ShopIDs) > 0 {
+		for _, id := range r.ShopIDs {
+			if !mongo.IsObjectID(id) {
+				return errWrongBody
+			}
+		}
+	}
+	return nil
+}
+func (r GetCartReq) toInput() cart.GetOption {
+	return cart.GetOption{
+		CartFilter: cart.CartFilter{
+			IDs:     r.IDs,
+			ShopIDs: r.ShopIDs,
+		},
+	}
+}
+
+type Media_Obj struct {
+	MediaID string `json:"media_id"`
+	URL     string `json:"url"`
+}
+type GetCartItemResponse struct {
+	ProductID string      `json:"product_id"`
+	Quantity  int         `json:"quantity"`
+	MediaS    []Media_Obj `json:"medias"`
+}
+type getCartResponse struct {
+	ID     string                `json:"id"`
+	UserID string                `json:"user_id"`
+	ShopID string                `json:"shop_id"`
+	Item   []GetCartItemResponse `json:"item"`
+}
+
+func (h handler) newGetResponse(carts cart.GetCartOutput) []getCartResponse {
+
+	var res []getCartResponse
+	for _, cart := range carts.CartOutPut {
+		var items []GetCartItemResponse
+		for _, item := range cart.Products {
+			var medias []Media_Obj
+			for _, media := range item.Medias {
+				medias = append(medias, Media_Obj{
+					MediaID: media.ID.Hex(),
+					URL:     media.URL,
+				})
+			}
+			items = append(items, GetCartItemResponse{
+				ProductID: item.ProductID,
+				Quantity:  item.Quantity,
+				MediaS:    medias,
+			})
+		}
+		res = append(res, getCartResponse{
+			ID:     cart.Cart.ID.Hex(),
+			UserID: cart.Cart.UserID.Hex(),
+			ShopID: cart.Cart.ShopID.Hex(),
+			Item:   items,
+		})
+	}
+	return res
+
+}
