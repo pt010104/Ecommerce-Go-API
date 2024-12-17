@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/pt010104/api-golang/pkg/paginator"
 	"github.com/pt010104/api-golang/pkg/response"
 )
 
@@ -91,7 +92,14 @@ func (h handler) Add(c *gin.Context) {
 // @Router			/api/v1/carts [GET]
 func (h handler) Get(c *gin.Context) {
 	ctx := c.Request.Context()
+	var pagQuery paginator.PaginatorQuery
+	if err := c.ShouldBindQuery(&pagQuery); err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.Get.ShouldBindQuery: %v", err)
+		response.Error(c, errWrongPaginationQuery)
+		return
+	}
 
+	pagQuery.Adjust()
 	sc, req, err := h.processGetCartRequest(c)
 	if err != nil {
 		h.l.Errorf(ctx, "cart.delivery.http.Get: %v", err)
@@ -99,7 +107,7 @@ func (h handler) Get(c *gin.Context) {
 		return
 	}
 
-	o, err := h.uc.GetCart(ctx, sc, req.toInput())
+	o, err := h.uc.GetCart(ctx, sc, req.toInput(pagQuery))
 	if err != nil {
 		h.l.Errorf(ctx, "cart.delivery.http.Get: %v", err)
 		err := h.mapErrors(err)

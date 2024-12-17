@@ -214,12 +214,13 @@ func (r GetCartReq) validate() error {
 	}
 	return nil
 }
-func (r GetCartReq) toInput() cart.GetOption {
+func (r GetCartReq) toInput(pag paginator.PaginatorQuery) cart.GetOption {
 	return cart.GetOption{
 		CartFilter: cart.CartFilter{
 			IDs:     r.IDs,
 			ShopIDs: r.ShopIDs,
 		},
+		PagQuery: pag,
 	}
 }
 
