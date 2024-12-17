@@ -17,3 +17,8 @@ type CreateVoucherInput struct {
 	DiscountAmount         float64
 	MaxDiscountAmount      float64
 }
+type ApplyVoucherInput struct {
+	Code string
+	//order amount is double type
+	OrderAmount float64
+}

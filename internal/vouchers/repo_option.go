@@ -3,6 +3,7 @@ package vouchers
 import (
 	"time"
 
+	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/pkg/paginator"
 )
 
@@ -37,4 +38,23 @@ type GetVoucherFilter struct {
 type GetVoucherOption struct {
 	Filter GetVoucherFilter
 	Pag    paginator.Paginator
+}
+type UpdateVoucherOption struct {
+	Name                   string
+	ID                     string
+	ShopIDs                []string
+	Description            string
+	Code                   string
+	ValidFrom              time.Time
+	ValidTo                time.Time
+	UsageLimit             uint
+	ApplicableProductIDs   []string
+	ApplicableCategorieIDs []string
+	MinimumOrderAmount     float64
+	DiscountType           string
+	DiscountAmount         float64
+	MaxDiscountAmount      float64
+	Scope                  int
+	UsedCount              int
+	Model                  models.Voucher
 }

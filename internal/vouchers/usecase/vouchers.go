@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"time"
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
@@ -94,4 +95,34 @@ func (uc implUsecase) List(ctx context.Context, sc models.Scope, opt vouchers.Ge
 	}
 	return vouchers1, nil
 
+}
+func (uc implUsecase) ApplyVoucher(ctx context.Context, sc models.Scope, input vouchers.ApplyVoucherInput) (models.Voucher, error) {
+	voucher, err := uc.repo.DetailVoucher(ctx, sc, input.Code)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return models.Voucher{}, vouchers.ErrVoucherNotFound
+		}
+		uc.l.Errorf(ctx, "vouchers.usecase.ApplyVoucher.DetailVoucher: %v", err)
+		return models.Voucher{}, err
+	}
+
+	if voucher.ValidFrom.After(time.Now()) || voucher.ValidTo.Before(time.Now()) {
+		return models.Voucher{}, vouchers.ErrVoucherExpired
+	}
+	if voucher.UsageLimit > 0 && uint(voucher.UsedCount) >= voucher.UsageLimit {
+		return models.Voucher{}, vouchers.ErrVoucherExpired
+	}
+	if voucher.MinimumOrderAmount > 0 {
+		if input.OrderAmount < voucher.MinimumOrderAmount {
+			return models.Voucher{}, vouchers.ErrVoucherMinimumOrderAmount
+		}
+	}
+
+	voucher.UsedCount++
+	_, err = uc.repo.UpdateVoucher(ctx, sc, vouchers.UpdateVoucherOption{
+		ID:        voucher.ID.Hex(),
+		UsedCount: voucher.UsedCount,
+	})
+
+	return voucher, nil
 }
