@@ -246,40 +246,28 @@ type listMetaResponse struct {
 	paginator.PaginatorResponse
 }
 
-func (h handler) newGetResponse(carts cart.GetCartOutput) []getCartResponse {
+func (h handler) newGetResponse(carts cart.GetCartOutput) getCartResponse {
 
-	var res []getCartResponse
-
+	var res getCartResponse
+	var resItem []getCartResponseItem
 	for _, cart := range carts.CartOutPut {
 		var items []GetCartItemResponse
-		for _, item := range cart.Products {
-			var medias []Media_Obj
-			for _, media := range item.Medias {
-				medias = append(medias, Media_Obj{
-					MediaID: media.ID.Hex(),
-					URL:     media.URL,
-				})
-			}
+		for _, item := range cart.Cart.Items {
 			items = append(items, GetCartItemResponse{
-				ProductID: item.ProductID,
+				ProductID: item.ProductID.Hex(),
 				Quantity:  item.Quantity,
-				MediaS:    medias,
 			})
 		}
-
-		res = append(res, getCartResponse{
-			Item: []getCartResponseItem{
-				{
-					ID:     cart.Cart.ID.Hex(),
-					UserID: cart.Cart.UserID.Hex(),
-					ShopID: cart.Cart.ShopID.Hex(),
-					Item:   items,
-				},
-			},
-			Meta: listMetaResponse{
-				PaginatorResponse: carts.Paginator.ToResponse(),
-			},
+		resItem = append(resItem, getCartResponseItem{
+			ID:     cart.Cart.ID.Hex(),
+			UserID: cart.Cart.UserID.Hex(),
+			ShopID: cart.Cart.ShopID.Hex(),
+			Item:   items,
 		})
+	}
+	res.Item = resItem
+	res.Meta = listMetaResponse{
+		PaginatorResponse: carts.Paginator.ToResponse(),
 	}
 	return res
 
