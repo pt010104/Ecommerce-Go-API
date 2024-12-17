@@ -40,8 +40,8 @@ type ProductItem struct {
 }
 
 type GetCartItem struct {
-	Products            []ProductItem
-	CartProductMap      map[string]models.Product
+	Products []ProductItem
+
 	CartProductMediaMap map[string][]models.Media
 	Cart                models.Cart
 	Shop                models.Shop

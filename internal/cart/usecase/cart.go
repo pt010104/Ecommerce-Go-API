@@ -241,11 +241,12 @@ func (uc implUseCase) GetCart(ctx context.Context, sc models.Scope, opt cart.Get
 			productItem.Medias = p.Images
 			fmt.Print("product media id : ", productItem.Medias)
 			productItem.Quantity = cartProductQuantityMap[v.ID.Hex()][p.P.ID.Hex()]
-			productItems = append(productItems, productItem)
 			carProductMediaMap[p.P.ID.Hex()] = p.Images
 
 			productItem.ProductName = p.P.Name
 			productItem.Price = p.P.Price
+
+			productItems = append(productItems, productItem)
 
 		}
 		getCartItems = append(getCartItems, cart.GetCartItem{
