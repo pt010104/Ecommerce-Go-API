@@ -132,6 +132,108 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/carts": {
+            "get": {
+                "description": "Get shop by ShopIDs, IDs,if no query is passed , all cart of current user will be returned",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Get cart",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU",
+                        "description": "Bearer JWT token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "6707825d45804caaf8316957",
+                        "description": "User ID",
+                        "name": "x-client-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
+                        "description": "Session ID",
+                        "name": "session-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "IDs",
+                        "name": "ids",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "Shop IDs",
+                        "name": "shop_ids",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.getCartResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/media": {
             "post": {
                 "description": "Upload one or multiple media files",
@@ -1255,7 +1357,9 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {}
+                        "schema": {
+                            "type": "object"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1321,7 +1425,9 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {}
+                        "schema": {
+                            "type": "object"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1509,7 +1615,9 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {}
+                        "schema": {
+                            "type": "object"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1560,7 +1668,9 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {}
+                        "schema": {
+                            "type": "object"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1623,7 +1733,9 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {}
+                        "schema": {
+                            "type": "object"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1723,79 +1835,6 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/response.Resp"
                         }
-                    }
-                }
-            }
-        },
-        "/carts": {
-            "get": {
-                "description": "Retrieve a list of carts based on user ID and filters , if no query is passed , all cart of current user will be returned",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Cart"
-                ],
-                "summary": "List carts",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "default": "\"*\"",
-                        "description": "Access-Control-Allow-Origin",
-                        "name": "Access-Control-Allow-Origin",
-                        "in": "header"
-                    },
-                    {
-                        "type": "string",
-                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU",
-                        "description": "Bearer JWT token",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "default": "6707825d45804caaf8316957",
-                        "description": "User ID",
-                        "name": "x-client-id",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
-                        "description": "Session ID",
-                        "name": "session-id",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "collectionFormat": "csv",
-                        "description": "Cart IDs (optional)",
-                        "name": "ids",
-                        "in": "query"
-                    },
-                    {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "collectionFormat": "csv",
-                        "description": "Shop IDs (optional)",
-                        "name": "shop_ids",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
                     }
                 }
             }
@@ -1965,6 +2004,40 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.GetCartItemResponse": {
+            "type": "object",
+            "properties": {
+                "medias": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.Media_Obj"
+                    }
+                },
+                "price": {
+                    "type": "number"
+                },
+                "product_id": {
+                    "type": "string"
+                },
+                "product_name": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "integer"
+                }
+            }
+        },
+        "http.Media_Obj": {
+            "type": "object",
+            "properties": {
+                "media_id": {
+                    "type": "string"
+                },
+                "url": {
                     "type": "string"
                 }
             }
@@ -2217,6 +2290,43 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "new_refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.getCartResponse": {
+            "type": "object",
+            "properties": {
+                "item": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.getCartResponseItem"
+                    }
+                },
+                "meta": {
+                    "$ref": "#/definitions/internal_cart_delivery_http.listMetaResponse"
+                }
+            }
+        },
+        "http.getCartResponseItem": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "item": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.GetCartItemResponse"
+                    }
+                },
+                "shop_id": {
+                    "type": "string"
+                },
+                "shop_name": {
+                    "type": "string"
+                },
+                "user_id": {
                     "type": "string"
                 }
             }
@@ -2565,6 +2675,26 @@ const docTemplate = `{
                 },
                 "shop_id": {
                     "type": "string"
+                }
+            }
+        },
+        "internal_cart_delivery_http.listMetaResponse": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "current_page": {
+                    "type": "integer"
+                },
+                "per_page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
                 }
             }
         },

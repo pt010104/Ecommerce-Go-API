@@ -25,6 +25,28 @@ definitions:
       name:
         type: string
     type: object
+  http.GetCartItemResponse:
+    properties:
+      medias:
+        items:
+          $ref: '#/definitions/http.Media_Obj'
+        type: array
+      price:
+        type: number
+      product_id:
+        type: string
+      product_name:
+        type: string
+      quantity:
+        type: integer
+    type: object
+  http.Media_Obj:
+    properties:
+      media_id:
+        type: string
+      url:
+        type: string
+    type: object
   http.UpdateCartRequest:
     properties:
       items:
@@ -194,6 +216,30 @@ definitions:
       new_access_token:
         type: string
       new_refresh_token:
+        type: string
+    type: object
+  http.getCartResponse:
+    properties:
+      item:
+        items:
+          $ref: '#/definitions/http.getCartResponseItem'
+        type: array
+      meta:
+        $ref: '#/definitions/internal_cart_delivery_http.listMetaResponse'
+    type: object
+  http.getCartResponseItem:
+    properties:
+      id:
+        type: string
+      item:
+        items:
+          $ref: '#/definitions/http.GetCartItemResponse'
+        type: array
+      shop_id:
+        type: string
+      shop_name:
+        type: string
+      user_id:
         type: string
     type: object
   http.getDetailResp:
@@ -422,6 +468,19 @@ definitions:
       shop_id:
         type: string
     type: object
+  internal_cart_delivery_http.listMetaResponse:
+    properties:
+      count:
+        type: integer
+      current_page:
+        type: integer
+      per_page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
   internal_shop_delivery_http.avatar_obj:
     properties:
       media_id:
@@ -547,6 +606,78 @@ paths:
       summary: Verify shop
       tags:
       - Admin
+  /api/v1/carts:
+    get:
+      consumes:
+      - application/json
+      description: Get shop by ShopIDs, IDs,if no query is passed , all cart of current
+        user will be returned
+      parameters:
+      - default: '"*"'
+        description: Access-Control-Allow-Origin
+        in: header
+        name: Access-Control-Allow-Origin
+        type: string
+      - default: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU
+        description: Bearer JWT token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - default: 6707825d45804caaf8316957
+        description: User ID
+        in: header
+        name: x-client-id
+        required: true
+        type: string
+      - default: zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=
+        description: Session ID
+        in: header
+        name: session-id
+        required: true
+        type: string
+      - collectionFormat: csv
+        description: IDs
+        in: query
+        items:
+          type: string
+        name: ids
+        type: array
+      - collectionFormat: csv
+        description: Shop IDs
+        in: query
+        items:
+          type: string
+        name: shop_ids
+        type: array
+      - default: 1
+        description: Page
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.getCartResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Resp'
+      summary: Get cart
+      tags:
+      - Cart
   /api/v1/media:
     post:
       consumes:
@@ -1373,7 +1504,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -1418,7 +1550,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -1543,7 +1676,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -1577,7 +1711,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -1620,7 +1755,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -1636,58 +1772,6 @@ paths:
       summary: Verify User Account
       tags:
       - User
-  /carts:
-    get:
-      consumes:
-      - application/json
-      description: Retrieve a list of carts based on user ID and filters , if no query
-        is passed , all cart of current user will be returned
-      parameters:
-      - default: '"*"'
-        description: Access-Control-Allow-Origin
-        in: header
-        name: Access-Control-Allow-Origin
-        type: string
-      - default: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU
-        description: Bearer JWT token
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      - default: 6707825d45804caaf8316957
-        description: User ID
-        in: header
-        name: x-client-id
-        required: true
-        type: string
-      - default: zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=
-        description: Session ID
-        in: header
-        name: session-id
-        required: true
-        type: string
-      - collectionFormat: csv
-        description: Cart IDs (optional)
-        in: query
-        items:
-          type: string
-        name: ids
-        type: array
-      - collectionFormat: csv
-        description: Shop IDs (optional)
-        in: query
-        items:
-          type: string
-        name: shop_ids
-        type: array
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-      summary: List carts
-      tags:
-      - Cart
   /carts/add:
     post:
       consumes:

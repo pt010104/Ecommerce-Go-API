@@ -8,7 +8,7 @@ import (
 
 type Handler interface {
 	Update(c *gin.Context)
-	List(c *gin.Context)
+
 	Add(c *gin.Context)
 	Get(c *gin.Context)
 }
