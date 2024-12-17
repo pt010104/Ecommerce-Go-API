@@ -4,5 +4,5 @@ import "github.com/gin-gonic/gin"
 
 func MapPublicRoutes(r *gin.RouterGroup, h Handler) {
 	r.GET("", h.GetProduct)
-	r.GET("/:id", h.Detail)
+	r.GET("/:id", h.DetailProduct)
 }

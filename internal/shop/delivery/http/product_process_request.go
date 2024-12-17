@@ -32,11 +32,7 @@ func (h handler) processCreateProductRequest(c *gin.Context) (models.Scope, crea
 func (h handler) processDetailProductRequest(c *gin.Context) (models.Scope, detailProductReq, error) {
 	ctx := c.Request.Context()
 
-	sc, ok := jwt.GetScopeFromContext(ctx)
-	if !ok {
-		h.l.Errorf(ctx, "shop.http.delivery.hhtp.handler.processRequest: unauthorized")
-		return models.Scope{}, detailProductReq{}, pkgErrors.NewUnauthorizedHTTPError()
-	}
+	sc, _ := jwt.GetScopeFromContext(ctx)
 
 	var req detailProductReq
 	if err := c.ShouldBindUri(&req); err != nil {
