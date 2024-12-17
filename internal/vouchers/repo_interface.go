@@ -9,4 +9,5 @@ import (
 type Repository interface {
 	CreateVoucher(ctx context.Context, sc models.Scope, opt CreateVoucherOption) (models.Voucher, error)
 	DetailVoucher(ctx context.Context, sc models.Scope, code string) (models.Voucher, error)
+	ListVoucher(ctx context.Context, sc models.Scope, opt GetVoucherFilter) ([]models.Voucher, error)
 }

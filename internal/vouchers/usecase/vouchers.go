@@ -6,6 +6,7 @@ import (
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/internal/vouchers"
+	"github.com/pt010104/api-golang/pkg/mongo"
 )
 
 func (uc implUsecase) CreateVoucher(ctx context.Context, sc models.Scope, input vouchers.CreateVoucherInput) (models.Voucher, error) {
@@ -32,7 +33,7 @@ func (uc implUsecase) CreateVoucher(ctx context.Context, sc models.Scope, input 
 		CreatedBy:              sc.UserID,
 	}
 
-	opt.ShopIDs = []string{sc.UserID}
+	opt.ShopIDs = input.ShopIDs
 	opt.Scope = models.ScopeShop
 
 	if role == models.RoleAdmin {
@@ -67,4 +68,30 @@ func (uc implUsecase) CreateVoucher(ctx context.Context, sc models.Scope, input 
 	}
 
 	return v, nil
+}
+func (uc implUsecase) Detail(ctx context.Context, sc models.Scope, id string) (models.Voucher, error) {
+	v, err := uc.repo.DetailVoucher(ctx, sc, id)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return models.Voucher{}, vouchers.ErrVoucherNotFound
+		}
+		uc.l.Errorf(ctx, "vouchers.usecase.Detail.DetailVoucher: %v", err)
+		return models.Voucher{}, err
+
+	}
+	return v, nil
+}
+func (uc implUsecase) List(ctx context.Context, sc models.Scope, opt vouchers.GetVoucherFilter) ([]models.Voucher, error) {
+
+	vouchers1, err := uc.repo.ListVoucher(ctx, sc, opt)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return []models.Voucher{}, vouchers.ErrVoucherNotFound
+		}
+
+		uc.l.Errorf(ctx, "vouchers.usecase.List.ListVoucher: %v", err)
+		return []models.Voucher{}, err
+	}
+	return vouchers1, nil
+
 }

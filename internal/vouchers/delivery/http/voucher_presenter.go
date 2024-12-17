@@ -97,6 +97,119 @@ type detailVoucherResp struct {
 	ApplicableCategorieIDs []string `json:"applicable_category_ids,omitempty"`
 	MinimumOrderAmount     float64  `json:"minimum_order_amount"`
 	MaxDiscountAmount      float64  `json:"max_discount_amount"`
-	ShopIDs                []string `json:"shop_ids"`
 	CreatedAt              string   `json:"created_at"`
+}
+type DetailVoucherReq struct {
+	ID string `uri:"code" binding:"required"`
+}
+
+func (h handler) newDetailResponse(v models.Voucher) detailVoucherResp {
+	return detailVoucherResp{
+		ID:                     v.ID.Hex(),
+		Name:                   v.Name,
+		Code:                   v.Code,
+		ValidFrom:              v.ValidFrom.Format(util.DateTimeFormat),
+		ValidTo:                v.ValidTo.Format(util.DateTimeFormat),
+		DiscountType:           v.DiscountType,
+		DiscountAmount:         v.DiscountAmount,
+		Description:            v.Description,
+		UsageLimit:             v.UsageLimit,
+		ApplicableProductIDs:   mongo.HexFromObjectIDsOrNil(v.ApplicableProductIDs),
+		ApplicableCategorieIDs: mongo.HexFromObjectIDsOrNil(v.ApplicableCategorieIDs),
+		MinimumOrderAmount:     v.MinimumOrderAmount,
+		MaxDiscountAmount:      v.MaxDiscountAmount,
+
+		CreatedAt: v.CreatedAt.Format(util.DateTimeFormat),
+	}
+}
+
+type ListVoucherReq struct {
+	IDs                    []string `form:"ids"`
+	Codes                  []string `form:"codes"`
+	ApplicableProductIDs   []string `form:"applicable_product_ids"`
+	ApplicableCategorieIDs []string `form:"applicable_category_ids"`
+	ShopIDs                []string `form:"shop_ids"`
+	ValidFrom              string   `form:"valid_from"`
+	ValidTo                string   `form:"valid_to"`
+	Scope                  int      `form:"scope"`
+}
+
+type listVoucherResp struct {
+	List []detailVoucherResp `json:"list"`
+}
+
+func (r ListVoucherReq) validate() error {
+	if r.ValidFrom != "" {
+		if _, err := util.StrToDateTime(r.ValidFrom); err != nil {
+			return errWrongBody
+		}
+	}
+	if r.ValidTo != "" {
+		if _, err := util.StrToDateTime(r.ValidTo); err != nil {
+			return errWrongBody
+		}
+	}
+
+	if len(r.IDs) > 0 {
+		for _, id := range r.IDs {
+			if !mongo.IsObjectID(id) {
+				return errWrongBody
+			}
+		}
+	}
+
+	if len(r.Codes) > 0 {
+		for _, code := range r.Codes {
+			if !mongo.IsObjectID(code) {
+				return errWrongBody
+			}
+		}
+	}
+
+	if len(r.ApplicableProductIDs) > 0 {
+		for _, id := range r.ApplicableProductIDs {
+			if !mongo.IsObjectID(id) {
+				return errWrongBody
+			}
+		}
+	}
+
+	if len(r.ApplicableCategorieIDs) > 0 {
+		for _, id := range r.ApplicableCategorieIDs {
+			if !mongo.IsObjectID(id) {
+				return errWrongBody
+			}
+		}
+	}
+
+	if len(r.ShopIDs) > 0 {
+		for _, id := range r.ShopIDs {
+			if !mongo.IsObjectID(id) {
+				return errWrongBody
+			}
+		}
+	}
+
+	return nil
+}
+func (r ListVoucherReq) toInput() vouchers.GetVoucherFilter {
+
+	validTo, _ := util.StrToDateTime(r.ValidTo)
+	validFrom, _ := util.StrToDateTime(r.ValidFrom)
+	return vouchers.GetVoucherFilter{
+		IDs:                    r.IDs,
+		Codes:                  r.Codes,
+		ApplicableProductIDs:   r.ApplicableProductIDs,
+		ApplicableCategorieIDs: r.ApplicableCategorieIDs,
+		ShopIDs:                r.ShopIDs,
+		ValidFrom:              &validFrom,
+		ValidTo:                &validTo,
+	}
+}
+func (h handler) newListResponse(vouchers []models.Voucher) listVoucherResp {
+	var res listVoucherResp
+	for _, v := range vouchers {
+		res.List = append(res.List, h.newDetailResponse(v))
+	}
+	return res
 }

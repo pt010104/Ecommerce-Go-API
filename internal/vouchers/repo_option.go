@@ -1,6 +1,10 @@
 package vouchers
 
-import "time"
+import (
+	"time"
+
+	"github.com/pt010104/api-golang/pkg/paginator"
+)
 
 type CreateVoucherOption struct {
 	Name                   string
@@ -18,4 +22,19 @@ type CreateVoucherOption struct {
 	MaxDiscountAmount      float64
 	Scope                  int
 	CreatedBy              string
+}
+type GetVoucherFilter struct {
+	ValidFrom              *time.Time
+	ValidTo                *time.Time
+	Scope                  int
+	Codes                  []string
+	IDs                    []string
+	ShopIDs                []string
+	ApplicableCategorieIDs []string
+	ApplicableProductIDs   []string
+}
+
+type GetVoucherOption struct {
+	Filter GetVoucherFilter
+	Pag    paginator.Paginator
 }
