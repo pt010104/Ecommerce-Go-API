@@ -9,7 +9,11 @@ import (
 
 func (repo implRepo) buildCategoryQuery(opt admins.GetCategoriesFilter) bson.M {
 	filter := bson.M{}
+	if len(opt.IDs) == 0 || len(opt.Name) == 0 {
 
+		return filter
+
+	}
 	if len(opt.IDs) > 0 {
 		filter["_id"] = bson.M{"$in": mongo.ObjectIDsFromHexOrNil(opt.IDs)}
 	}

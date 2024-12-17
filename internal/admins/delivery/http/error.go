@@ -8,6 +8,7 @@ import (
 var (
 	errNoPermission = pkgErrors.NewHTTPError(130001, "you dont have permision to dothis")
 	errWrongInput   = pkgErrors.NewHTTPError(130002, "category must have name and description")
+	errWrongBody    = pkgErrors.NewHTTPError(130003, "invalid object ID")
 )
 
 func (h handler) mapErrors(e error) error {
@@ -17,7 +18,8 @@ func (h handler) mapErrors(e error) error {
 
 	case admins.ErrNoPermission:
 		return errNoPermission
-
+	case admins.ErrWrongBody:
+		return errWrongBody
 	}
 
 	return e

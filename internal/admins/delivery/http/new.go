@@ -9,6 +9,7 @@ import (
 type Handler interface {
 	CreateCategory(c *gin.Context)
 	VerifyShop(c *gin.Context)
+	ListCategory(c *gin.Context)
 }
 
 type handler struct {

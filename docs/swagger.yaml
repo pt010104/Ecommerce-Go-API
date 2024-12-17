@@ -317,6 +317,13 @@ definitions:
       stock_level:
         type: integer
     type: object
+  http.listCategoryResponse:
+    properties:
+      categories:
+        items:
+          $ref: '#/definitions/http.CategoryResponse'
+        type: array
+    type: object
   http.listProductItem:
     properties:
       avatar:
@@ -527,6 +534,34 @@ definitions:
 info:
   contact: {}
 paths:
+  /api/v1/admin:
+    get:
+      consumes:
+      - application/json
+      description: get cate by name or ids , if both are not present , return all
+        categories
+      parameters:
+      - collectionFormat: csv
+        description: ids
+        in: query
+        items:
+          type: string
+        name: ids
+        type: array
+      - description: name
+        in: query
+        name: name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.listCategoryResponse'
+      summary: get cate by name or ids , if both are not present , return all categories
+      tags:
+      - Admin
   /api/v1/admin/categories:
     post:
       consumes:
@@ -1504,7 +1539,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -1549,7 +1585,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -1674,7 +1711,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -1708,7 +1746,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -1751,7 +1790,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
