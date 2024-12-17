@@ -190,17 +190,22 @@ func (uc implUseCase) GetCart(ctx context.Context, sc models.Scope, opt cart.Get
 		uc.l.Errorf(ctx, "cart.usecase.GetCart: %v", err)
 		return cart.GetCartOutput{}, err
 	}
-
+	var carProductMediaMap = make(map[string][]models.Media)
 	var productItem cart.ProductItem
 	var productItems []cart.ProductItem
 	var getCartItems []cart.GetCartItem
 	var cartProductMap = make(map[string][]string)
 	var cartProductQuantityMap = make(map[string]map[string]int)
+	var cartShopMap = make(map[string]models.Shop)
+	var shopIDs []string
+	//3dimensional array cart id, product id , models.Product
+
 	for _, v := range carts {
+		shopIDs = append(shopIDs, v.ShopID.Hex())
 		for _, item := range v.Items {
 
 			cartProductMap[v.ID.Hex()] = append(cartProductMap[v.ID.Hex()], item.ProductID.Hex())
-			//print product id and quantity
+
 			fmt.Print("cart id : ", v.ID.Hex())
 			fmt.Println(item.ProductID.Hex(), item.Quantity)
 
@@ -208,6 +213,16 @@ func (uc implUseCase) GetCart(ctx context.Context, sc models.Scope, opt cart.Get
 			cartProductQuantityMap[v.ID.Hex()][item.ProductID.Hex()] = item.Quantity
 
 		}
+	}
+	listShops, err := uc.shopUc.ListShop(ctx, models.Scope{}, shop.GetShopsFilter{
+		IDs: shopIDs,
+	})
+	if err != nil {
+		uc.l.Errorf(ctx, "cart.usecase.GetCart: %v", err)
+		return cart.GetCartOutput{}, err
+	}
+	for _, v := range listShops {
+		cartShopMap[v.ID.Hex()] = v
 	}
 	for _, v := range carts {
 		listProducts, err := uc.shopUc.ListProduct(ctx, models.Scope{}, shop.ListProductInput{
@@ -222,14 +237,22 @@ func (uc implUseCase) GetCart(ctx context.Context, sc models.Scope, opt cart.Get
 
 		for _, p := range listProducts.Products {
 			productItem.ProductID = p.P.ID.Hex()
+
 			productItem.Medias = p.Images
+			fmt.Print("product media id : ", productItem.Medias)
 			productItem.Quantity = cartProductQuantityMap[v.ID.Hex()][p.P.ID.Hex()]
 			productItems = append(productItems, productItem)
+			carProductMediaMap[p.P.ID.Hex()] = p.Images
+
+			productItem.ProductName = p.P.Name
+			productItem.Price = p.P.Price
+
 		}
 		getCartItems = append(getCartItems, cart.GetCartItem{
-			Cart: v,
-
-			Products: productItems,
+			Cart:                v,
+			CartProductMediaMap: carProductMediaMap,
+			Products:            productItems,
+			Shop:                cartShopMap[v.ShopID.Hex()],
 		})
 
 	}

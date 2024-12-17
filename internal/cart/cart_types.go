@@ -32,15 +32,19 @@ type UpdateOutput struct {
 	Shops []models.Shop
 }
 type ProductItem struct {
-	ProductID string
-	Medias    []models.Media
-	Quantity  int
+	ProductID   string
+	Medias      []models.Media
+	Quantity    int
+	Price       float32
+	ProductName string
 }
 
 type GetCartItem struct {
-	Products []ProductItem
-
-	Cart models.Cart
+	Products            []ProductItem
+	CartProductMap      map[string]models.Product
+	CartProductMediaMap map[string][]models.Media
+	Cart                models.Cart
+	Shop                models.Shop
 }
 type GetCartOutput struct {
 	CartOutPut []GetCartItem

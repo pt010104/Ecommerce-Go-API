@@ -28,4 +28,5 @@ func MapProductRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) 
 	r.DELETE("", h.DeleteProduct)
 	r.POST("", h.CreateProduct)
 	r.PUT("", h.UpdateProduct)
+
 }

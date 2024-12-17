@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"github.com/pt010104/api-golang/internal/admins"
@@ -131,9 +132,11 @@ func (uc *implUsecase) DetailProduct(ctx context.Context, sc models.Scope, produ
 		defer wg.Done()
 		shop, err := uc.repo.DetailShop(ctx, models.Scope{}, u.ShopID.Hex())
 		if err != nil {
+
 			errCh <- err
 			return
 		}
+		fmt.Print("shop: ", shop)
 		mu.Lock()
 		shopDetail = shop
 		mu.Unlock()
@@ -290,6 +293,22 @@ func (uc implUsecase) ListProduct(ctx context.Context, sc models.Scope, input sh
 		inventoryMap[inv.ID] = inv
 	}
 
+	//map productID to its mediaIDs
+	//map productID to its array of models.Media
+	mediaMap := make(map[string][]models.Media)
+	for _, p := range products {
+		//print mediaIDs
+		fmt.Println("mediaIDs: ", p.MediaIDs)
+		media, er := uc.mediaUC.List(ctx, models.Scope{}, media.ListInput{
+			GetFilter: media.GetFilter{IDs: mongo.HexFromObjectIDsOrNil(p.MediaIDs)},
+		})
+		if er != nil {
+			uc.l.Errorf(ctx, "shop.usecase.ListProduct: %v", er)
+			return shop.ListProductOutput{}, er
+		}
+		mediaMap[p.ID.Hex()] = media
+
+	}
 	var productsOutPut []shop.ProductOutPutItem
 	for _, p := range products {
 		var cates []models.Category
@@ -298,11 +317,13 @@ func (uc implUsecase) ListProduct(ctx context.Context, sc models.Scope, input sh
 				cates = append(cates, cate)
 			}
 		}
-
+		//print mediaIDs
+		fmt.Println("mediaIDs: ", p.MediaIDs)
 		item := shop.ProductOutPutItem{
 			P:         p,
 			Inventory: inventoryMap[p.InventoryID],
 			Cate:      cates,
+			Images:    mediaMap[p.ID.Hex()],
 		}
 
 		productsOutPut = append(productsOutPut, item)

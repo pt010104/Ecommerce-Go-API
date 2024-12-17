@@ -228,15 +228,31 @@ type Media_Obj struct {
 	URL     string `json:"url"`
 }
 type GetCartItemResponse struct {
-	ProductID string      `json:"product_id"`
-	Quantity  int         `json:"quantity"`
-	MediaS    []Media_Obj `json:"medias"`
+	ProductID   string      `json:"product_id"`
+	Quantity    int         `json:"quantity"`
+	MediaS      []Media_Obj `json:"medias"`
+	ProductName string      `json:"product_name"`
+	Price       float32     `json:"price"`
 }
+
+// func from models.media to Media_Obj
+func fromMediaToMediaObj(m []models.Media) []Media_Obj {
+	var mediaObj []Media_Obj
+	for _, v := range m {
+		mediaObj = append(mediaObj, Media_Obj{
+			MediaID: v.ID.Hex(),
+			URL:     v.URL,
+		})
+	}
+	return mediaObj
+}
+
 type getCartResponseItem struct {
-	ID     string                `json:"id"`
-	UserID string                `json:"user_id"`
-	ShopID string                `json:"shop_id"`
-	Item   []GetCartItemResponse `json:"item"`
+	ID       string                `json:"id"`
+	UserID   string                `json:"user_id"`
+	ShopID   string                `json:"shop_id"`
+	Item     []GetCartItemResponse `json:"item"`
+	ShopName string                `json:"shop_name"`
 }
 type getCartResponse struct {
 	Item []getCartResponseItem `json:"item"`
@@ -250,19 +266,27 @@ func (h handler) newGetResponse(carts cart.GetCartOutput) getCartResponse {
 
 	var res getCartResponse
 	var resItem []getCartResponseItem
+
 	for _, cart := range carts.CartOutPut {
+
 		var items []GetCartItemResponse
-		for _, item := range cart.Cart.Items {
+		for _, item := range cart.Products {
 			items = append(items, GetCartItemResponse{
-				ProductID: item.ProductID.Hex(),
-				Quantity:  item.Quantity,
+				ProductID:   item.ProductID,
+				Quantity:    item.Quantity,
+				MediaS:      fromMediaToMediaObj(cart.CartProductMediaMap[item.ProductID]),
+				ProductName: item.ProductName,
+				Price:       item.Price,
 			})
+
 		}
+
 		resItem = append(resItem, getCartResponseItem{
-			ID:     cart.Cart.ID.Hex(),
-			UserID: cart.Cart.UserID.Hex(),
-			ShopID: cart.Cart.ShopID.Hex(),
-			Item:   items,
+			ID:       cart.Cart.ID.Hex(),
+			UserID:   cart.Cart.UserID.Hex(),
+			ShopID:   cart.Cart.ShopID.Hex(),
+			Item:     items,
+			ShopName: cart.Shop.Name,
 		})
 	}
 	res.Item = resItem
