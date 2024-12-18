@@ -84,6 +84,7 @@ func (srv HTTPServer) mapHandlers() error {
 
 	//Public routes
 	shopHTTP.MapPublicRoutes(api.Group("/shops/products"), shopH)
+	adminHTTP.MapPublicRoutes(api.Group("/categories"), adminH)
 
 	return nil
 }

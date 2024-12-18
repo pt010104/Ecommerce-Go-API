@@ -39,23 +39,3 @@ func (h handler) VerifyShop(c *gin.Context) {
 
 	response.OK(c, h.toResList(s))
 }
-
-func (h handler) ListCate(c *gin.Context) {
-	ctx := c.Request.Context()
-
-	req, sc, err := h.processListCategoryRequest(c)
-	if err != nil {
-		h.l.Errorf(ctx, "admins.delivery.http.handler.Create.processCreateRequest: %v", err)
-		response.Error(c, err)
-		return
-	}
-	s, err := h.uc.ListCategories(ctx, sc, req.toInput())
-	if err != nil {
-		h.l.Errorf(ctx, "admins.delivery.http.handler.Create.Create: %v", err)
-		err = h.mapErrors(err)
-		response.Error(c, err)
-		return
-	}
-
-	response.OK(c, s)
-}
