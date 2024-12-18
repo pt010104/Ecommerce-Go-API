@@ -100,7 +100,23 @@ type detailVoucherResp struct {
 	CreatedAt              string   `json:"created_at"`
 }
 type DetailVoucherReq struct {
-	ID string `uri:"code" binding:"required"`
+	ID   string `uri:"id" binding:"required"`
+	Code string `uri:"code" binding:"required"`
+}
+
+func (req DetailVoucherReq) validate() error {
+	if !mongo.IsObjectID(req.ID) {
+		return errWrongBody
+	}
+
+	return nil
+}
+
+func (req DetailVoucherReq) toInput() vouchers.DetailVoucherInput {
+	return vouchers.DetailVoucherInput{
+		ID:   req.ID,
+		Code: req.Code,
+	}
 }
 
 func (h handler) newDetailResponse(v models.Voucher) detailVoucherResp {

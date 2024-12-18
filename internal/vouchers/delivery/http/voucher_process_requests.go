@@ -46,6 +46,11 @@ func (h handler) processDetailVoucherRequest(c *gin.Context) (DetailVoucherReq, 
 		return DetailVoucherReq{}, models.Scope{}, errWrongBody
 	}
 
+	if err := req.validate(); err != nil {
+		h.l.Errorf(ctx, "voucher.delivery.http.handler.processDetailRequest: invalid request %v", err)
+		return DetailVoucherReq{}, models.Scope{}, errWrongBody
+	}
+
 	return req, sc, nil
 
 }

@@ -20,7 +20,9 @@ func (uc implUsecase) validateCreateVoucher(ctx context.Context, input vouchers.
 		return vouchers.ErrInvalidInput
 	}
 
-	v, err := uc.repo.DetailVoucher(ctx, models.Scope{}, input.Code)
+	v, err := uc.repo.DetailVoucher(ctx, models.Scope{}, vouchers.DetailVoucherOption{
+		Code: input.Code,
+	})
 	if err != nil {
 		if err != mongo.ErrNoDocuments {
 			uc.l.Errorf(ctx, "voucher.usecase.CreateVoucher.validateCreateVoucher.DetailVoucher: %v", err)

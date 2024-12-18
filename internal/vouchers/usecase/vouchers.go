@@ -19,23 +19,25 @@ func (uc implUsecase) CreateVoucher(ctx context.Context, sc models.Scope, input 
 	}
 
 	opt := vouchers.CreateVoucherOption{
-		Name:                   input.Name,
-		Code:                   input.Code,
-		Description:            input.Description,
-		ValidFrom:              input.ValidFrom,
-		ValidTo:                input.ValidTo,
-		DiscountType:           input.DiscountType,
-		DiscountAmount:         input.DiscountAmount,
-		MaxDiscountAmount:      input.MaxDiscountAmount,
-		UsageLimit:             input.UsageLimit,
-		MinimumOrderAmount:     input.MinimumOrderAmount,
-		ApplicableProductIDs:   input.ApplicableProductIDs,
-		ApplicableCategorieIDs: input.ApplicableCategorieIDs,
-		CreatedBy:              sc.UserID,
+		Data: vouchers.VoucherData{
+			Name:                   input.Name,
+			Code:                   input.Code,
+			Description:            input.Description,
+			ValidFrom:              input.ValidFrom,
+			ValidTo:                input.ValidTo,
+			DiscountType:           input.DiscountType,
+			DiscountAmount:         input.DiscountAmount,
+			MaxDiscountAmount:      input.MaxDiscountAmount,
+			UsageLimit:             input.UsageLimit,
+			MinimumOrderAmount:     input.MinimumOrderAmount,
+			ApplicableProductIDs:   input.ApplicableProductIDs,
+			ApplicableCategorieIDs: input.ApplicableCategorieIDs,
+			CreatedBy:              sc.UserID,
+		},
 	}
 
-	opt.ShopIDs = []string{sc.ShopID}
-	opt.Scope = models.ScopeShop
+	opt.Data.ShopIDs = []string{sc.ShopID}
+	opt.Data.Scope = models.ScopeShop
 
 	if role == models.RoleAdmin {
 		if len(input.ShopIDs) > 0 {
@@ -56,9 +58,9 @@ func (uc implUsecase) CreateVoucher(ctx context.Context, sc models.Scope, input 
 				return models.Voucher{}, vouchers.ErrShopNotFound
 			}
 
-			opt.ShopIDs = input.ShopIDs
+			opt.Data.ShopIDs = input.ShopIDs
 		} else {
-			opt.Scope = models.ScopeAll
+			opt.Data.Scope = models.ScopeAll
 		}
 	}
 
@@ -71,8 +73,13 @@ func (uc implUsecase) CreateVoucher(ctx context.Context, sc models.Scope, input 
 	return v, nil
 }
 
-func (uc implUsecase) Detail(ctx context.Context, sc models.Scope, id string) (models.Voucher, error) {
-	v, err := uc.repo.DetailVoucher(ctx, sc, id)
+func (uc implUsecase) Detail(ctx context.Context, sc models.Scope, input vouchers.DetailVoucherInput) (models.Voucher, error) {
+	opt := vouchers.DetailVoucherOption{
+		ID:   input.ID,
+		Code: input.Code,
+	}
+
+	v, err := uc.repo.DetailVoucher(ctx, sc, opt)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return models.Voucher{}, vouchers.ErrVoucherNotFound
@@ -100,7 +107,10 @@ func (uc implUsecase) List(ctx context.Context, sc models.Scope, opt vouchers.Ge
 }
 
 func (uc implUsecase) ApplyVoucher(ctx context.Context, sc models.Scope, input vouchers.ApplyVoucherInput) (models.Voucher, error) {
-	voucher, err := uc.repo.DetailVoucher(ctx, sc, input.Code)
+	voucher, err := uc.repo.DetailVoucher(ctx, sc, vouchers.DetailVoucherOption{
+		ID:   input.ID,
+		Code: input.Code,
+	})
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return models.Voucher{}, vouchers.ErrVoucherNotFound
@@ -122,10 +132,13 @@ func (uc implUsecase) ApplyVoucher(ctx context.Context, sc models.Scope, input v
 	}
 
 	voucher.UsedCount++
-	_, err = uc.repo.UpdateVoucher(ctx, sc, vouchers.UpdateVoucherOption{
-		ID:        voucher.ID.Hex(),
-		UsedCount: voucher.UsedCount,
+	nv, err := uc.repo.UpdateVoucher(ctx, sc, vouchers.UpdateVoucherOption{
+		Model: voucher,
 	})
+	if err != nil {
+		uc.l.Errorf(ctx, "vouchers.usecase.ApplyVoucher.UpdateVoucher: %v", err)
+		return models.Voucher{}, err
+	}
 
-	return voucher, nil
+	return nv, nil
 }

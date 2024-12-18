@@ -33,7 +33,7 @@ func (h handler) DetailVoucher(c *gin.Context) {
 		response.Error(c, err)
 		return
 	}
-	u, err := h.uc.Detail(ctx, sc, req.ID)
+	u, err := h.uc.Detail(ctx, sc, req.toInput())
 	if err != nil {
 		h.l.Errorf(ctx, "category.delivery.http.handler.Create.Create: %v", err)
 		err = h.mapErrors(err)

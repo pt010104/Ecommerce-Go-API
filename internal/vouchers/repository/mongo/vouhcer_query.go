@@ -11,10 +11,14 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func (repo implRepo) buildVoucherDetailQuery(ctx context.Context, sc models.Scope, code string) bson.M {
+func (repo implRepo) buildVoucherDetailQuery(ctx context.Context, sc models.Scope, opt vouchers.DetailVoucherOption) bson.M {
 	filter := bson.M{}
 
-	filter["code"] = code
+	filter["_id"] = mongo.ObjectIDFromHexOrNil(opt.ID)
+
+	if opt.Code != "" {
+		filter["code"] = opt.Code
+	}
 
 	return filter
 

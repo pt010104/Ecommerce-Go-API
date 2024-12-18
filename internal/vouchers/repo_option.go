@@ -7,7 +7,7 @@ import (
 	"github.com/pt010104/api-golang/pkg/paginator"
 )
 
-type CreateVoucherOption struct {
+type VoucherData struct {
 	Name                   string
 	ShopIDs                []string
 	Description            string
@@ -23,6 +23,11 @@ type CreateVoucherOption struct {
 	MaxDiscountAmount      float64
 	Scope                  int
 	CreatedBy              string
+	UsedCount              int
+}
+
+type CreateVoucherOption struct {
+	Data VoucherData
 }
 type GetVoucherFilter struct {
 	ValidFrom              *time.Time
@@ -39,22 +44,13 @@ type GetVoucherOption struct {
 	Filter GetVoucherFilter
 	Pag    paginator.Paginator
 }
+
 type UpdateVoucherOption struct {
-	Name                   string
-	ID                     string
-	ShopIDs                []string
-	Description            string
-	Code                   string
-	ValidFrom              time.Time
-	ValidTo                time.Time
-	UsageLimit             uint
-	ApplicableProductIDs   []string
-	ApplicableCategorieIDs []string
-	MinimumOrderAmount     float64
-	DiscountType           string
-	DiscountAmount         float64
-	MaxDiscountAmount      float64
-	Scope                  int
-	UsedCount              int
-	Model                  models.Voucher
+	Model models.Voucher
+	Data  VoucherData
+}
+
+type DetailVoucherOption struct {
+	ID   string
+	Code string
 }
