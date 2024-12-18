@@ -1,6 +1,8 @@
 package http
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
@@ -270,7 +272,9 @@ func (h handler) GetAll(c *gin.Context) {
 		response.Error(c, err)
 		return
 	}
+	//print req
 
+	fmt.Print("REQ ", req)
 	var pagQuery paginator.PaginatorQuery
 	if err := c.ShouldBindQuery(&pagQuery); err != nil {
 		h.l.Errorf(ctx, "shop.delivery.http.Get.ShouldBindQuery: %v", err)

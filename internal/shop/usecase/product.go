@@ -501,7 +501,9 @@ func (uc implUsecase) GetAll(ctx context.Context, sc models.Scope, input shop.Ge
 		wgErr       error
 	)
 
+	fmt.Print("input: ", input)
 	opt := shop.GetProductOption{
+
 		GetProductFilter: input.GetProductFilter,
 		PagQuery:         input.PagQuery,
 	}

@@ -395,8 +395,8 @@ type inventoryResp struct {
 }
 
 type getAllProductsRequest struct {
-	IDs     []string `form:"ids[]" json:"ids"`
-	CateIDs []string `form:"cate_ids[]" json:"category_ids"`
+	IDs     []string `form:"ids" `
+	CateIDs []string `form:"category_ids"`
 	Search  string   `form:"search" json:"search"`
 }
 type getAllProductsResp struct {
@@ -420,6 +420,9 @@ func (r getAllProductsRequest) validate() error {
 	return nil
 }
 func (r getAllProductsRequest) toInput() shop.GetProductFilter {
+	//print cate
+
+	fmt.Println(r.CateIDs)
 	return shop.GetProductFilter{
 		IDs:     r.IDs,
 		CateIDs: r.CateIDs,
