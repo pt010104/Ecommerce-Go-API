@@ -23,6 +23,7 @@ type Voucher struct {
 	UsedCount              int                  `bson:"used_count"`
 	CreatedBy              primitive.ObjectID   `bson:"created_by"`
 	Scope                  int                  `bson:"scope"` // 0: all, 1: shop
+	ShopIDs                []primitive.ObjectID `bson:"shop_ids,omitempty"`
 	CreatedAt              time.Time            `bson:"created_at"`
 	UpdatedAt              time.Time            `bson:"updated_at"`
 }

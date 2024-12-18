@@ -9,7 +9,6 @@ import (
 	"github.com/pt010104/api-golang/internal/vouchers"
 	"github.com/pt010104/api-golang/pkg/mongo"
 	"go.mongodb.org/mongo-driver/bson"
-	//import "go.mongodb.org/mongo-driver/mongo" as mongo1
 
 	mongo1 "go.mongodb.org/mongo-driver/mongo"
 )

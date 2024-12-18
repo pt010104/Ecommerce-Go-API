@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/pt010104/api-golang/internal/models"
+	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/pkg/mongo"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
@@ -30,13 +31,21 @@ func (uc implUsecase) validateCreateVoucher(ctx context.Context, input vouchers.
 		return vouchers.ErrExistCode
 	}
 
-	// if len(input.ApplicableProductIDs) > 0 {
-	// 	producsts, err := uc.shopUc.ListProducts(ctx, input.ApplicableProductIDs)
-	// }
+	if len(input.ApplicableProductIDs) > 0 {
+		productOutput, err := uc.shopUc.ListProduct(ctx, models.Scope{}, shop.ListProductInput{
+			GetProductFilter: shop.GetProductFilter{
+				IDs: input.ApplicableProductIDs,
+			},
+		})
+		if err != nil {
+			uc.l.Errorf(ctx, "voucher.usecase.CreateVoucher.validateCreateVoucher.ListProduct: %v", err)
+			return err
+		}
 
-	// if len(input.ApplicableCategorieIDs) > 0 {
-	// 	categories, err := uc.shopUc.ListCategories(ctx, input.ApplicableCategorieIDs)
-	// }
+		if len(productOutput.Products) != len(input.ApplicableProductIDs) {
+			return vouchers.ErrInvalidInput
+		}
+	}
 
 	if input.DiscountType != models.DiscountTypePercent && input.DiscountType != models.DiscountTypeFixed {
 		return vouchers.ErrInvalidInput

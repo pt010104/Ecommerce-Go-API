@@ -34,7 +34,7 @@ func (uc implUsecase) CreateVoucher(ctx context.Context, sc models.Scope, input 
 		CreatedBy:              sc.UserID,
 	}
 
-	opt.ShopIDs = input.ShopIDs
+	opt.ShopIDs = []string{sc.ShopID}
 	opt.Scope = models.ScopeShop
 
 	if role == models.RoleAdmin {
@@ -70,6 +70,7 @@ func (uc implUsecase) CreateVoucher(ctx context.Context, sc models.Scope, input 
 
 	return v, nil
 }
+
 func (uc implUsecase) Detail(ctx context.Context, sc models.Scope, id string) (models.Voucher, error) {
 	v, err := uc.repo.DetailVoucher(ctx, sc, id)
 	if err != nil {
@@ -82,6 +83,7 @@ func (uc implUsecase) Detail(ctx context.Context, sc models.Scope, id string) (m
 	}
 	return v, nil
 }
+
 func (uc implUsecase) List(ctx context.Context, sc models.Scope, opt vouchers.GetVoucherFilter) ([]models.Voucher, error) {
 
 	vouchers1, err := uc.repo.ListVoucher(ctx, sc, opt)
@@ -96,6 +98,7 @@ func (uc implUsecase) List(ctx context.Context, sc models.Scope, opt vouchers.Ge
 	return vouchers1, nil
 
 }
+
 func (uc implUsecase) ApplyVoucher(ctx context.Context, sc models.Scope, input vouchers.ApplyVoucherInput) (models.Voucher, error) {
 	voucher, err := uc.repo.DetailVoucher(ctx, sc, input.Code)
 	if err != nil {
