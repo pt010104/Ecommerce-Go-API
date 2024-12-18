@@ -36,7 +36,7 @@ func (h handler) CreateCategory(c *gin.Context) {
 }
 
 // @Summary get cate by name or ids , if both are not present , return all categories
-// @Tags Admin
+// @Tags categories
 // @Description get cate by name or ids , if both are not present , return all categories
 // @Accept json
 // @Produce json

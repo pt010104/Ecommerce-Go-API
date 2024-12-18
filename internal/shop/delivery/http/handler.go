@@ -270,10 +270,10 @@ func (h handler) GetShopIDByUserID(c *gin.Context) {
 // @Tags			Shop
 // @Accept			json
 // @Produce		json
-// @Success		200	{object}	getAllResp
+// @Success		200	{object}	getAllProductsResp
 // @Failure		400	{object}	response.Resp	"Bad Request"
 // @Failure		500	{object}	response.Resp	"Internal Server Error"
-// @Router			/api/v1/shops/all [GET]
+// @Router			/api/v1/shops/products/all [GET]
 func (h handler) GetAll(c *gin.Context) {
 	ctx := c.Request.Context()
 

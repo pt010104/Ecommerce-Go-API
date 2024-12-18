@@ -4,47 +4,6 @@
         "contact": {}
     },
     "paths": {
-        "/api/v1/admin": {
-            "get": {
-                "description": "get cate by name or ids , if both are not present , return all categories",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Admin"
-                ],
-                "summary": "get cate by name or ids , if both are not present , return all categories",
-                "parameters": [
-                    {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "collectionFormat": "csv",
-                        "description": "ids",
-                        "name": "ids",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "name",
-                        "name": "name",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/http.listCategoryResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/api/v1/admin/categories": {
             "post": {
                 "description": "Create a new category",
@@ -259,6 +218,47 @@
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/categories": {
+            "get": {
+                "description": "get cate by name or ids , if both are not present , return all categories",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "categories"
+                ],
+                "summary": "get cate by name or ids , if both are not present , return all categories",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "ids",
+                        "name": "ids",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "name",
+                        "name": "name",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.listCategoryResponse"
                         }
                     }
                 }
@@ -803,6 +803,41 @@
                         "description": "Shop ID",
                         "schema": {
                             "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/shops/products/all": {
+            "get": {
+                "description": "Get all products",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Shop"
+                ],
+                "summary": "Get all products",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.getAllProductsResp"
                         }
                     },
                     "400": {
@@ -2169,6 +2204,17 @@
                 }
             }
         },
+        "http.categoryResp": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "http.createCategoryReq": {
             "type": "object",
             "required": [
@@ -2311,6 +2357,49 @@
                 },
                 "new_refresh_token": {
                     "type": "string"
+                }
+            }
+        },
+        "http.getAllProductsResp": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.getAllProductsRespItem"
+                    }
+                },
+                "meta": {
+                    "$ref": "#/definitions/internal_shop_delivery_http.listMetaResponse"
+                }
+            }
+        },
+        "http.getAllProductsRespItem": {
+            "type": "object",
+            "properties": {
+                "categories": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.categoryResp"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "images": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.mediaResp"
+                    }
+                },
+                "inventory": {
+                    "$ref": "#/definitions/http.inventoryResp"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "shop": {
+                    "$ref": "#/definitions/http.shopResp"
                 }
             }
         },
@@ -2466,6 +2555,14 @@
                 }
             }
         },
+        "http.inventoryResp": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
         "http.listCategoryResponse": {
             "type": "object",
             "properties": {
@@ -2509,6 +2606,17 @@
                 }
             }
         },
+        "http.mediaResp": {
+            "type": "object",
+            "properties": {
+                "media_id": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
         "http.productResponse": {
             "type": "object",
             "properties": {
@@ -2544,6 +2652,29 @@
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.shopResp": {
+            "type": "object",
+            "properties": {
+                "city": {
+                    "type": "string"
+                },
+                "district": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "street": {
                     "type": "string"
                 }
             }
