@@ -119,3 +119,20 @@ func (h handler) processUpdateProductRequest(c *gin.Context) (models.Scope, Upda
 	return sc, req, nil
 
 }
+func (h handler) processGetAllRequest(c *gin.Context) (models.Scope, getAllProductsRequest, error) {
+	ctx := c.Request.Context()
+
+	var req getAllProductsRequest
+	if err := c.ShouldBindQuery(&req); err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.handler.processGetRequest: invalid request")
+		return models.Scope{}, req, errWrongQuery
+	}
+
+	if err := req.validate(); err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.handler.processGetRequest: invalid request")
+		return models.Scope{}, req, errWrongBody
+	}
+
+	return models.Scope{}, req, nil
+
+}

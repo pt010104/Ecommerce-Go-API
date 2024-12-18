@@ -32,4 +32,5 @@ type UseCase interface {
 	SetAdminUC(adminUC admins.UseCase)
 	GetProduct(ctx context.Context, sc models.Scope, input GetProductInput) (output GetProductOutput, e error)
 	UpdateProduct(ctx context.Context, sc models.Scope, input UpdateProductOption) (models.Product, error)
+	GetAll(ctx context.Context, sc models.Scope, input GetProductOption) (GetAllProductOutput, error)
 }

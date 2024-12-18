@@ -361,3 +361,119 @@ func (h handler) newUpdateProductResponse(p models.Product) updateProductResp {
 	}
 
 }
+
+type getAllProductsRespItem struct {
+	ID         string         `json:"id"`
+	Name       string         `json:"name"`
+	Categories []categoryResp `json:"categories,omitempty"`
+	Images     []mediaResp    `json:"images,omitempty"`
+	Shop       shopResp       `json:"shop"`
+	Inventory  inventoryResp  `json:"inventory"`
+}
+
+type categoryResp struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+type mediaResp struct {
+	MediaID string `json:"media_id"`
+	URL     string `json:"url"`
+}
+
+type shopResp struct {
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	Phone    string `json:"phone"`
+	City     string `json:"city"`
+	Street   string `json:"street"`
+	District string `json:"district"`
+}
+
+type inventoryResp struct {
+	ID string `json:"id"`
+}
+
+type getAllProductsRequest struct {
+	IDs     []string `form:"ids[]" json:"ids"`
+	CateIDs []string `form:"cate_ids[]" json:"category_ids"`
+	Search  string   `form:"search" json:"search"`
+}
+type getAllProductsResp struct {
+	Meta  listMetaResponse         `json:"meta"`
+	Items []getAllProductsRespItem `json:"items"`
+}
+
+func (r getAllProductsRequest) validate() error {
+	// Validate IDs if needed
+	for _, id := range r.IDs {
+		if !mongo.IsObjectID(id) {
+			return errWrongBody
+		}
+	}
+	for _, id := range r.CateIDs {
+		if !mongo.IsObjectID(id) {
+			return errWrongBody
+		}
+	}
+
+	return nil
+}
+func (r getAllProductsRequest) toInput() shop.GetProductFilter {
+	return shop.GetProductFilter{
+		IDs:     r.IDs,
+		CateIDs: r.CateIDs,
+		Search:  r.Search,
+	}
+
+}
+func (h handler) newGetAllProductsResp(output shop.GetAllProductOutput) getAllProductsResp {
+	var items []getAllProductsRespItem
+	for _, p := range output.Products {
+		var categories []categoryResp
+		for _, c := range p.Cate {
+			categories = append(categories, categoryResp{
+				ID:   c.ID.Hex(),
+				Name: c.Name,
+			})
+		}
+
+		var images []mediaResp
+		for _, m := range p.Images {
+			images = append(images, mediaResp{
+				MediaID: m.ID.Hex(),
+				URL:     m.URL,
+			})
+		}
+
+		shopItem := shopResp{
+			ID:       p.Shop.ID.Hex(),
+			Name:     p.Shop.Name,
+			Phone:    p.Shop.Phone,
+			City:     p.Shop.City,
+			Street:   p.Shop.Street,
+			District: p.Shop.District,
+		}
+
+		invItem := inventoryResp{
+			ID: p.Inventory.ID.Hex(),
+		}
+
+		item := getAllProductsRespItem{
+			ID:         p.P.ID.Hex(),
+			Name:       p.P.Name,
+			Categories: categories,
+			Images:     images,
+			Shop:       shopItem,
+			Inventory:  invItem,
+		}
+		items = append(items, item)
+	}
+
+	return getAllProductsResp{
+		Meta: listMetaResponse{
+			PaginatorResponse: output.Pag.ToResponse(),
+		},
+		Items: items,
+	}
+}

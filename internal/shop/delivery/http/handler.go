@@ -261,3 +261,34 @@ func (h handler) GetShopIDByUserID(c *gin.Context) {
 
 	response.OK(c, shopID)
 }
+func (h handler) GetAll(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	sc, req, err := h.processGetAllRequest(c)
+	if err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.GetAll: %v", err)
+		response.Error(c, err)
+		return
+	}
+
+	var pagQuery paginator.PaginatorQuery
+	if err := c.ShouldBindQuery(&pagQuery); err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.Get.ShouldBindQuery: %v", err)
+		response.Error(c, errWrongPaginationQuery)
+		return
+	}
+
+	pagQuery.Adjust()
+
+	p, err := h.uc.GetAll(ctx, sc, shop.GetProductOption{
+		PagQuery:         pagQuery,
+		GetProductFilter: req.toInput()})
+	if err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.GetAll: %v", err)
+		err := h.mapErrors(err)
+		response.Error(c, err)
+		return
+	}
+
+	response.OK(c, h.newGetAllProductsResp(p))
+}

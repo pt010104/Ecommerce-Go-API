@@ -57,3 +57,14 @@ type UpdateProductInput struct {
 	CategoryID      []string
 	MediaIDs        []string
 }
+type GetAllProductItem struct {
+	P         models.Product
+	Inventory models.Inventory
+	Cate      []models.Category
+	Images    []models.Media
+	Shop      models.Shop
+}
+type GetAllProductOutput struct {
+	Products []GetAllProductItem
+	Pag      paginator.Paginator
+}

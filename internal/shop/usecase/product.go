@@ -490,6 +490,155 @@ func (uc implUsecase) GetProduct(ctx context.Context, sc models.Scope, input sho
 	}, nil
 }
 
+func (uc implUsecase) GetAll(ctx context.Context, sc models.Scope, input shop.GetProductOption) (shop.GetAllProductOutput, error) {
+	var (
+		s           []models.Product
+		pag         paginator.Paginator
+		categories  []models.Category
+		inventories []models.Inventory
+		shops       []models.Shop
+		wg          sync.WaitGroup
+		wgErr       error
+	)
+
+	opt := shop.GetProductOption{
+		GetProductFilter: input.GetProductFilter,
+		PagQuery:         input.PagQuery,
+	}
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var err error
+		s, pag, err = uc.repo.GetProduct(ctx, models.Scope{}, opt)
+		if err != nil {
+			uc.l.Errorf(ctx, "shop.usecase.GetAll.repo.GetProduct: %v", err)
+			wgErr = err
+			return
+		}
+	}()
+
+	wg.Wait()
+	if wgErr != nil {
+		return shop.GetAllProductOutput{}, wgErr
+	}
+
+	var inventoryIDs []string
+	categoryIDSet := make(map[string]struct{})
+	shopIDSet := make(map[primitive.ObjectID]struct{})
+
+	for _, p := range s {
+		inventoryIDs = append(inventoryIDs, p.InventoryID.Hex())
+		for _, catID := range p.CategoryID {
+			categoryIDSet[catID.Hex()] = struct{}{}
+		}
+		shopIDSet[p.ShopID] = struct{}{}
+	}
+
+	var categoryIDs []string
+	for id := range categoryIDSet {
+		categoryIDs = append(categoryIDs, id)
+	}
+
+	var shopIDs []primitive.ObjectID
+	for sid := range shopIDSet {
+		shopIDs = append(shopIDs, sid)
+	}
+
+	wg.Add(3)
+	go func() {
+		defer wg.Done()
+		var err error
+		categories, err = uc.adminUC.ListCategories(ctx, models.Scope{}, admins.GetCategoriesFilter{
+			IDs: categoryIDs,
+		})
+		if err != nil {
+			uc.l.Errorf(ctx, "shop.usecase.GetAll.adminUC.ListCategories: %v", err)
+			wgErr = err
+			return
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		var err error
+		inventoryIDs = util.RemoveDuplicates(inventoryIDs)
+		inventories, err = uc.repo.ListInventory(ctx, models.Scope{}, mongo.ObjectIDsFromHexOrNil(inventoryIDs))
+		if err != nil {
+			uc.l.Errorf(ctx, "shop.usecase.GetAll.repo.ListInventory: %v", err)
+			wgErr = err
+			return
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		var err error
+		// Assuming there's a method to get multiple shops by their IDs
+		shops, err = uc.repo.ListShop(ctx, models.Scope{}, shop.GetShopsFilter{
+			IDs: mongo.HexFromObjectIDsOrNil(shopIDs),
+		})
+		if err != nil {
+			uc.l.Errorf(ctx, "shop.usecase.GetAll.repo.ListShops: %v", err)
+			wgErr = err
+			return
+		}
+	}()
+
+	wg.Wait()
+	if wgErr != nil {
+		return shop.GetAllProductOutput{}, wgErr
+	}
+
+	categoryMap := make(map[string]models.Category)
+	for _, cate := range categories {
+		categoryMap[cate.ID.Hex()] = cate
+	}
+
+	inventoryMap := make(map[primitive.ObjectID]models.Inventory)
+	for _, inv := range inventories {
+		inventoryMap[inv.ID] = inv
+	}
+
+	shopMap := make(map[primitive.ObjectID]models.Shop)
+	for _, sh := range shops {
+		shopMap[sh.ID] = sh
+	}
+
+	var list []shop.GetAllProductItem
+
+	for _, p := range s {
+		var cates []models.Category
+		for _, catID := range p.CategoryID {
+			if cate, ok := categoryMap[catID.Hex()]; ok {
+				cates = append(cates, cate)
+			}
+		}
+
+		avatar, err := uc.mediaUC.List(ctx, models.Scope{}, media.ListInput{
+			GetFilter: media.GetFilter{IDs: mongo.HexFromObjectIDsOrNil(p.MediaIDs)},
+		})
+		if err != nil {
+			uc.l.Errorf(ctx, "shop.usecase.GetAll: %v", err)
+			return shop.GetAllProductOutput{}, err
+		}
+
+		item := shop.GetAllProductItem{
+			P:         p,
+			Inventory: inventoryMap[p.InventoryID],
+			Cate:      cates,
+			Images:    avatar,
+			Shop:      shopMap[p.ShopID],
+		}
+		list = append(list, item)
+	}
+
+	return shop.GetAllProductOutput{
+		Products: list,
+		Pag:      pag,
+	}, nil
+}
+
 func (uc implUsecase) UpdateProduct(ctx context.Context, sc models.Scope, input shop.UpdateProductOption) (models.Product, error) {
 	shop1, err := uc.repo.DetailShop(ctx, models.Scope{}, sc.ShopID)
 	if err != nil {
