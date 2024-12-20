@@ -2068,7 +2068,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/vouchers/{id}": {
+        "/api/v1/vouchers/{code}": {
             "get": {
                 "description": "Get details of a specific voucher",
                 "consumes": [
@@ -2115,8 +2115,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Voucher ID",
-                        "name": "id",
+                        "description": "Voucher code",
+                        "name": "code",
                         "in": "path",
                         "required": true
                     }

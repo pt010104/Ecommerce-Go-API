@@ -2042,7 +2042,7 @@ paths:
       summary: Create a voucher
       tags:
       - Voucher
-  /api/v1/vouchers/{id}:
+  /api/v1/vouchers/{code}:
     get:
       consumes:
       - application/json
@@ -2071,9 +2071,9 @@ paths:
         name: session-id
         required: true
         type: string
-      - description: Voucher ID
+      - description: Voucher code
         in: path
-        name: id
+        name: code
         required: true
         type: string
       produces:
