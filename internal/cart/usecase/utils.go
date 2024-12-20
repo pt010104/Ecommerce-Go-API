@@ -7,6 +7,7 @@ import (
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/pkg/mongo"
+	"github.com/pt010104/api-golang/pkg/util"
 )
 
 func (uc implUseCase) validateCartItem(ctx context.Context, sc models.Scope, input []cart.CartItemInput) error {
@@ -73,6 +74,8 @@ func (uc implUseCase) getDataCartItems(ctx context.Context, sc models.Scope, inp
 	for _, product := range productOutput.Products {
 		shopIDs = append(shopIDs, product.P.ShopID.Hex())
 	}
+
+	shopIDs = util.RemoveDuplicates(shopIDs)
 
 	shops, err := uc.shopUc.ListShop(ctx, sc, shop.GetShopsFilter{
 		IDs: shopIDs,
