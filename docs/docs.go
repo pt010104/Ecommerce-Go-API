@@ -232,6 +232,131 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "patch": {
+                "description": "Update an existing cart with new product details , pass all the item in the cart , once the update api is called , the cart will be replaced with the new items",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Update a cart",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU",
+                        "description": "Bearer JWT token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "6707825d45804caaf8316957",
+                        "description": "User ID",
+                        "name": "x-client-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
+                        "description": "Session ID",
+                        "name": "session-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Cart update request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.UpdateCartRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/http.updateCartResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/carts/add": {
+            "post": {
+                "description": "ADD a product to user cart . Auto group by shop ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Add a cart",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU",
+                        "description": "Bearer JWT token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "6707825d45804caaf8316957",
+                        "description": "User ID",
+                        "name": "x-client-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
+                        "description": "Session ID",
+                        "name": "session-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Add to cart request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.addToCartRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
             }
         },
         "/api/v1/categories": {
@@ -2138,133 +2263,6 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/response.Resp"
-                        }
-                    }
-                }
-            }
-        },
-        "/carts/add": {
-            "post": {
-                "description": "ADD a product to user cart . Auto group by shop ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Cart"
-                ],
-                "summary": "Add a cart",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "default": "\"*\"",
-                        "description": "Access-Control-Allow-Origin",
-                        "name": "Access-Control-Allow-Origin",
-                        "in": "header"
-                    },
-                    {
-                        "type": "string",
-                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU",
-                        "description": "Bearer JWT token",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "default": "6707825d45804caaf8316957",
-                        "description": "User ID",
-                        "name": "x-client-id",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
-                        "description": "Session ID",
-                        "name": "session-id",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "description": "Add to cart request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/http.addToCartRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            }
-        },
-        "/carts/update-cart": {
-            "post": {
-                "description": "Update an existing cart with new product details , pass all the item in the cart , once the update api is called , the cart will be replaced with the new items",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Cart"
-                ],
-                "summary": "Update a cart",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "default": "\"*\"",
-                        "description": "Access-Control-Allow-Origin",
-                        "name": "Access-Control-Allow-Origin",
-                        "in": "header"
-                    },
-                    {
-                        "type": "string",
-                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU",
-                        "description": "Bearer JWT token",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "default": "6707825d45804caaf8316957",
-                        "description": "User ID",
-                        "name": "x-client-id",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
-                        "description": "Session ID",
-                        "name": "session-id",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "description": "Cart update request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/http.UpdateCartRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/http.updateCartResponse"
                         }
                     }
                 }

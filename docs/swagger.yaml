@@ -789,6 +789,95 @@ paths:
       summary: Get cart
       tags:
       - Cart
+    patch:
+      consumes:
+      - application/json
+      description: Update an existing cart with new product details , pass all the
+        item in the cart , once the update api is called , the cart will be replaced
+        with the new items
+      parameters:
+      - default: '"*"'
+        description: Access-Control-Allow-Origin
+        in: header
+        name: Access-Control-Allow-Origin
+        type: string
+      - default: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU
+        description: Bearer JWT token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - default: 6707825d45804caaf8316957
+        description: User ID
+        in: header
+        name: x-client-id
+        required: true
+        type: string
+      - default: zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=
+        description: Session ID
+        in: header
+        name: session-id
+        required: true
+        type: string
+      - description: Cart update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/http.UpdateCartRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.updateCartResponse'
+      summary: Update a cart
+      tags:
+      - Cart
+  /api/v1/carts/add:
+    post:
+      consumes:
+      - application/json
+      description: ADD a product to user cart . Auto group by shop ID
+      parameters:
+      - default: '"*"'
+        description: Access-Control-Allow-Origin
+        in: header
+        name: Access-Control-Allow-Origin
+        type: string
+      - default: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU
+        description: Bearer JWT token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - default: 6707825d45804caaf8316957
+        description: User ID
+        in: header
+        name: x-client-id
+        required: true
+        type: string
+      - default: zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=
+        description: Session ID
+        in: header
+        name: session-id
+        required: true
+        type: string
+      - description: Add to cart request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/http.addToCartRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Add a cart
+      tags:
+      - Cart
   /api/v1/categories:
     get:
       consumes:
@@ -2094,94 +2183,4 @@ paths:
       summary: Get voucher details
       tags:
       - Voucher
-  /carts/add:
-    post:
-      consumes:
-      - application/json
-      description: ADD a product to user cart . Auto group by shop ID
-      parameters:
-      - default: '"*"'
-        description: Access-Control-Allow-Origin
-        in: header
-        name: Access-Control-Allow-Origin
-        type: string
-      - default: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU
-        description: Bearer JWT token
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      - default: 6707825d45804caaf8316957
-        description: User ID
-        in: header
-        name: x-client-id
-        required: true
-        type: string
-      - default: zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=
-        description: Session ID
-        in: header
-        name: session-id
-        required: true
-        type: string
-      - description: Add to cart request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/http.addToCartRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-      summary: Add a cart
-      tags:
-      - Cart
-  /carts/update-cart:
-    post:
-      consumes:
-      - application/json
-      description: Update an existing cart with new product details , pass all the
-        item in the cart , once the update api is called , the cart will be replaced
-        with the new items
-      parameters:
-      - default: '"*"'
-        description: Access-Control-Allow-Origin
-        in: header
-        name: Access-Control-Allow-Origin
-        type: string
-      - default: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU
-        description: Bearer JWT token
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      - default: 6707825d45804caaf8316957
-        description: User ID
-        in: header
-        name: x-client-id
-        required: true
-        type: string
-      - default: zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=
-        description: Session ID
-        in: header
-        name: session-id
-        required: true
-        type: string
-      - description: Cart update request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/http.UpdateCartRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/http.updateCartResponse'
-      summary: Update a cart
-      tags:
-      - Cart
 swagger: "2.0"

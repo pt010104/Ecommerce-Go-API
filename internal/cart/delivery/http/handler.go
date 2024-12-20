@@ -17,7 +17,7 @@ import (
 // @Param			session-id					header		string		true	"Session ID"					default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
 // @Param request body UpdateCartRequest true "Cart update request"
 // @Success 200 {object} updateCartResponse
-// @Router /carts/update-cart [post]
+// @Router /api/v1/carts [PATCH]
 func (h handler) Update(c *gin.Context) {
 	ctx := c.Request.Context()
 
@@ -50,7 +50,7 @@ func (h handler) Update(c *gin.Context) {
 // @Param			session-id					header		string		true	"Session ID"					default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
 // @Param request body addToCartRequest  true "Add to cart request"
 // @Success 200
-// @Router /carts/add [post]
+// @Router /api/v1/carts/add [post]
 func (h handler) Add(c *gin.Context) {
 	ctx := c.Request.Context()
 
@@ -89,7 +89,7 @@ func (h handler) Add(c *gin.Context) {
 // @Success		200							{object}	getCartResponse
 // @Failure		400							{object}	response.Resp	"Bad Request"
 // @Failure		500							{object}	response.Resp	"Internal Server Error"
-// @Router			/api/v1/carts [GET]
+// @Router /api/v1/carts [GET]
 func (h handler) Get(c *gin.Context) {
 	ctx := c.Request.Context()
 	var pagQuery paginator.PaginatorQuery
