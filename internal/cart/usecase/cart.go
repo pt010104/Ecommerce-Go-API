@@ -183,6 +183,7 @@ func (uc implUseCase) Add(ctx context.Context, sc models.Scope, input cart.Creat
 
 	return nil
 }
+
 func (uc implUseCase) GetCart(ctx context.Context, sc models.Scope, opt cart.GetOption) (cart.GetCartOutput, error) {
 
 	carts, pag, err := uc.repo.GetCart(ctx, sc, opt)
@@ -190,30 +191,22 @@ func (uc implUseCase) GetCart(ctx context.Context, sc models.Scope, opt cart.Get
 		uc.l.Errorf(ctx, "cart.usecase.GetCart: %v", err)
 		return cart.GetCartOutput{}, err
 	}
-	var carProductMediaMap = make(map[string][]models.Media)
 	var productItem cart.ProductItem
-	var productItems []cart.ProductItem
 	var getCartItems []cart.GetCartItem
-	var cartProductMap = make(map[string][]string)
 	var cartProductQuantityMap = make(map[string]map[string]int)
+	var cartProductMap = make(map[string][]string)
 	var cartShopMap = make(map[string]models.Shop)
 	var shopIDs []string
-	//3dimensional array cart id, product id , models.Product
 
 	for _, v := range carts {
 		shopIDs = append(shopIDs, v.ShopID.Hex())
+		cartProductQuantityMap[v.ID.Hex()] = make(map[string]int)
 		for _, item := range v.Items {
-
 			cartProductMap[v.ID.Hex()] = append(cartProductMap[v.ID.Hex()], item.ProductID.Hex())
-
-			fmt.Print("cart id : ", v.ID.Hex())
-			fmt.Println(item.ProductID.Hex(), item.Quantity)
-
-			cartProductQuantityMap[v.ID.Hex()] = make(map[string]int)
 			cartProductQuantityMap[v.ID.Hex()][item.ProductID.Hex()] = item.Quantity
-
 		}
 	}
+
 	listShops, err := uc.shopUc.ListShop(ctx, models.Scope{}, shop.GetShopsFilter{
 		IDs: shopIDs,
 	})
@@ -221,13 +214,19 @@ func (uc implUseCase) GetCart(ctx context.Context, sc models.Scope, opt cart.Get
 		uc.l.Errorf(ctx, "cart.usecase.GetCart: %v", err)
 		return cart.GetCartOutput{}, err
 	}
+
 	for _, v := range listShops {
 		cartShopMap[v.ID.Hex()] = v
 	}
+
 	for _, v := range carts {
+		var productItems []cart.ProductItem
+		var carProductMediaMap = make(map[string][]models.Media)
+
 		listProducts, err := uc.shopUc.ListProduct(ctx, models.Scope{}, shop.ListProductInput{
 			GetProductFilter: shop.GetProductFilter{
-				IDs: cartProductMap[v.ID.Hex()],
+				IDs:    cartProductMap[v.ID.Hex()],
+				ShopID: v.ShopID.Hex(),
 			},
 		})
 		if err != nil {
@@ -236,30 +235,31 @@ func (uc implUseCase) GetCart(ctx context.Context, sc models.Scope, opt cart.Get
 		}
 
 		for _, p := range listProducts.Products {
-			productItem.ProductID = p.P.ID.Hex()
-
-			productItem.Medias = p.Images
-			fmt.Print("product media id : ", productItem.Medias)
-			productItem.Quantity = cartProductQuantityMap[v.ID.Hex()][p.P.ID.Hex()]
+			productItem = cart.ProductItem{
+				ProductID:   p.P.ID.Hex(),
+				Medias:      p.Images,
+				Quantity:    cartProductQuantityMap[v.ID.Hex()][p.P.ID.Hex()],
+				ProductName: p.P.Name,
+				Price:       p.P.Price,
+			}
 			carProductMediaMap[p.P.ID.Hex()] = p.Images
-
-			productItem.ProductName = p.P.Name
-			productItem.Price = p.P.Price
-
 			productItems = append(productItems, productItem)
-
 		}
-		getCartItems = append(getCartItems, cart.GetCartItem{
-			Cart:                v,
-			CartProductMediaMap: carProductMediaMap,
-			Products:            productItems,
-			Shop:                cartShopMap[v.ShopID.Hex()],
-		})
 
+		if len(productItems) > 0 {
+			getCartItems = append(getCartItems, cart.GetCartItem{
+				Cart:                v,
+				CartProductMediaMap: carProductMediaMap,
+				Products:            productItems,
+				Shop:                cartShopMap[v.ShopID.Hex()],
+			})
+		}
 	}
+
 	sort.Slice(getCartItems, func(i, j int) bool {
 		return getCartItems[i].Cart.CreatedAt.After(getCartItems[j].Cart.CreatedAt)
 	})
+
 	return cart.GetCartOutput{
 		CartOutPut: getCartItems,
 		Paginator:  pag,

@@ -231,7 +231,7 @@ type Media_Obj struct {
 type GetCartItemResponse struct {
 	ProductID   string      `json:"product_id"`
 	Quantity    int         `json:"quantity"`
-	MediaS      []Media_Obj `json:"medias"`
+	MediaS      []Media_Obj `json:"medias,omitempty"`
 	ProductName string      `json:"product_name"`
 	Price       float32     `json:"price"`
 }
@@ -264,36 +264,38 @@ type listMetaResponse struct {
 }
 
 func (h handler) newGetResponse(carts cart.GetCartOutput) getCartResponse {
-
 	var res getCartResponse
 	var resItem []getCartResponseItem
 
 	for _, cart := range carts.CartOutPut {
-
 		var items []GetCartItemResponse
-		for _, item := range cart.Products {
-			items = append(items, GetCartItemResponse{
-				ProductID:   item.ProductID,
-				Quantity:    item.Quantity,
-				MediaS:      fromMediaToMediaObj(cart.CartProductMediaMap[item.ProductID]),
-				ProductName: item.ProductName,
-				Price:       item.Price,
-			})
 
+		for _, item := range cart.Products {
+			if item.Quantity > 0 {
+				items = append(items, GetCartItemResponse{
+					ProductID:   item.ProductID,
+					Quantity:    item.Quantity,
+					MediaS:      fromMediaToMediaObj(cart.CartProductMediaMap[item.ProductID]),
+					ProductName: item.ProductName,
+					Price:       item.Price,
+				})
+			}
 		}
 
-		resItem = append(resItem, getCartResponseItem{
-			ID:       cart.Cart.ID.Hex(),
-			UserID:   cart.Cart.UserID.Hex(),
-			ShopID:   cart.Cart.ShopID.Hex(),
-			Item:     items,
-			ShopName: cart.Shop.Name,
-		})
+		if len(items) > 0 {
+			resItem = append(resItem, getCartResponseItem{
+				ID:       cart.Cart.ID.Hex(),
+				UserID:   cart.Cart.UserID.Hex(),
+				ShopID:   cart.Cart.ShopID.Hex(),
+				Item:     items,
+				ShopName: cart.Shop.Name,
+			})
+		}
 	}
+
 	res.Item = resItem
 	res.Meta = listMetaResponse{
 		PaginatorResponse: carts.Paginator.ToResponse(),
 	}
 	return res
-
 }
