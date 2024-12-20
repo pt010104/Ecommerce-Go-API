@@ -297,8 +297,6 @@ func (uc implUsecase) ListProduct(ctx context.Context, sc models.Scope, input sh
 	//map productID to its array of models.Media
 	mediaMap := make(map[string][]models.Media)
 	for _, p := range products {
-		//print mediaIDs
-		fmt.Println("mediaIDs: ", p.MediaIDs)
 		media, er := uc.mediaUC.List(ctx, models.Scope{}, media.ListInput{
 			GetFilter: media.GetFilter{IDs: mongo.HexFromObjectIDsOrNil(p.MediaIDs)},
 		})
@@ -317,8 +315,6 @@ func (uc implUsecase) ListProduct(ctx context.Context, sc models.Scope, input sh
 				cates = append(cates, cate)
 			}
 		}
-		//print mediaIDs
-		fmt.Println("mediaIDs: ", p.MediaIDs)
 		item := shop.ProductOutPutItem{
 			P:         p,
 			Inventory: inventoryMap[p.InventoryID],

@@ -225,8 +225,7 @@ func (uc implUseCase) GetCart(ctx context.Context, sc models.Scope, opt cart.Get
 
 		listProducts, err := uc.shopUc.ListProduct(ctx, models.Scope{}, shop.ListProductInput{
 			GetProductFilter: shop.GetProductFilter{
-				IDs:    cartProductMap[v.ID.Hex()],
-				ShopID: v.ShopID.Hex(),
+				IDs: cartProductMap[v.ID.Hex()],
 			},
 		})
 		if err != nil {
