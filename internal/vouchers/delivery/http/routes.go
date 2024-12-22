@@ -8,7 +8,8 @@ import (
 func MapRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
 
 	r.Use(mw.Auth())
-	r.GET("/:code", h.DetailVoucher)
+	r.GET("by-code/:code", h.DetailVoucher)
+	r.GET("by-id/:id", h.DetailVoucher)
 	r.POST("", h.CreateVoucher)
 	r.GET("", h.ListVoucher)
 }

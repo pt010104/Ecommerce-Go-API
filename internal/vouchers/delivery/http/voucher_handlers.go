@@ -42,7 +42,7 @@ func (h handler) CreateVoucher(c *gin.Context) {
 
 // @Summary Get voucher details
 // @Schemes http https
-// @Description Get details of a specific voucher
+// @Description Get details of a specific voucher , pass id or code as param one of them must be presented if search by id change the route to by-id/id
 // @Tags Voucher
 // @Accept json
 // @Produce json
@@ -50,11 +50,11 @@ func (h handler) CreateVoucher(c *gin.Context) {
 // @Param Authorization header string true "Bearer JWT token" default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
 // @Param x-client-id header string true "User ID" default(6707825d45804caaf8316957)
 // @Param session-id header string true "Session ID" default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
-// @Param code path string true "Voucher code"
+// @Param data body DetailVoucherReq true "Detail Voucher Request"
 // @Success 200 {object} response.Resp
 // @Failure 400 {object} response.Resp "Bad Request"
 // @Failure 500 {object} response.Resp "Internal Server Error"
-// @Router /api/v1/vouchers/{code} [get]
+// @Router /api/v1/vouchers/by-code{code} [get]
 func (h handler) DetailVoucher(c *gin.Context) {
 	ctx := c.Request.Context()
 

@@ -14,7 +14,9 @@ import (
 func (repo implRepo) buildVoucherDetailQuery(ctx context.Context, sc models.Scope, opt vouchers.DetailVoucherOption) bson.M {
 	filter := bson.M{}
 
-	filter["_id"] = mongo.ObjectIDFromHexOrNil(opt.ID)
+	if opt.ID != "" {
+		filter["_id"] = mongo.ObjectIDFromHexOrNil(opt.ID)
+	}
 
 	if opt.Code != "" {
 		filter["code"] = opt.Code

@@ -25,6 +25,13 @@ definitions:
       name:
         type: string
     type: object
+  http.DetailVoucherReq:
+    properties:
+      code:
+        type: string
+      id:
+        type: string
+    type: object
   http.GetCartItemResponse:
     properties:
       medias:
@@ -1755,7 +1762,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -1800,7 +1808,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -1925,7 +1934,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -1959,7 +1969,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -2002,7 +2013,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -2131,11 +2143,12 @@ paths:
       summary: Create a voucher
       tags:
       - Voucher
-  /api/v1/vouchers/{code}:
+  /api/v1/vouchers/by-code{code}:
     get:
       consumes:
       - application/json
-      description: Get details of a specific voucher
+      description: Get details of a specific voucher , pass id or code as param one
+        of them must be presented
       parameters:
       - default: '"*"'
         description: Access-Control-Allow-Origin
@@ -2160,11 +2173,12 @@ paths:
         name: session-id
         required: true
         type: string
-      - description: Voucher code
-        in: path
-        name: code
+      - description: Detail Voucher Request
+        in: body
+        name: data
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/http.DetailVoucherReq'
       produces:
       - application/json
       responses:
