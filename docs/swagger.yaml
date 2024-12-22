@@ -356,7 +356,7 @@ definitions:
           $ref: '#/definitions/http.listProductItem'
         type: array
       shop_object:
-        $ref: '#/definitions/http.shopObject'
+        $ref: '#/definitions/internal_shop_delivery_http.shopObject'
     type: object
   http.getShopResp:
     properties:
@@ -457,13 +457,6 @@ definitions:
       name:
         type: string
       phone:
-        type: string
-    type: object
-  http.shopObject:
-    properties:
-      id:
-        type: string
-      name:
         type: string
     type: object
   http.shopResp:
@@ -618,6 +611,13 @@ definitions:
         type: integer
       total_pages:
         type: integer
+    type: object
+  internal_shop_delivery_http.shopObject:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
     type: object
   internal_user_delivery_http.avatar_obj:
     properties:

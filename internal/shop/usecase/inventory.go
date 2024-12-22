@@ -55,6 +55,7 @@ func (uc implUsecase) UpdateInventory(ctx context.Context, sc models.Scope, inpu
 		StockLevel:      input.StockLevel,
 		ReorderLevel:    input.ReorderLevel,
 		ReorderQuantity: input.ReorderQuantity,
+		ReservedLevel:   input.ReservedLevel,
 	}
 	ni, err := uc.repo.UpdateInventory(ctx, sc, opt)
 	if err != nil {

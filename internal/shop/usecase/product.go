@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	"sync"
 
 	"github.com/pt010104/api-golang/internal/admins"
@@ -136,7 +135,6 @@ func (uc *implUsecase) DetailProduct(ctx context.Context, sc models.Scope, produ
 			errCh <- err
 			return
 		}
-		fmt.Print("shop: ", shop)
 		mu.Lock()
 		shopDetail = shop
 		mu.Unlock()
@@ -497,7 +495,6 @@ func (uc implUsecase) GetAll(ctx context.Context, sc models.Scope, input shop.Ge
 		wgErr       error
 	)
 
-	fmt.Print("input: ", input)
 	opt := shop.GetProductOption{
 
 		GetProductFilter: input.GetProductFilter,

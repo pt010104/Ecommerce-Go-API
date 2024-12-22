@@ -32,3 +32,8 @@ type UpdateProductOption struct {
 	CategoryID      []primitive.ObjectID
 	MediaIDs        []primitive.ObjectID
 }
+
+type UpdateManyProductsOption struct {
+	ProductIDs    []primitive.ObjectID
+	ReservedStock []uint
+}

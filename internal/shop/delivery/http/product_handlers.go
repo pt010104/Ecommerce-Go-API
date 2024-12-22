@@ -1,8 +1,6 @@
 package http
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
 
 	"github.com/pt010104/api-golang/internal/shop"
@@ -140,7 +138,6 @@ func (h handler) GetProduct(c *gin.Context) {
 
 	sc, req, err := h.processGetProductRequest(c)
 	if err != nil {
-		fmt.Print("err", req.IDs)
 		h.l.Errorf(ctx, "shop.delivery.http.getproduct: %v", err)
 		response.Error(c, err)
 		return

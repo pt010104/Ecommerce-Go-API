@@ -9,10 +9,10 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func (repo implRepo) buildInventoryDetailQuery(ctx context.Context, ID primitive.ObjectID) (bson.M, error) {
+func (repo implRepo) buildInventoryDetailQuery(ctx context.Context, id primitive.ObjectID) (bson.M, error) {
 	filter := bson.M{}
 
-	filter["_id"] = ID
+	filter["_id"] = id
 
 	return filter, nil
 }

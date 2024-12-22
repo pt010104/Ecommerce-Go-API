@@ -2806,7 +2806,7 @@ const docTemplate = `{
                     }
                 },
                 "shop_object": {
-                    "$ref": "#/definitions/http.shopObject"
+                    "$ref": "#/definitions/internal_shop_delivery_http.shopObject"
                 }
             }
         },
@@ -2962,17 +2962,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "phone": {
-                    "type": "string"
-                }
-            }
-        },
-        "http.shopObject": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "name": {
                     "type": "string"
                 }
             }
@@ -3209,6 +3198,17 @@ const docTemplate = `{
                 },
                 "total_pages": {
                     "type": "integer"
+                }
+            }
+        },
+        "internal_shop_delivery_http.shopObject": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },

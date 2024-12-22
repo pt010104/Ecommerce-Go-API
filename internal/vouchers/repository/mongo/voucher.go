@@ -34,7 +34,6 @@ func (repo implRepo) DetailVoucher(ctx context.Context, sc models.Scope, opt vou
 	col := repo.getVoucherCollection()
 
 	filter := repo.buildVoucherDetailQuery(ctx, sc, opt)
-	fmt.Print(filter)
 	var voucher models.Voucher
 	err := col.FindOne(ctx, filter).Decode(&voucher)
 	if err != nil {

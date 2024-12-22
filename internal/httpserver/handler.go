@@ -3,6 +3,7 @@ package httpserver
 import (
 	adminHTTP "github.com/pt010104/api-golang/internal/admins/delivery/http"
 	cartHTTP "github.com/pt010104/api-golang/internal/cart/delivery/http"
+	checkoutHTTP "github.com/pt010104/api-golang/internal/checkout/delivery/http"
 	mediaHTTP "github.com/pt010104/api-golang/internal/media/delivery/http"
 	"github.com/pt010104/api-golang/internal/middleware"
 	shopHTTP "github.com/pt010104/api-golang/internal/shop/delivery/http"
@@ -12,6 +13,8 @@ import (
 	adminRepo "github.com/pt010104/api-golang/internal/admins/repository/mongo"
 	cartRepo "github.com/pt010104/api-golang/internal/cart/repository/mongo"
 	cartUC "github.com/pt010104/api-golang/internal/cart/usecase"
+	checkoutRepo "github.com/pt010104/api-golang/internal/checkout/repository/mongo"
+	checkoutUC "github.com/pt010104/api-golang/internal/checkout/usecase"
 	mediaRepo "github.com/pt010104/api-golang/internal/media/repository/mongo"
 	shopRepo "github.com/pt010104/api-golang/internal/shop/repository/mongo"
 	userRepo "github.com/pt010104/api-golang/internal/user/repository/mongo"
@@ -46,6 +49,7 @@ func (srv HTTPServer) mapHandlers() error {
 	redisRepo := redis.New(srv.l, srv.redis)
 	cartRepo := cartRepo.New(srv.l, srv.database)
 	mediaRepo := mediaRepo.New(srv.l, srv.database)
+	checkoutRepo := checkoutRepo.New(srv.l, srv.database)
 
 	//Producer
 	prod := producer.New(srv.l, srv.amqpConn)
@@ -62,6 +66,7 @@ func (srv HTTPServer) mapHandlers() error {
 	shopUC.SetAdminUC(adminUC)
 	cartUC := cartUC.New(srv.l, cartRepo, shopUC)
 	voucherUC := voucherUC.New(voucherRepo, srv.l, shopUC)
+	checkoutUC := checkoutUC.New(srv.l, checkoutRepo, shopUC, cartUC)
 
 	// Handlers
 	userH := userHTTP.New(srv.l, userUC)
@@ -70,6 +75,7 @@ func (srv HTTPServer) mapHandlers() error {
 	voucherH := voucherHTTP.New(srv.l, voucherUC)
 	cartH := cartHTTP.New(srv.l, cartUC)
 	mediaH := mediaHTTP.New(srv.l, mediaUC)
+	checkoutH := checkoutHTTP.New(srv.l, checkoutUC)
 	mw := middleware.New(srv.l, shopUC, userUC)
 
 	//Routes
@@ -81,6 +87,7 @@ func (srv HTTPServer) mapHandlers() error {
 	voucherHTTP.MapRouters(api.Group("/vouchers"), voucherH, mw)
 	cartHTTP.MapRouters(api.Group("/carts"), cartH, mw)
 	mediaHTTP.MapRouters(api.Group("/media"), mediaH, mw)
+	checkoutHTTP.MapRouters(api.Group("/checkout"), checkoutH, mw)
 
 	//Public routes
 	shopHTTP.MapPublicRoutes(api.Group("/shops/products"), shopH)

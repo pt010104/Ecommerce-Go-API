@@ -1,8 +1,6 @@
 package http
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
 
 	"github.com/pt010104/api-golang/pkg/response"
@@ -350,7 +348,6 @@ func (h handler) Update(c *gin.Context) {
 		return
 	}
 	u, err := h.uc.Update(ctx, sc, req.toInput())
-	fmt.Print("reqid", req.MediaID)
 	if err != nil {
 		h.l.Errorf(ctx, "user.delivery.http.handler.Update.uc.Update: %v", err)
 		response.Error(c, err)

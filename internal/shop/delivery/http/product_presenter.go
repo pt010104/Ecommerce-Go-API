@@ -422,7 +422,6 @@ func (r getAllProductsRequest) validate() error {
 func (r getAllProductsRequest) toInput() shop.GetProductFilter {
 	//print cate
 
-	fmt.Println(r.CateIDs)
 	return shop.GetProductFilter{
 		IDs:     r.IDs,
 		CateIDs: r.CateIDs,

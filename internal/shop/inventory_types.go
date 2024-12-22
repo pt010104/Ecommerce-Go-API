@@ -21,4 +21,5 @@ type UpdateInventoryInput struct {
 	StockLevel      *uint
 	ReorderLevel    *uint
 	ReorderQuantity *uint
+	ReservedLevel   uint
 }

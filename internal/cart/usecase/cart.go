@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	"sort"
 	"sync"
 
@@ -151,7 +150,6 @@ func (uc implUseCase) Add(ctx context.Context, sc models.Scope, input cart.Creat
 
 			return err
 		}
-		fmt.Println(existingCart.Items)
 		inven, err := uc.shopUc.DetailInventory(ctx, p.Inventory.ID)
 		if err != nil {
 			uc.l.Errorf(ctx, "cart.Usecase.Add.DetailInventory", err)

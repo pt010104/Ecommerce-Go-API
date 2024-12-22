@@ -49,6 +49,11 @@ func (impl implRepo) buildInventoryUpdateModel(context context.Context, opt shop
 		opt.Model.StockLevel = *opt.StockLevel
 	}
 
+	if opt.ReservedLevel != 0 {
+		setUpdate["reserved_level"] = opt.ReservedLevel
+		opt.Model.ReservedLevel = opt.ReservedLevel
+	}
+
 	var update bson.M
 	if len(setUpdate) > 0 {
 		update = bson.M{

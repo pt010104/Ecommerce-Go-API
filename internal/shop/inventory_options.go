@@ -15,4 +15,5 @@ type UpdateInventoryOption struct {
 	StockLevel      *uint
 	ReorderLevel    *uint
 	ReorderQuantity *uint
+	ReservedLevel   uint
 }
