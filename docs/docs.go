@@ -2193,9 +2193,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/vouchers/{code}": {
+        "/api/v1/vouchers/by-code{code}": {
             "get": {
-                "description": "Get details of a specific voucher",
+                "description": "Get details of a specific voucher , pass id or code as param one of them must be presented if search by id change the route to by-id/id",
                 "consumes": [
                     "application/json"
                 ],
@@ -2239,11 +2239,13 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "type": "string",
-                        "description": "Voucher code",
-                        "name": "code",
-                        "in": "path",
-                        "required": true
+                        "description": "Detail Voucher Request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.DetailVoucherReq"
+                        }
                     }
                 ],
                 "responses": {
@@ -2306,6 +2308,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.DetailVoucherReq": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "id": {
                     "type": "string"
                 }
             }

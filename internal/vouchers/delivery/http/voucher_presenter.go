@@ -100,12 +100,17 @@ type detailVoucherResp struct {
 	CreatedAt              string   `json:"created_at"`
 }
 type DetailVoucherReq struct {
-	ID   string `uri:"id" binding:"required"`
-	Code string `uri:"code" binding:"required"`
+	ID   string `uri:"id"`
+	Code string `uri:"code"`
 }
 
 func (req DetailVoucherReq) validate() error {
-	if !mongo.IsObjectID(req.ID) {
+	if req.ID != "" {
+		if !mongo.IsObjectID(req.ID) {
+			return errWrongBody
+		}
+	}
+	if req.ID == "" && req.Code == "" {
 		return errWrongBody
 	}
 
