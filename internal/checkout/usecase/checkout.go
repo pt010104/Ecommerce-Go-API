@@ -61,12 +61,12 @@ func (uc implUseCase) Create(ctx context.Context, sc models.Scope, productIDs []
 	for _, inven := range invens {
 		inventoryIDs = append(inventoryIDs, inven.ID)
 	}
+
 	err = uc.updateReservedLevel(ctx, sc, invens, inventoryIDs, productQuantityMap, products)
 	if err != nil {
 		return checkout.CreateOutput{}, err
 	}
 
-	// Calculate prices
 	shops, totalPricesByShop, totalPrice, err := uc.calculateTotalPrices(ctx, sc, products, productQuantityMap)
 	if err != nil {
 		return checkout.CreateOutput{}, err
