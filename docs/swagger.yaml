@@ -1762,8 +1762,7 @@ paths:
       responses:
         "200":
           description: OK
-          schema:
-            type: object
+          schema: {}
         "400":
           description: Bad Request
           schema:
@@ -1808,8 +1807,7 @@ paths:
       responses:
         "200":
           description: OK
-          schema:
-            type: object
+          schema: {}
         "400":
           description: Bad Request
           schema:
@@ -1934,8 +1932,7 @@ paths:
       responses:
         "200":
           description: OK
-          schema:
-            type: object
+          schema: {}
         "400":
           description: Bad Request
           schema:
@@ -1969,8 +1966,7 @@ paths:
       responses:
         "200":
           description: OK
-          schema:
-            type: object
+          schema: {}
         "400":
           description: Bad Request
           schema:
@@ -2013,8 +2009,7 @@ paths:
       responses:
         "200":
           description: OK
-          schema:
-            type: object
+          schema: {}
         "400":
           description: Bad Request
           schema:
@@ -2148,7 +2143,7 @@ paths:
       consumes:
       - application/json
       description: Get details of a specific voucher , pass id or code as param one
-        of them must be presented
+        of them must be presented if search by id change the route to by-id/id
       parameters:
       - default: '"*"'
         description: Access-Control-Allow-Origin
