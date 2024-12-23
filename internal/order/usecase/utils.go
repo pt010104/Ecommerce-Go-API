@@ -96,14 +96,18 @@ func (uc implUseCase) validateStock(ctx context.Context, sc models.Scope, produc
 
 func (uc implUseCase) updateReservedLevel(ctx context.Context, sc models.Scope, invens []models.Inventory, inventoryIDs []primitive.ObjectID, productQuantityMap map[string]int, products []models.Product) error {
 	const maxRetries = 5
-
 	for _, inventory := range invens {
 		retryCount := 0
 		for retryCount < maxRetries {
+			var currentVersion int
 			currentVersion, err := uc.redisRepo.GetVersionInventory(ctx, inventory.ID)
 			if err != nil {
-				uc.l.Errorf(ctx, "order.usecase.updateReservedLevel.redisRepo.GetVersionInventory: %v", err)
-				return err
+				if err.Error() == order.ErrRedisNotFound.Error() {
+					currentVersion = 0
+				} else {
+					uc.l.Errorf(ctx, "order.usecase.updateReservedLevel.redisRepo.GetVersionInventory: %v", err)
+					return err
+				}
 			}
 
 			newReservedLevel := inventory.ReservedLevel

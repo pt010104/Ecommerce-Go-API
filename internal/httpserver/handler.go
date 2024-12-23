@@ -15,10 +15,11 @@ import (
 	cartUC "github.com/pt010104/api-golang/internal/cart/usecase"
 	mediaRepo "github.com/pt010104/api-golang/internal/media/repository/mongo"
 	orderRepo "github.com/pt010104/api-golang/internal/order/repository/mongo"
+	redisOrderRepo "github.com/pt010104/api-golang/internal/order/repository/redis"
 	orderUC "github.com/pt010104/api-golang/internal/order/usecase"
 	shopRepo "github.com/pt010104/api-golang/internal/shop/repository/mongo"
 	userRepo "github.com/pt010104/api-golang/internal/user/repository/mongo"
-	"github.com/pt010104/api-golang/internal/user/repository/redis"
+	redisUserRepo "github.com/pt010104/api-golang/internal/user/repository/redis"
 	voucherRepo "github.com/pt010104/api-golang/internal/vouchers/repository/mongo"
 
 	adminUC "github.com/pt010104/api-golang/internal/admins/usecase"
@@ -46,7 +47,8 @@ func (srv HTTPServer) mapHandlers() error {
 	shopRepo := shopRepo.New(srv.l, srv.database)
 	adminRepo := adminRepo.New(srv.l, srv.database)
 	voucherRepo := voucherRepo.New(srv.l, srv.database)
-	redisRepo := redis.New(srv.l, srv.redis)
+	redisUserRepo := redisUserRepo.New(srv.l, srv.redis)
+	redisOrderRepo := redisOrderRepo.New(srv.l, srv.redis)
 	cartRepo := cartRepo.New(srv.l, srv.database)
 	mediaRepo := mediaRepo.New(srv.l, srv.database)
 	orderRepo := orderRepo.New(srv.l, srv.database)
@@ -60,13 +62,13 @@ func (srv HTTPServer) mapHandlers() error {
 	//Usecase
 	emailUC := emailUC.New(srv.l)
 	mediaUC := mediaUC.New(srv.l, mediaRepo, prod, srv.cloudinary)
-	userUC := userUC.New(srv.l, userRepo, emailUC, redisRepo, mediaUC)
+	userUC := userUC.New(srv.l, userRepo, emailUC, redisUserRepo, mediaUC)
 	shopUC := shopUC.New(srv.l, shopRepo, nil, userUC, mediaUC)
 	adminUC := adminUC.New(adminRepo, srv.l, shopUC)
 	shopUC.SetAdminUC(adminUC)
 	cartUC := cartUC.New(srv.l, cartRepo, shopUC)
 	voucherUC := voucherUC.New(voucherRepo, srv.l, shopUC)
-	orderUC := orderUC.New(srv.l, orderRepo, shopUC, cartUC)
+	orderUC := orderUC.New(srv.l, orderRepo, shopUC, cartUC, redisOrderRepo)
 
 	// Handlers
 	userH := userHTTP.New(srv.l, userUC)

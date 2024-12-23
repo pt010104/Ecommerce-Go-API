@@ -8,4 +8,5 @@ var (
 	ErrProductNotFound       = errors.New("product not found")
 	ErrProductNotEnoughStock = errors.New("product not enough stock")
 	ErrTooManyRetries        = errors.New("too many retries due to concurrent modifications")
+	ErrRedisNotFound         = errors.New("redis: nil")
 )

@@ -15,11 +15,12 @@ type implUseCase struct {
 	cartUC    cart.UseCase
 }
 
-func New(l log.Logger, repo order.Repo, shopUC shop.UseCase, cartUC cart.UseCase) order.UseCase {
+func New(l log.Logger, repo order.Repo, shopUC shop.UseCase, cartUC cart.UseCase, redisRepo order.Redis) order.UseCase {
 	return &implUseCase{
-		l:      l,
-		repo:   repo,
-		shopUC: shopUC,
-		cartUC: cartUC,
+		l:         l,
+		repo:      repo,
+		shopUC:    shopUC,
+		cartUC:    cartUC,
+		redisRepo: redisRepo,
 	}
 }
