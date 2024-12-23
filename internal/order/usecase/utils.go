@@ -85,7 +85,7 @@ func (uc implUseCase) validateStock(ctx context.Context, sc models.Scope, produc
 	}
 
 	for _, inven := range invens {
-		if inven.StockLevel < uint(productQuantityMap[inven.ID.Hex()]) {
+		if inven.StockLevel-inven.ReservedLevel < uint(productQuantityMap[inven.ID.Hex()]) {
 			uc.l.Errorf(ctx, "order.usecase.validateStock: %v", order.ErrProductNotEnoughStock)
 			return nil, order.ErrProductNotEnoughStock
 		}
@@ -140,7 +140,7 @@ func (uc implUseCase) updateReservedLevel(ctx context.Context, sc models.Scope, 
 					return err
 				}
 
-				if freshInventory.StockLevel < uint(productQuantityMap[inventory.ID.Hex()]) {
+				if freshInventory.StockLevel-freshInventory.ReservedLevel < uint(productQuantityMap[inventory.ID.Hex()]) {
 					uc.l.Errorf(ctx, "order.usecase.updateReservedLevel: %v", order.ErrProductNotEnoughStock)
 					return order.ErrProductNotEnoughStock
 				}

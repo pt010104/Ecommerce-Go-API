@@ -28,7 +28,7 @@ func (uc implUseCase) validateCartItem(ctx context.Context, sc models.Scope, inp
 }
 
 func (uc implUseCase) checkStock(ctx context.Context, sc models.Scope, inventory models.Inventory, quantity int) error {
-	if inventory.StockLevel < uint(quantity) {
+	if inventory.StockLevel-inventory.ReservedLevel < uint(quantity) {
 		uc.l.Errorf(ctx, "cart.Usecase.checkStock: %v", cart.ErrNotEnoughStock)
 		return cart.ErrNotEnoughStock
 	}
