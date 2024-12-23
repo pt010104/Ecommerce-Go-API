@@ -17,6 +17,8 @@ type Handler interface {
 	VerifyUser(c *gin.Context)
 	DistributeNewToken(c *gin.Context)
 	Update(c *gin.Context)
+	AddAddress(c *gin.Context)
+	UpdateAddress(c *gin.Context)
 }
 type handler struct {
 	l  log.Logger

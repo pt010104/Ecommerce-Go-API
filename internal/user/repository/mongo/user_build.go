@@ -54,6 +54,11 @@ func (impl implRepo) buildUpdateUserModel(context context.Context, opt user.Upda
 		opt.Model.MediaID = mongo.ObjectIDFromHexOrNil(opt.MediaID)
 	}
 
+	if len(opt.Address) > 0 {
+		setFields["address"] = opt.Address
+		opt.Model.Address = opt.Address
+	}
+
 	update := bson.M{}
 	if len(setFields) > 0 {
 		update["$set"] = setFields

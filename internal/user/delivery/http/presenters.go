@@ -89,12 +89,22 @@ func (h handler) newSignUpResponse(u models.User) signUpResponse {
 	}
 }
 
-type detailResp struct {
-	ID    string `json:"id"`
-	Email string `json:"email"`
-	Name  string `json:"name"`
+type address_obj struct {
+	ID       string `json:"id"`
+	Street   string `json:"street"`
+	District string `json:"district"`
+	City     string `json:"city"`
+	Province string `json:"province"`
+	Phone    string `json:"phone"`
+	Default  bool   `json:"default"`
+}
 
-	Avatar *avatar_obj `json:"avatar,omitempty"`
+type detailResp struct {
+	ID      string        `json:"id"`
+	Email   string        `json:"email"`
+	Name    string        `json:"name"`
+	Avatar  *avatar_obj   `json:"avatar,omitempty"`
+	Address []address_obj `json:"addressess,omitempty"`
 }
 
 func (h handler) newDetailResp(u user.DetailUserOutput) detailResp {
@@ -106,11 +116,25 @@ func (h handler) newDetailResp(u user.DetailUserOutput) detailResp {
 		}
 	}
 
+	address := make([]address_obj, 0, len(u.User.Address))
+	for _, addr := range u.User.Address {
+		address = append(address, address_obj{
+			ID:       addr.ID.Hex(),
+			Street:   addr.Street,
+			District: addr.District,
+			City:     addr.City,
+			Province: addr.Province,
+			Phone:    addr.Phone,
+			Default:  addr.Default,
+		})
+	}
+
 	return detailResp{
-		ID:     u.User.ID.Hex(),
-		Email:  u.User.Email,
-		Name:   u.User.Name,
-		Avatar: avatar,
+		ID:      u.User.ID.Hex(),
+		Email:   u.User.Email,
+		Name:    u.User.Name,
+		Avatar:  avatar,
+		Address: address,
 	}
 }
 
@@ -193,4 +217,46 @@ func (r updateReq) validate() error {
 
 type UpdateResp struct {
 	MediaID string `json:"media_id"`
+}
+
+type addressReq struct {
+	Street   string `json:"street" binding:"required"`
+	District string `json:"district" binding:"required"`
+	City     string `json:"city" binding:"required"`
+	Province string `json:"province" binding:"required"`
+	Phone    string `json:"phone" binding:"required"`
+	Default  bool   `json:"default"`
+}
+
+func (r addressReq) toInput() user.AddAddressInput {
+	return user.AddAddressInput{
+		Street:   r.Street,
+		District: r.District,
+		City:     r.City,
+		Province: r.Province,
+		Phone:    r.Phone,
+		Default:  r.Default,
+	}
+}
+
+type updateAddressReq struct {
+	ID       string `json:"id" binding:"required"`
+	Street   string `json:"street" binding:"required"`
+	District string `json:"district" binding:"required"`
+	City     string `json:"city" binding:"required"`
+	Province string `json:"province" binding:"required"`
+	Phone    string `json:"phone" binding:"required"`
+	Default  bool   `json:"default"`
+}
+
+func (r updateAddressReq) toInput() user.UpdateAddressInput {
+	return user.UpdateAddressInput{
+		AddressID: r.ID,
+		Street:    r.Street,
+		District:  r.District,
+		City:      r.City,
+		Province:  r.Province,
+		Phone:     r.Phone,
+		Default:   r.Default,
+	}
 }

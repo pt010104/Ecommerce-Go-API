@@ -57,3 +57,22 @@ type DetailUserOutput struct {
 	User       models.User
 	Avatar_URL string
 }
+
+type AddAddressInput struct {
+	Street   string
+	District string
+	City     string
+	Province string
+	Phone    string
+	Default  bool
+}
+
+type UpdateAddressInput struct {
+	AddressID string
+	Street    string
+	District  string
+	City      string
+	Province  string
+	Phone     string
+	Default   bool
+}

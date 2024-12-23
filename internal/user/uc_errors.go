@@ -16,4 +16,6 @@ var (
 	ErrRefreshTokenIsExpired     = errors.New("Refresh Token is expired")
 	ErrMismatchedHashAndPassword = errors.New("Credentials not matched")
 	ErrInvalidInput              = errors.New("invalid input")
+
+	ErrAddressNotFound = errors.New("address not found")
 )

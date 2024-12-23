@@ -21,4 +21,7 @@ type UseCase interface {
 	VerifyEmail(ctx context.Context, email string) (token string, err error)
 	ResetPassWord(ctx context.Context, input ResetPasswordInput) error
 	DistributeNewToken(ctx context.Context, input DistributeNewTokenInput) (output DistributeNewTokenOutput, er error)
+
+	AddAddress(ctx context.Context, sc models.Scope, input AddAddressInput) error
+	UpdateAddress(ctx context.Context, sc models.Scope, input UpdateAddressInput) error
 }

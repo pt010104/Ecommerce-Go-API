@@ -163,3 +163,38 @@ func (h handler) processupdateRequest(c *gin.Context) (models.Scope, updateReq, 
 
 	return sc, req, nil
 }
+
+func (h handler) processAddAddressRequest(c *gin.Context) (models.Scope, addressReq, error) {
+	ctx := c.Request.Context()
+
+	sc, ok := jwt.GetScopeFromContext(ctx)
+	if !ok {
+		h.l.Errorf(ctx, "user.delivery.http.handler.processAddAddressRequest: unauthorized")
+		return models.Scope{}, addressReq{}, pkgErrors.NewUnauthorizedHTTPError()
+	}
+
+	var req addressReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.processAddAddressRequest: invalid request")
+		return models.Scope{}, addressReq{}, errWrongBody
+	}
+
+	return sc, req, nil
+}
+func (h handler) processUpdateAddressRequest(c *gin.Context) (models.Scope, updateAddressReq, error) {
+	ctx := c.Request.Context()
+
+	sc, ok := jwt.GetScopeFromContext(ctx)
+	if !ok {
+		h.l.Errorf(ctx, "user.delivery.http.handler.processUpdateAddressRequest: unauthorized")
+		return models.Scope{}, updateAddressReq{}, pkgErrors.NewUnauthorizedHTTPError()
+	}
+
+	var req updateAddressReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.processUpdateAddressRequest: invalid request")
+		return models.Scope{}, updateAddressReq{}, errWrongBody
+	}
+
+	return sc, req, nil
+}

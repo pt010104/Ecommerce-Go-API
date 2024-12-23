@@ -355,3 +355,77 @@ func (h handler) Update(c *gin.Context) {
 	}
 	response.OK(c, h.newDetailResp(u))
 }
+
+// @Summary		Add New Address
+// @Schemes		http https
+// @Description	Add a new address for a user
+// @Tags			Address
+// @Accept			json
+// @Produce		json
+//
+// @Param			Access-Control-Allow-Origin	header		string	false	"Access-Control-Allow-Origin"	default("*")
+// @Param			Authorization				header		string	true	"Bearer JWT token"				default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
+// @Param			x-client-id					header		string	true	"User ID"						default(6707825d45804caaf8316957)
+// @Param			session-id					header		string	true	"Session ID"					default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
+// @Param			address						body		addressReq	true	"Address"
+// @Success		200							{object}	interface{}
+// @Failure		400							{object}	response.Resp	"Bad Request"
+// @Failure		500							{object}	response.Resp	"Internal Server Error"
+//
+// @Router			/api/v1/users/address [POST]
+func (h handler) AddAddress(c *gin.Context) {
+	ctx := c.Request.Context()
+	sc, req, err := h.processAddAddressRequest(c)
+	if err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.AddAddress.processAddAddressRequest: %v", err)
+		response.Error(c, err)
+		return
+	}
+
+	err = h.uc.AddAddress(ctx, sc, req.toInput())
+	if err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.AddAddress.uc.AddAddress: %v", err)
+		response.Error(c, err)
+		return
+	}
+
+	response.OK(c, nil)
+}
+
+// @Summary		Update Address
+// @Schemes		http https
+// @Description	Update an existing address for a user
+// @Tags			Address
+// @Accept			json
+// @Produce		json
+//
+// @Param			Access-Control-Allow-Origin	header		string	false	"Access-Control-Allow-Origin"	default("*")
+// @Param			Authorization				header		string	true	"Bearer JWT token"				default(Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU)
+// @Param			x-client-id					header		string	true	"User ID"						default(6707825d45804caaf8316957)
+// @Param			session-id					header		string	true	"Session ID"					default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
+// @Param			id							path		string	true	"Address ID"
+// @Param			address						body		addressReq	true	"Updated Address"
+// @Success		200							{object}	interface{}
+// @Failure		400							{object}	response.Resp	"Bad Request"
+// @Failure		404							{object}	response.Resp	"Address Not Found"
+// @Failure		500							{object}	response.Resp	"Internal Server Error"
+//
+// @Router			/api/v1/users/address/{id} [PUT]
+func (h handler) UpdateAddress(c *gin.Context) {
+	ctx := c.Request.Context()
+	sc, req, err := h.processUpdateAddressRequest(c)
+	if err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.UpdateAddress.processUpdateAddressRequest: %v", err)
+		response.Error(c, err)
+		return
+	}
+
+	err = h.uc.UpdateAddress(ctx, sc, req.toInput())
+	if err != nil {
+		h.l.Errorf(ctx, "user.delivery.http.handler.UpdateAddress.uc.UpdateAddress: %v", err)
+		response.Error(c, err)
+		return
+	}
+
+	response.OK(c, nil)
+}

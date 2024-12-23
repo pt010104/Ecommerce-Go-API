@@ -34,6 +34,7 @@ type UpdateUserOption struct {
 	Name       string
 	IsVerified bool
 	MediaID    string
+	Address    []models.Address
 }
 type UpdateKeyTokenInput struct {
 	UserID       string
@@ -43,4 +44,13 @@ type UpdateKeyTokenInput struct {
 type UpdateRequestTokenOption struct {
 	IsUsed *bool
 	Token  string
+}
+
+type AddAddressOption struct {
+	Street   string
+	District string
+	City     string
+	Province string
+	Phone    string
+	Default  bool
 }

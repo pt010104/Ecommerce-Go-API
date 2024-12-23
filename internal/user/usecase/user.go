@@ -580,3 +580,105 @@ func (uc implUsecase) Update(ctx context.Context, sc models.Scope, input user.Up
 	}, nil
 
 }
+
+func (uc implUsecase) AddAddress(ctx context.Context, sc models.Scope, input user.AddAddressInput) error {
+	u, err := uc.GetModel(ctx, sc.UserID)
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.AddAddress.GetModel: %v", err)
+		return err
+	}
+
+	newAddress := models.Address{
+		ID:       primitive.NewObjectID(),
+		Street:   input.Street,
+		District: input.District,
+		City:     input.City,
+		Province: input.Province,
+		Phone:    input.Phone,
+		Default:  input.Default,
+	}
+
+	if input.Default {
+		for i := range u.Address {
+			u.Address[i].Default = false
+		}
+	}
+
+	u.Address = append(u.Address, newAddress)
+
+	_, err = uc.repo.UpdateUser(ctx, user.UpdateUserOption{
+		Model:   u,
+		Address: u.Address,
+	})
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.AddAddress.UpdateUser: %v", err)
+		return err
+	}
+
+	go func() {
+		redisCtx := context.Background()
+		if err := uc.redisRepo.StoreUser(redisCtx, u); err != nil {
+			uc.l.Warnf(ctx, "user.usecase.AddAddress.redis.StoreUser: %v", err)
+		}
+	}()
+
+	return nil
+}
+
+func (uc implUsecase) UpdateAddress(ctx context.Context, sc models.Scope, input user.UpdateAddressInput) error {
+	u, err := uc.GetModel(ctx, sc.UserID)
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.UpdateAddress.GetModel: %v", err)
+		return err
+	}
+
+	addressID, err := primitive.ObjectIDFromHex(input.AddressID)
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.UpdateAddress.ObjectIDFromHex: %v", err)
+		return err
+	}
+
+	addressIndex := -1
+	for i, addr := range u.Address {
+		if addr.ID == addressID {
+			addressIndex = i
+			break
+		}
+	}
+
+	if addressIndex == -1 {
+		uc.l.Errorf(ctx, "user.usecase.UpdateAddress: address not found")
+		return user.ErrAddressNotFound
+	}
+
+	if input.Default {
+		for i := range u.Address {
+			u.Address[i].Default = false
+		}
+	}
+
+	u.Address[addressIndex].Street = input.Street
+	u.Address[addressIndex].District = input.District
+	u.Address[addressIndex].City = input.City
+	u.Address[addressIndex].Province = input.Province
+	u.Address[addressIndex].Phone = input.Phone
+	u.Address[addressIndex].Default = input.Default
+
+	_, err = uc.repo.UpdateUser(ctx, user.UpdateUserOption{
+		Model:   u,
+		Address: u.Address,
+	})
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.UpdateAddress.UpdateUser: %v", err)
+		return err
+	}
+
+	go func() {
+		redisCtx := context.Background()
+		if err := uc.redisRepo.StoreUser(redisCtx, u); err != nil {
+			uc.l.Warnf(ctx, "user.usecase.UpdateAddress.redis.StoreUser: %v", err)
+		}
+	}()
+
+	return nil
+}

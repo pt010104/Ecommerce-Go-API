@@ -15,8 +15,8 @@ type implUsecase struct {
 	mediaUC   media.UseCase
 }
 
-func New(l log.Logger, repo user.Repository, emailUC email.UseCase, redisRepo user.Redis, mediaUC media.UseCase) implUsecase {
-	return implUsecase{
+func New(l log.Logger, repo user.Repository, emailUC email.UseCase, redisRepo user.Redis, mediaUC media.UseCase) user.UseCase {
+	return &implUsecase{
 		l:         l,
 		repo:      repo,
 		emailUC:   emailUC,
