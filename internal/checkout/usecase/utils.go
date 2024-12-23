@@ -34,9 +34,11 @@ func (uc implUseCase) validateProducts(ctx context.Context, sc models.Scope, pro
 		products = append(products, product.P)
 	}
 
-	var image_urls []string
-	for _, product := range p.Products {
-		image_urls = append(image_urls, product.Images[0].URL)
+	image_urls := make([]string, len(p.Products))
+	for i, product := range p.Products {
+		if len(product.Images) > 0 {
+			image_urls[i] = product.Images[0].URL
+		}
 	}
 
 	return products, image_urls, nil

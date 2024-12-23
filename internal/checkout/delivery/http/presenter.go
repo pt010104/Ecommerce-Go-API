@@ -32,7 +32,7 @@ type shopObject struct {
 type productObject struct {
 	ProductID    string  `json:"product_id"`
 	ProductName  string  `json:"product_name"`
-	ProductImage string  `json:"product_image"`
+	ProductImage string  `json:"product_image,omitempty"`
 	Price        float32 `json:"price"`
 	Quantity     int     `json:"quantity"`
 }
