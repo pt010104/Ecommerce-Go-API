@@ -2646,6 +2646,32 @@ const docTemplate = `{
                 }
             }
         },
+        "http.address_obj": {
+            "type": "object",
+            "properties": {
+                "city": {
+                    "type": "string"
+                },
+                "default": {
+                    "type": "boolean"
+                },
+                "district": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "province": {
+                    "type": "string"
+                },
+                "street": {
+                    "type": "string"
+                }
+            }
+        },
         "http.categoryObject": {
             "type": "object",
             "properties": {
@@ -2849,6 +2875,12 @@ const docTemplate = `{
         "http.detailResp": {
             "type": "object",
             "properties": {
+                "addressess": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.address_obj"
+                    }
+                },
                 "avatar": {
                     "$ref": "#/definitions/internal_user_delivery_http.avatar_obj"
                 },

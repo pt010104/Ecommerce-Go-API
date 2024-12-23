@@ -119,6 +119,23 @@ definitions:
       street:
         type: string
     type: object
+  http.address_obj:
+    properties:
+      city:
+        type: string
+      default:
+        type: boolean
+      district:
+        type: string
+      id:
+        type: string
+      phone:
+        type: string
+      province:
+        type: string
+      street:
+        type: string
+    type: object
   http.addressReq:
     properties:
       city:
@@ -279,6 +296,10 @@ definitions:
     type: object
   http.detailResp:
     properties:
+      addressess:
+        items:
+          $ref: '#/definitions/http.address_obj'
+        type: array
       avatar:
         $ref: '#/definitions/internal_user_delivery_http.avatar_obj'
       email:
