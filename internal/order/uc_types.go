@@ -1,4 +1,4 @@
-package checkout
+package order
 
 import (
 	"time"
@@ -6,7 +6,7 @@ import (
 	"github.com/pt010104/api-golang/internal/models"
 )
 
-type CreateOutput struct {
+type CreateCheckoutOutput struct {
 	CheckoutID       string             `json:"checkout_id"`
 	ExpiredAt        time.Time          `json:"expired_at"`
 	TotalPriceByShop map[string]float64 `json:"total_price_by_shop"`

@@ -6,8 +6,8 @@ import (
 	"sync"
 
 	"github.com/pt010104/api-golang/internal/cart"
-	"github.com/pt010104/api-golang/internal/checkout"
 	"github.com/pt010104/api-golang/internal/models"
+	"github.com/pt010104/api-golang/internal/order"
 	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/pkg/mongo"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -20,13 +20,13 @@ func (uc implUseCase) validateProducts(ctx context.Context, sc models.Scope, pro
 		},
 	})
 	if err != nil {
-		uc.l.Errorf(ctx, "checkout.usecase.validateProducts.shopUC.ListProduct: %v", err)
+		uc.l.Errorf(ctx, "order.usecase.validateProducts.shopUC.ListProduct: %v", err)
 		return nil, nil, err
 	}
 
 	if len(p.Products) != len(productIDs) {
-		uc.l.Errorf(ctx, "checkout.usecase.validateProducts: %v", checkout.ErrProductNotFound)
-		return nil, nil, checkout.ErrProductNotFound
+		uc.l.Errorf(ctx, "order.usecase.validateProducts: %v", order.ErrProductNotFound)
+		return nil, nil, order.ErrProductNotFound
 	}
 
 	var products []models.Product
@@ -47,7 +47,7 @@ func (uc implUseCase) validateProducts(ctx context.Context, sc models.Scope, pro
 func (uc implUseCase) validateCart(ctx context.Context, sc models.Scope, productIDs []string) ([]primitive.ObjectID, map[string]int, error) {
 	carts, err := uc.cartUC.GetCart(ctx, sc, cart.GetOption{})
 	if err != nil {
-		uc.l.Errorf(ctx, "checkout.usecase.validateCart.cartUC.GetCart: %v", err)
+		uc.l.Errorf(ctx, "order.usecase.validateCart.cartUC.GetCart: %v", err)
 		return nil, nil, err
 	}
 
@@ -65,8 +65,8 @@ func (uc implUseCase) validateCart(ctx context.Context, sc models.Scope, product
 
 	for _, pid := range productIDs {
 		if !slices.Contains(cartProductIDs, pid) {
-			uc.l.Errorf(ctx, "checkout.usecase.validateCart: %v", checkout.ErrProductNotFoundInCart)
-			return nil, nil, checkout.ErrProductNotFoundInCart
+			uc.l.Errorf(ctx, "order.usecase.validateCart: %v", order.ErrProductNotFoundInCart)
+			return nil, nil, order.ErrProductNotFoundInCart
 		}
 	}
 
@@ -81,14 +81,14 @@ func (uc implUseCase) validateStock(ctx context.Context, sc models.Scope, produc
 
 	invens, err := uc.shopUC.ListInventory(ctx, sc, inventoryIDs)
 	if err != nil {
-		uc.l.Errorf(ctx, "checkout.usecase.validateStock.shopUC.ListInventory: %v", err)
+		uc.l.Errorf(ctx, "order.usecase.validateStock.shopUC.ListInventory: %v", err)
 		return nil, err
 	}
 
 	for _, inven := range invens {
 		if inven.StockLevel < uint(productQuantityMap[inven.ID.Hex()]) {
-			uc.l.Errorf(ctx, "checkout.usecase.validateStock: %v", checkout.ErrProductNotEnoughStock)
-			return nil, checkout.ErrProductNotEnoughStock
+			uc.l.Errorf(ctx, "order.usecase.validateStock: %v", order.ErrProductNotEnoughStock)
+			return nil, order.ErrProductNotEnoughStock
 		}
 	}
 
@@ -124,7 +124,7 @@ func (uc implUseCase) updateReservedLevel(ctx context.Context, sc models.Scope, 
 
 	wg.Wait()
 	if wgErr != nil {
-		uc.l.Errorf(ctx, "checkout.usecase.updateReservedLevel: %v", wgErr)
+		uc.l.Errorf(ctx, "order.usecase.updateReservedLevel: %v", wgErr)
 		return wgErr
 	}
 
@@ -141,13 +141,13 @@ func (uc implUseCase) calculateTotalPrices(ctx context.Context, sc models.Scope,
 		IDs: mongo.HexFromObjectIDsOrNil(shopIDs),
 	})
 	if err != nil {
-		uc.l.Errorf(ctx, "checkout.usecase.calculateTotalPrices.shopUC.ListShop: %v", err)
+		uc.l.Errorf(ctx, "order.usecase.calculateTotalPrices.shopUC.ListShop: %v", err)
 		return nil, nil, 0, err
 	}
 
 	totalPricesByShop, err := uc.calculateTotalPricesByShop(ctx, sc, products, productQuantityMap)
 	if err != nil {
-		uc.l.Errorf(ctx, "checkout.usecase.calculateTotalPrices: %v", err)
+		uc.l.Errorf(ctx, "order.usecase.calculateTotalPrices: %v", err)
 		return nil, nil, 0, err
 	}
 

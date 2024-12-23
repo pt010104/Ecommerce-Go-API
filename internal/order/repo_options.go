@@ -1,7 +1,7 @@
-package checkout
+package order
 
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
-type CreateOption struct {
+type CreateCheckoutOption struct {
 	ProductIDs []primitive.ObjectID
 }

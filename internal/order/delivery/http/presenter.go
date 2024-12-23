@@ -1,16 +1,16 @@
 package http
 
 import (
-	"github.com/pt010104/api-golang/internal/checkout"
+	"github.com/pt010104/api-golang/internal/order"
 	"github.com/pt010104/api-golang/pkg/mongo"
 	"github.com/pt010104/api-golang/pkg/response"
 )
 
-type CreateRequest struct {
+type CreateCheckoutRequest struct {
 	ProductIDs []string `json:"product_ids" binding:"required"`
 }
 
-func (r CreateRequest) validate() error {
+func (r CreateCheckoutRequest) validate() error {
 	if len(r.ProductIDs) == 0 {
 		return errWrongBody
 	}
@@ -50,7 +50,7 @@ type checkoutResponse struct {
 	ExpiredAt  response.DateTime `json:"expired_at"`
 }
 
-func (h handler) newCreateCheckoutResponse(o checkout.CreateOutput) checkoutResponse {
+func (h handler) newCreateCheckoutCheckoutResponse(o order.CreateCheckoutOutput) checkoutResponse {
 	var checkoutResponse checkoutResponse
 	image_urls := make(map[string]string)
 	for i, url := range o.ImageURLs {

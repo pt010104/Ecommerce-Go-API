@@ -2,19 +2,19 @@ package usecase
 
 import (
 	"github.com/pt010104/api-golang/internal/cart"
-	"github.com/pt010104/api-golang/internal/checkout"
+	"github.com/pt010104/api-golang/internal/order"
 	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/pkg/log"
 )
 
 type implUseCase struct {
 	l      log.Logger
-	repo   checkout.Repo
+	repo   order.Repo
 	shopUC shop.UseCase
 	cartUC cart.UseCase
 }
 
-func New(l log.Logger, repo checkout.Repo, shopUC shop.UseCase, cartUC cart.UseCase) checkout.UseCase {
+func New(l log.Logger, repo order.Repo, shopUC shop.UseCase, cartUC cart.UseCase) order.UseCase {
 	return &implUseCase{
 		l:      l,
 		repo:   repo,
