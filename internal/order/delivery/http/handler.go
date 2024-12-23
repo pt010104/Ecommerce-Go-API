@@ -18,7 +18,7 @@ func (h *handler) CreateCheckout(c *gin.Context) {
 	o, err := h.uc.CreateCheckout(ctx, sc, req.ProductIDs)
 	if err != nil {
 		h.l.Errorf(ctx, "order.delivery.http.handler.CreateCheckout: %v", err)
-		response.Error(c, err)
+		response.Error(c, h.mapErrors(err))
 		return
 	}
 

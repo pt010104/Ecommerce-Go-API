@@ -139,6 +139,12 @@ func (uc implUseCase) updateReservedLevel(ctx context.Context, sc models.Scope, 
 					uc.l.Errorf(ctx, "order.usecase.updateReservedLevel.shopUC.DetailInventory: %v", err)
 					return err
 				}
+
+				if freshInventory.StockLevel < uint(productQuantityMap[inventory.ID.Hex()]) {
+					uc.l.Errorf(ctx, "order.usecase.updateReservedLevel: %v", order.ErrProductNotEnoughStock)
+					return order.ErrProductNotEnoughStock
+				}
+
 				inventory = freshInventory
 				continue
 			}
