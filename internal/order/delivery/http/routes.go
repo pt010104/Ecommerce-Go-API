@@ -6,7 +6,11 @@ import (
 )
 
 func MapRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
-	r.Use(mw.Auth())
-	r.POST("", h.CreateCheckout)
+	MapCheckoutRouters(r, h, mw)
+}
 
+func MapCheckoutRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
+	group := r.Group("/checkout")
+	group.Use(mw.Auth())
+	group.POST("", h.CreateCheckout)
 }

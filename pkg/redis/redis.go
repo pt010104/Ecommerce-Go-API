@@ -19,6 +19,7 @@ type Database interface {
 type Client interface {
 	Disconnect() error
 	Get(ctx context.Context, key string) ([]byte, error)
+	Incr(ctx context.Context, key string) *redis.IntCmd
 	Set(ctx context.Context, key string, value interface{}, expiration int) error
 	Del(ctx context.Context, keys ...string) error
 }
@@ -41,4 +42,8 @@ func (rc *redisClient) Set(ctx context.Context, key string, value interface{}, e
 
 func (rc *redisClient) Del(ctx context.Context, keys ...string) error {
 	return rc.cl.Del(ctx, keys...).Err()
+}
+
+func (rc *redisClient) Incr(ctx context.Context, key string) *redis.IntCmd {
+	return rc.cl.Incr(ctx, key)
 }

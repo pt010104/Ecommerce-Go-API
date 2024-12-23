@@ -3,7 +3,6 @@ package usecase
 import (
 	"context"
 	"slices"
-	"sync"
 
 	"github.com/pt010104/api-golang/internal/cart"
 	"github.com/pt010104/api-golang/internal/models"
@@ -96,36 +95,57 @@ func (uc implUseCase) validateStock(ctx context.Context, sc models.Scope, produc
 }
 
 func (uc implUseCase) updateReservedLevel(ctx context.Context, sc models.Scope, invens []models.Inventory, inventoryIDs []primitive.ObjectID, productQuantityMap map[string]int, products []models.Product) error {
-	var reservedLevelMap = make(map[string]uint)
+	const maxRetries = 5
+
 	for _, inventory := range invens {
-		reservedLevelMap[inventory.ID.Hex()] = inventory.ReservedLevel
-	}
+		retryCount := 0
+		for retryCount < maxRetries {
+			currentVersion, err := uc.redisRepo.GetVersionInventory(ctx, inventory.ID)
+			if err != nil {
+				uc.l.Errorf(ctx, "order.usecase.updateReservedLevel.redisRepo.GetVersionInventory: %v", err)
+				return err
+			}
 
-	for _, product := range products {
-		reservedLevelMap[product.InventoryID.Hex()] += uint(productQuantityMap[product.ID.Hex()])
-	}
+			newReservedLevel := inventory.ReservedLevel
+			for _, product := range products {
+				if product.InventoryID == inventory.ID {
+					newReservedLevel += uint(productQuantityMap[product.ID.Hex()])
+				}
+			}
 
-	var wg sync.WaitGroup
-	var wgErr error
-	wg.Add(len(inventoryIDs))
-
-	for _, inventoryID := range inventoryIDs {
-		go func(inventoryID primitive.ObjectID) {
-			defer wg.Done()
-			_, err := uc.shopUC.UpdateInventory(ctx, sc, shop.UpdateInventoryInput{
-				ID:            inventoryID,
-				ReservedLevel: reservedLevelMap[inventoryID.Hex()],
+			_, err = uc.shopUC.UpdateInventory(ctx, sc, shop.UpdateInventoryInput{
+				ID:            inventory.ID,
+				ReservedLevel: newReservedLevel,
 			})
 			if err != nil {
-				wgErr = err
+				uc.l.Errorf(ctx, "order.usecase.updateReservedLevel.shopUC.UpdateInventory: %v", err)
+				return err
 			}
-		}(inventoryID)
-	}
 
-	wg.Wait()
-	if wgErr != nil {
-		uc.l.Errorf(ctx, "order.usecase.updateReservedLevel: %v", wgErr)
-		return wgErr
+			newVersion, err := uc.redisRepo.IncrementVersionInventory(ctx, inventory.ID)
+			if err != nil {
+				uc.l.Errorf(ctx, "order.usecase.updateReservedLevel.redisRepo.IncrementVersionInventory: %v", err)
+				return err
+			}
+
+			if newVersion != currentVersion+1 {
+				retryCount++
+				freshInventory, err := uc.shopUC.DetailInventory(ctx, inventory.ID)
+				if err != nil {
+					uc.l.Errorf(ctx, "order.usecase.updateReservedLevel.shopUC.DetailInventory: %v", err)
+					return err
+				}
+				inventory = freshInventory
+				continue
+			}
+
+			break
+		}
+
+		if retryCount == maxRetries {
+			uc.l.Errorf(ctx, "order.usecase.updateReservedLevel: too many retries due to concurrent modifications")
+			return order.ErrTooManyRetries
+		}
 	}
 
 	return nil

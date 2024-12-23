@@ -8,10 +8,11 @@ import (
 )
 
 type implUseCase struct {
-	l      log.Logger
-	repo   order.Repo
-	shopUC shop.UseCase
-	cartUC cart.UseCase
+	l         log.Logger
+	redisRepo order.Redis
+	repo      order.Repo
+	shopUC    shop.UseCase
+	cartUC    cart.UseCase
 }
 
 func New(l log.Logger, repo order.Repo, shopUC shop.UseCase, cartUC cart.UseCase) order.UseCase {
