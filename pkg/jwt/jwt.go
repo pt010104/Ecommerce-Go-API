@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/pt010104/api-golang/pkg/util"
 )
 
 type Payload struct {
@@ -47,8 +48,8 @@ func Verify(token string, key string) (Payload, error) {
 
 func Sign(payload Payload, expirationTime time.Duration, key string) (string, error) {
 	payload.StandardClaims = jwt.StandardClaims{
-		ExpiresAt: time.Now().Add(expirationTime).Unix(),
-		IssuedAt:  time.Now().Unix(),
+		ExpiresAt: util.Now().Add(expirationTime).Unix(),
+		IssuedAt:  util.Now().Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)

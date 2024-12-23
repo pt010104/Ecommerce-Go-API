@@ -2,16 +2,16 @@ package mongo
 
 import (
 	"context"
-	"time"
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/user"
+	"github.com/pt010104/api-golang/pkg/util"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func (impl implRepo) buildRequestTokenModel(context context.Context, userId primitive.ObjectID, token string) (models.RequestToken, error) {
-	now := time.Now()
+	now := util.Now()
 
 	u := models.RequestToken{
 		ID:        primitive.NewObjectID(),
@@ -26,7 +26,7 @@ func (impl implRepo) buildRequestTokenModel(context context.Context, userId prim
 
 func (repo implRepo) buildUpdateRequestTokenModel(ctx context.Context, opt user.UpdateRequestTokenOption) (bson.M, error) {
 	setFields := bson.M{
-		"updated_at": time.Now(),
+		"updated_at": util.Now(),
 	}
 
 	if opt.IsUsed != nil {

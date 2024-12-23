@@ -29,8 +29,8 @@ func (uc implUsecase) generateJWT(userName string, secret string) (string, error
 		"sub": userName,
 		"iss": "US",
 
-		"exp": time.Now().Add(time.Hour).Unix(),
-		"iat": time.Now().Unix(),
+		"exp": util.Now().Add(time.Hour).Unix(),
+		"iat": util.Now().Unix(),
 	})
 	tokenString, err := claims.SignedString([]byte(secret))
 	if err != nil {

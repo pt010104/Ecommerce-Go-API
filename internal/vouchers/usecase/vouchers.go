@@ -2,12 +2,12 @@ package usecase
 
 import (
 	"context"
-	"time"
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/internal/vouchers"
 	"github.com/pt010104/api-golang/pkg/mongo"
+	"github.com/pt010104/api-golang/pkg/util"
 )
 
 func (uc implUsecase) CreateVoucher(ctx context.Context, sc models.Scope, input vouchers.CreateVoucherInput) (models.Voucher, error) {
@@ -119,7 +119,7 @@ func (uc implUsecase) ApplyVoucher(ctx context.Context, sc models.Scope, input v
 		return models.Voucher{}, err
 	}
 
-	if voucher.ValidFrom.After(time.Now()) || voucher.ValidTo.Before(time.Now()) {
+	if voucher.ValidFrom.After(util.Now()) || voucher.ValidTo.Before(util.Now()) {
 		return models.Voucher{}, vouchers.ErrVoucherExpired
 	}
 	if voucher.UsageLimit > 0 && uint(voucher.UsedCount) >= voucher.UsageLimit {

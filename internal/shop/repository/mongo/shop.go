@@ -3,11 +3,11 @@ package mongo
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/pkg/paginator"
+	"github.com/pt010104/api-golang/pkg/util"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -164,7 +164,7 @@ func (repo implRepo) UpdateShop(ctx context.Context, sc models.Scope, option sho
 		option.Model.IsVerified = option.IsVerified
 	}
 
-	updateData["updated_at"] = time.Now()
+	updateData["updated_at"] = util.Now()
 
 	update := bson.M{}
 	if len(updateData) > 0 {

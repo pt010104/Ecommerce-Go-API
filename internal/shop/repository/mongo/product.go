@@ -2,11 +2,11 @@ package mongo
 
 import (
 	"context"
-	"time"
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/pkg/paginator"
+	"github.com/pt010104/api-golang/pkg/util"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -180,7 +180,7 @@ func (repo implRepo) UpdateProduct(ctx context.Context, sc models.Scope, option 
 		option.Model.Price = option.Price
 	}
 
-	updateData["updated_at"] = time.Now()
+	updateData["updated_at"] = util.Now()
 
 	update := bson.M{}
 	if len(updateData) > 0 {

@@ -2,11 +2,12 @@ package usecase
 
 import (
 	"fmt"
-	"time"
+
+	"github.com/pt010104/api-golang/pkg/util"
 )
 
 func (uc implUsecase) generateFilename(userID string) string {
-	timestamp := time.Now().UnixNano()
+	timestamp := util.Now().UnixNano()
 	return fmt.Sprintf("%d_%s", timestamp, userID)
 }
 

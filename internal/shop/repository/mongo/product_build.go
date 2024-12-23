@@ -2,15 +2,15 @@ package mongo
 
 import (
 	"context"
-	"time"
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
+	"github.com/pt010104/api-golang/pkg/util"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func (repo implRepo) buildProductModel(opt shop.CreateProductOption, ctx context.Context) (models.Product, error) {
-	now := time.Now()
+	now := util.Now()
 
 	p := models.Product{
 		ID:          primitive.NewObjectID(),

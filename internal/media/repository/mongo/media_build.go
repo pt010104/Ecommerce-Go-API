@@ -1,17 +1,16 @@
 package mongo
 
 import (
-	"time"
-
 	"github.com/pt010104/api-golang/internal/media"
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/pkg/mongo"
+	"github.com/pt010104/api-golang/pkg/util"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func (r implRepository) buildMediaModel(sc models.Scope, opt media.UploadOption) (models.Media, error) {
-	now := time.Now()
+	now := util.Now()
 
 	m := models.Media{
 		ID:        primitive.NewObjectID(),
@@ -28,7 +27,7 @@ func (r implRepository) buildMediaModel(sc models.Scope, opt media.UploadOption)
 }
 
 func (r implRepository) buildUpdateModel(opt media.UpdateOption) bson.M {
-	now := time.Now()
+	now := util.Now()
 	updateSet := bson.M{}
 
 	if opt.Status != "" {

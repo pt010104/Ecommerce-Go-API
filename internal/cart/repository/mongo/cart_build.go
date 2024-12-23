@@ -2,18 +2,18 @@ package mongo
 
 import (
 	"context"
-	"time"
 
 	"github.com/pt010104/api-golang/internal/cart"
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/pkg/mongo"
+	"github.com/pt010104/api-golang/pkg/util"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func (repo implRepo) buildCartModel(ctx context.Context, sc models.Scope, opt cart.CreateCartOption) (models.Cart, error) {
-	now := time.Now()
+	now := util.Now()
 
 	for _, item := range opt.CartItemList {
 		item.UpdatedAt = now
@@ -32,7 +32,7 @@ func (repo implRepo) buildCartModel(ctx context.Context, sc models.Scope, opt ca
 }
 
 func (repo implRepo) buildCartUpdateModel(ctx context.Context, sc models.Scope, opt cart.UpdateCartOption) (models.Cart, bson.M, error) {
-	now := time.Now()
+	now := util.Now()
 
 	unsetFields := bson.M{}
 

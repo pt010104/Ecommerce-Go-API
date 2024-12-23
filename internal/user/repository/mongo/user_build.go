@@ -2,17 +2,17 @@ package mongo
 
 import (
 	"context"
-	"time"
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/user"
 	"github.com/pt010104/api-golang/pkg/mongo"
+	"github.com/pt010104/api-golang/pkg/util"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func (impl implRepo) buildUserModel(context context.Context, opt user.CreateUserOption) (models.User, error) {
-	now := time.Now()
+	now := util.Now()
 
 	u := models.User{
 		ID:         primitive.NewObjectID(),
@@ -33,11 +33,11 @@ func (impl implRepo) buildUpdateUserModel(context context.Context, opt user.Upda
 	setFields := bson.M{
 		"name":       opt.Name,
 		"email":      opt.Email,
-		"updated_at": time.Now(),
+		"updated_at": util.Now(),
 	}
 	opt.Model.Name = opt.Name
 	opt.Model.Email = opt.Email
-	opt.Model.UpdatedAt = time.Now()
+	opt.Model.UpdatedAt = util.Now()
 
 	if opt.IsVerified {
 		setFields["is_verified"] = opt.IsVerified

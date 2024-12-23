@@ -2,16 +2,16 @@ package mongo
 
 import (
 	"context"
-	"time"
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/pkg/mongo"
+	"github.com/pt010104/api-golang/pkg/util"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func (repo implRepo) buildShopModel(ctx context.Context, sc models.Scope, opt shop.CreateShopOption) models.Shop {
-	now := time.Now()
+	now := util.Now()
 
 	s := models.Shop{
 		ID:         primitive.NewObjectID(),

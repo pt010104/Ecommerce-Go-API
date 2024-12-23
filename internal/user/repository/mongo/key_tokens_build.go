@@ -2,16 +2,16 @@ package mongo
 
 import (
 	"context"
-	"time"
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/user"
+	"github.com/pt010104/api-golang/pkg/util"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func (impl implRepo) buildKeyTokenModel(context context.Context, opt user.CreateKeyTokenOption) (models.KeyToken, error) {
-	now := time.Now()
+	now := util.Now()
 
 	u := models.KeyToken{
 		ID:           primitive.NewObjectID(),
@@ -27,7 +27,7 @@ func (impl implRepo) buildKeyTokenModel(context context.Context, opt user.Create
 }
 
 func (impl implRepo) buildUpdateKeyTokenModel(context context.Context, opt user.UpdateKeyTokenInput) (primitive.M, error) {
-	now := time.Now()
+	now := util.Now()
 
 	setFields := bson.M{
 		"updated_at": now,

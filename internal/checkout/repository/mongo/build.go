@@ -7,12 +7,13 @@ import (
 	"github.com/pt010104/api-golang/internal/checkout"
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/pkg/mongo"
+	"github.com/pt010104/api-golang/pkg/util"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func (repo implRepo) buildCheckoutModel(ctx context.Context, sc models.Scope, opt checkout.CreateOption) (models.Checkout, error) {
-	now := time.Now()
+	now := util.Now()
 
 	p := models.Checkout{
 		ID:        primitive.NewObjectID(),

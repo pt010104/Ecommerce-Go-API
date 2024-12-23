@@ -2,16 +2,16 @@ package mongo
 
 import (
 	"context"
-	"time"
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
+	"github.com/pt010104/api-golang/pkg/util"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func (impl implRepo) buildInventoryModel(context context.Context, opt shop.CreateInventoryOption) (models.Inventory, error) {
-	now := time.Now()
+	now := util.Now()
 
 	i := models.Inventory{
 		ID:         primitive.NewObjectID(),
@@ -29,7 +29,7 @@ func (impl implRepo) buildInventoryModel(context context.Context, opt shop.Creat
 }
 
 func (impl implRepo) buildInventoryUpdateModel(context context.Context, opt shop.UpdateInventoryOption) (models.Inventory, bson.M, error) {
-	now := time.Now()
+	now := util.Now()
 
 	setUpdate := bson.M{
 		"updated_at": now,
