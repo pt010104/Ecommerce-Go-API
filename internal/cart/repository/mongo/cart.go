@@ -43,14 +43,13 @@ func (repo implRepo) GetOne(ctx context.Context, sc models.Scope, opt cart.GetOn
 		repo.l.Errorf(ctx, "Cart.Repo.GetOne.buildCartQuery", err)
 		return models.Cart{}, err
 	}
+
 	var cart models.Cart
 	err = col.FindOne(ctx, filter).Decode(&cart)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-
 			return models.Cart{}, err
 		}
-
 		repo.l.Errorf(ctx, "Cart.Repo.GetOne.FindOne", err)
 		return models.Cart{}, err
 	}

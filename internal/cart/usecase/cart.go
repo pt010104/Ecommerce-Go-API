@@ -138,24 +138,34 @@ func (uc implUseCase) Add(ctx context.Context, sc models.Scope, input cart.Creat
 
 	var found bool
 	var newItems []models.CartItem
+	existCartProductIDs := []string{}
+
+	for _, item := range existingCart.Items {
+		existCartProductIDs = append(existCartProductIDs, item.ProductID.Hex())
+	}
+
+	products, err := uc.shopUc.ListProduct(ctx, models.Scope{}, shop.ListProductInput{
+		GetProductFilter: shop.GetProductFilter{
+			IDs: existCartProductIDs,
+		},
+	})
+	if err != nil {
+		uc.l.Errorf(ctx, "cart.Usecase.Add.ListProduct: %v", err)
+		return err
+	}
+
+	invensMap := make(map[string]models.Inventory)
+	for _, p := range products.Products {
+		invensMap[p.P.ID.Hex()] = p.Inventory
+	}
+
 	for _, item := range existingCart.Items {
 		if item.ProductID == data.CartItems[0].ProductID {
 			item.Quantity += input.Quantity
 			found = true
 		}
-		//print existingCart.Items
-		p, err := uc.shopUc.DetailProduct(ctx, models.Scope{}, item.ProductID)
-		if err != nil {
-			uc.l.Errorf(ctx, "cart.Usecase.Add.DetailProduct", err)
 
-			return err
-		}
-		inven, err := uc.shopUc.DetailInventory(ctx, p.Inventory.ID)
-		if err != nil {
-			uc.l.Errorf(ctx, "cart.Usecase.Add.DetailInventory", err)
-			return err
-		}
-		if err := uc.checkStock(ctx, sc, inven, item.Quantity); err != nil {
+		if err := uc.checkStock(ctx, sc, invensMap[item.ProductID.Hex()], item.Quantity); err != nil {
 			uc.l.Errorf(ctx, "cart.Usecase.Add.checkStock", err)
 			return err
 		}
@@ -183,12 +193,12 @@ func (uc implUseCase) Add(ctx context.Context, sc models.Scope, input cart.Creat
 }
 
 func (uc implUseCase) GetCart(ctx context.Context, sc models.Scope, opt cart.GetOption) (cart.GetCartOutput, error) {
-
 	carts, pag, err := uc.repo.GetCart(ctx, sc, opt)
 	if err != nil {
 		uc.l.Errorf(ctx, "cart.usecase.GetCart: %v", err)
 		return cart.GetCartOutput{}, err
 	}
+
 	var productItem cart.ProductItem
 	var getCartItems []cart.GetCartItem
 	var cartProductQuantityMap = make(map[string]map[string]int)
