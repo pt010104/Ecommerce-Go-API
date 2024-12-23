@@ -835,52 +835,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/shops/create-product": {
-            "post": {
-                "description": "Create a new product in the shop",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Shop"
-                ],
-                "summary": "Create a product",
-                "parameters": [
-                    {
-                        "description": "Request Body",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/http.createProductReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success Response",
-                        "schema": {
-                            "$ref": "#/definitions/response.Resp"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Resp"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Resp"
-                        }
-                    }
-                }
-            }
-        },
         "/api/v1/shops/get-shop-id-by-user-id/{id}": {
             "get": {
                 "description": "Get shop ID by user ID",
@@ -956,9 +910,72 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/shops/products/all": {
+        "/api/v1/shops/products": {
             "get": {
-                "description": "Get all products",
+                "description": "Retrieve a paginated list of products with optional filters , at least 1 parameter request body must be provided",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Get products with pagination",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "name": "category_ids",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "name": "ids",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "shop_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated Products",
+                        "schema": {
+                            "$ref": "#/definitions/http.getProductResp"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new product in the shop",
                 "consumes": [
                     "application/json"
                 ],
@@ -968,12 +985,23 @@ const docTemplate = `{
                 "tags": [
                     "Shop"
                 ],
-                "summary": "Get all products",
+                "summary": "Create a product",
+                "parameters": [
+                    {
+                        "description": "Request Body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.createProductReq"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success Response",
                         "schema": {
-                            "$ref": "#/definitions/http.getAllProductsResp"
+                            "$ref": "#/definitions/response.Resp"
                         }
                     },
                     "400": {
@@ -989,9 +1017,7 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/api/v1/shops/products/delete": {
+            },
             "delete": {
                 "description": "delete product by id",
                 "consumes": [
@@ -1068,9 +1094,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/shops/products/get-product": {
+        "/api/v1/shops/products/all": {
             "get": {
-                "description": "Retrieve a paginated list of products with optional filters , at least 1 parameter request body must be provided",
+                "description": "Get all products",
                 "consumes": [
                     "application/json"
                 ],
@@ -1078,56 +1104,26 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Product"
+                    "Shop"
                 ],
-                "summary": "Get products with pagination",
-                "parameters": [
-                    {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "collectionFormat": "csv",
-                        "name": "category_ids",
-                        "in": "query"
-                    },
-                    {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "collectionFormat": "csv",
-                        "name": "ids",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "search",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "shop_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Items per page",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
+                "summary": "Get all products",
                 "responses": {
                     "200": {
-                        "description": "Paginated Products",
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/http.getProductResp"
+                            "$ref": "#/definitions/http.getAllProductsResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
                         }
                     }
                 }

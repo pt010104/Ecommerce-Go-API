@@ -1314,36 +1314,6 @@ paths:
       summary: Get shop detail
       tags:
       - Shop
-  /api/v1/shops/create-product:
-    post:
-      consumes:
-      - application/json
-      description: Create a new product in the shop
-      parameters:
-      - description: Request Body
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/http.createProductReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Success Response
-          schema:
-            $ref: '#/definitions/response.Resp'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.Resp'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.Resp'
-      summary: Create a product
-      tags:
-      - Shop
   /api/v1/shops/get-shop-id-by-user-id/{id}:
     get:
       consumes:
@@ -1394,6 +1364,130 @@ paths:
           schema:
             $ref: '#/definitions/response.Resp'
       summary: Get shop ID by user ID
+      tags:
+      - Shop
+  /api/v1/shops/products:
+    delete:
+      consumes:
+      - application/json
+      description: delete product by id
+      parameters:
+      - default: '"*"'
+        description: Access-Control-Allow-Origin
+        in: header
+        name: Access-Control-Allow-Origin
+        type: string
+      - default: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU
+        description: Bearer JWT token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - default: 6707825d45804caaf8316957
+        description: User ID
+        in: header
+        name: x-client-id
+        required: true
+        type: string
+      - default: zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=
+        description: Session ID
+        in: header
+        name: session-id
+        required: true
+        type: string
+      - description: Request Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/http.deleteProductRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Resp'
+      summary: delete product by their id
+      tags:
+      - Products
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a paginated list of products with optional filters , at
+        least 1 parameter request body must be provided
+      parameters:
+      - collectionFormat: csv
+        in: query
+        items:
+          type: string
+        name: category_ids
+        type: array
+      - collectionFormat: csv
+        in: query
+        items:
+          type: string
+        name: ids
+        type: array
+      - in: query
+        name: search
+        type: string
+      - in: query
+        name: shop_id
+        type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Paginated Products
+          schema:
+            $ref: '#/definitions/http.getProductResp'
+      summary: Get products with pagination
+      tags:
+      - Product
+    post:
+      consumes:
+      - application/json
+      description: Create a new product in the shop
+      parameters:
+      - description: Request Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/http.createProductReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success Response
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Resp'
+      summary: Create a product
       tags:
       - Shop
   /api/v1/shops/products/{id}:
@@ -1471,102 +1565,6 @@ paths:
       summary: Get all products
       tags:
       - Shop
-  /api/v1/shops/products/delete:
-    delete:
-      consumes:
-      - application/json
-      description: delete product by id
-      parameters:
-      - default: '"*"'
-        description: Access-Control-Allow-Origin
-        in: header
-        name: Access-Control-Allow-Origin
-        type: string
-      - default: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU
-        description: Bearer JWT token
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      - default: 6707825d45804caaf8316957
-        description: User ID
-        in: header
-        name: x-client-id
-        required: true
-        type: string
-      - default: zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=
-        description: Session ID
-        in: header
-        name: session-id
-        required: true
-        type: string
-      - description: Request Body
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/http.deleteProductRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Success
-          schema:
-            $ref: '#/definitions/response.Resp'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.Resp'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.Resp'
-      summary: delete product by their id
-      tags:
-      - Products
-  /api/v1/shops/products/get-product:
-    get:
-      consumes:
-      - application/json
-      description: Retrieve a paginated list of products with optional filters , at
-        least 1 parameter request body must be provided
-      parameters:
-      - collectionFormat: csv
-        in: query
-        items:
-          type: string
-        name: category_ids
-        type: array
-      - collectionFormat: csv
-        in: query
-        items:
-          type: string
-        name: ids
-        type: array
-      - in: query
-        name: search
-        type: string
-      - in: query
-        name: shop_id
-        type: string
-      - description: Page number
-        in: query
-        name: page
-        type: integer
-      - description: Items per page
-        in: query
-        name: limit
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Paginated Products
-          schema:
-            $ref: '#/definitions/http.getProductResp'
-      summary: Get products with pagination
-      tags:
-      - Product
   /api/v1/shops/products/update:
     post:
       consumes:

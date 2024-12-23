@@ -18,7 +18,7 @@ import (
 // @Success      200 {object} response.Resp "Success Response"
 // @Failure      400 {object} response.Resp "Bad Request"
 // @Failure      500 {object} response.Resp "Internal Server Error"
-// @Router       /api/v1/shops/create-product [post]
+// @Router       /api/v1/shops/products [post]
 func (h handler) CreateProduct(c *gin.Context) {
 	ctx := c.Request.Context()
 
@@ -101,7 +101,7 @@ func (h handler) DetailProduct(c *gin.Context) {
 // @Failure		400							{object}	response.Resp	"Bad Request"
 // @Failure		500							{object}	response.Resp	"Internal Server Error"
 //
-// @Router			/api/v1/shops/products/delete [DELETE]
+// @Router			/api/v1/shops/products [DELETE]
 func (h handler) DeleteProduct(c *gin.Context) {
 	ctx := c.Request.Context()
 
@@ -132,7 +132,7 @@ func (h handler) DeleteProduct(c *gin.Context) {
 // @Param        page query int false "Page number"
 // @Param        limit query int false "Items per page"
 // @Success      200 {object} getProductResp "Paginated Products"
-// @Router       /api/v1/shops/products/get-product [get]
+// @Router       /api/v1/shops/products [get]
 func (h handler) GetProduct(c *gin.Context) {
 	ctx := c.Request.Context()
 
