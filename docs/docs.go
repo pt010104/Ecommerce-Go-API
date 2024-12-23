@@ -1501,7 +1501,9 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {}
+                        "schema": {
+                            "$ref": "#/definitions/http.detailAddressResp"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
