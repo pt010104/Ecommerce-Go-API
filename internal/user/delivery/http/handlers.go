@@ -410,7 +410,7 @@ func (h handler) AddAddress(c *gin.Context) {
 // @Failure		404							{object}	response.Resp	"Address Not Found"
 // @Failure		500							{object}	response.Resp	"Internal Server Error"
 //
-// @Router			/api/v1/users/address/{id} [PATCH]
+// @Router			/api/v1/users/address/ [PATCH]
 func (h handler) UpdateAddress(c *gin.Context) {
 	ctx := c.Request.Context()
 	sc, req, err := h.processUpdateAddressRequest(c)

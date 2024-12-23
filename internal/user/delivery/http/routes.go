@@ -19,5 +19,5 @@ func MapRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
 	r.PUT("", h.Update)
 
 	r.POST("/address", h.AddAddress)
-	r.PATCH("/address/:id", h.UpdateAddress)
+	r.PATCH("/address", h.UpdateAddress)
 }

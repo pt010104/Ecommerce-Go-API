@@ -1520,7 +1520,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/users/address/{id}": {
+        "/api/v1/users/address/": {
             "patch": {
                 "description": "Update an existing address for a user",
                 "consumes": [

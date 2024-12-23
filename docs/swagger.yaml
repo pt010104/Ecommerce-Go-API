@@ -1786,7 +1786,7 @@ paths:
       summary: Add New Address
       tags:
       - Address
-  /api/v1/users/address/{id}:
+  /api/v1/users/address/:
     patch:
       consumes:
       - application/json
