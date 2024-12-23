@@ -1519,7 +1519,7 @@ const docTemplate = `{
             }
         },
         "/api/v1/users/address/{id}": {
-            "put": {
+            "patch": {
                 "description": "Update an existing address for a user",
                 "consumes": [
                     "application/json"
@@ -1583,7 +1583,9 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {}
+                        "schema": {
+                            "$ref": "#/definitions/http.detailAddressResp"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -2817,6 +2819,17 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "type": "string"
+                    }
+                }
+            }
+        },
+        "http.detailAddressResp": {
+            "type": "object",
+            "properties": {
+                "addressess": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.address_obj"
                     }
                 }
             }

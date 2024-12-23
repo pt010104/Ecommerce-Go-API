@@ -581,11 +581,11 @@ func (uc implUsecase) Update(ctx context.Context, sc models.Scope, input user.Up
 
 }
 
-func (uc implUsecase) AddAddress(ctx context.Context, sc models.Scope, input user.AddAddressInput) error {
+func (uc implUsecase) AddAddress(ctx context.Context, sc models.Scope, input user.AddAddressInput) (user.DetailAddressOutput, error) {
 	u, err := uc.GetModel(ctx, sc.UserID)
 	if err != nil {
 		uc.l.Errorf(ctx, "user.usecase.AddAddress.GetModel: %v", err)
-		return err
+		return user.DetailAddressOutput{}, err
 	}
 
 	newAddress := models.Address{
@@ -612,7 +612,7 @@ func (uc implUsecase) AddAddress(ctx context.Context, sc models.Scope, input use
 	})
 	if err != nil {
 		uc.l.Errorf(ctx, "user.usecase.AddAddress.UpdateUser: %v", err)
-		return err
+		return user.DetailAddressOutput{}, err
 	}
 
 	go func() {
@@ -622,20 +622,22 @@ func (uc implUsecase) AddAddress(ctx context.Context, sc models.Scope, input use
 		}
 	}()
 
-	return nil
+	return user.DetailAddressOutput{
+		Addressess: u.Address,
+	}, nil
 }
 
-func (uc implUsecase) UpdateAddress(ctx context.Context, sc models.Scope, input user.UpdateAddressInput) error {
+func (uc implUsecase) UpdateAddress(ctx context.Context, sc models.Scope, input user.UpdateAddressInput) (user.DetailAddressOutput, error) {
 	u, err := uc.GetModel(ctx, sc.UserID)
 	if err != nil {
 		uc.l.Errorf(ctx, "user.usecase.UpdateAddress.GetModel: %v", err)
-		return err
+		return user.DetailAddressOutput{}, err
 	}
 
 	addressID, err := primitive.ObjectIDFromHex(input.AddressID)
 	if err != nil {
 		uc.l.Errorf(ctx, "user.usecase.UpdateAddress.ObjectIDFromHex: %v", err)
-		return err
+		return user.DetailAddressOutput{}, err
 	}
 
 	addressIndex := -1
@@ -648,7 +650,7 @@ func (uc implUsecase) UpdateAddress(ctx context.Context, sc models.Scope, input 
 
 	if addressIndex == -1 {
 		uc.l.Errorf(ctx, "user.usecase.UpdateAddress: address not found")
-		return user.ErrAddressNotFound
+		return user.DetailAddressOutput{}, user.ErrAddressNotFound
 	}
 
 	if input.Default {
@@ -670,7 +672,7 @@ func (uc implUsecase) UpdateAddress(ctx context.Context, sc models.Scope, input 
 	})
 	if err != nil {
 		uc.l.Errorf(ctx, "user.usecase.UpdateAddress.UpdateUser: %v", err)
-		return err
+		return user.DetailAddressOutput{}, err
 	}
 
 	go func() {
@@ -680,5 +682,7 @@ func (uc implUsecase) UpdateAddress(ctx context.Context, sc models.Scope, input 
 		}
 	}()
 
-	return nil
+	return user.DetailAddressOutput{
+		Addressess: u.Address,
+	}, nil
 }

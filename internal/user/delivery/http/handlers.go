@@ -368,7 +368,7 @@ func (h handler) Update(c *gin.Context) {
 // @Param			x-client-id					header		string	true	"User ID"						default(6707825d45804caaf8316957)
 // @Param			session-id					header		string	true	"Session ID"					default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
 // @Param			address						body		addressReq	true	"Address"
-// @Success		200							{object}	interface{}
+// @Success		200							{object}	detailAddressResp
 // @Failure		400							{object}	response.Resp	"Bad Request"
 // @Failure		500							{object}	response.Resp	"Internal Server Error"
 //
@@ -382,14 +382,14 @@ func (h handler) AddAddress(c *gin.Context) {
 		return
 	}
 
-	err = h.uc.AddAddress(ctx, sc, req.toInput())
+	addressess, err := h.uc.AddAddress(ctx, sc, req.toInput())
 	if err != nil {
 		h.l.Errorf(ctx, "user.delivery.http.handler.AddAddress.uc.AddAddress: %v", err)
 		response.Error(c, err)
 		return
 	}
 
-	response.OK(c, nil)
+	response.OK(c, h.newDetailAddressResp(addressess))
 }
 
 // @Summary		Update Address
@@ -405,12 +405,12 @@ func (h handler) AddAddress(c *gin.Context) {
 // @Param			session-id					header		string	true	"Session ID"					default(zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=)
 // @Param			id							path		string	true	"Address ID"
 // @Param			address						body		addressReq	true	"Updated Address"
-// @Success		200							{object}	interface{}
+// @Success		200							{object}	detailAddressResp
 // @Failure		400							{object}	response.Resp	"Bad Request"
 // @Failure		404							{object}	response.Resp	"Address Not Found"
 // @Failure		500							{object}	response.Resp	"Internal Server Error"
 //
-// @Router			/api/v1/users/address/{id} [PUT]
+// @Router			/api/v1/users/address/{id} [PATCH]
 func (h handler) UpdateAddress(c *gin.Context) {
 	ctx := c.Request.Context()
 	sc, req, err := h.processUpdateAddressRequest(c)
@@ -420,12 +420,12 @@ func (h handler) UpdateAddress(c *gin.Context) {
 		return
 	}
 
-	err = h.uc.UpdateAddress(ctx, sc, req.toInput())
+	addressess, err := h.uc.UpdateAddress(ctx, sc, req.toInput())
 	if err != nil {
 		h.l.Errorf(ctx, "user.delivery.http.handler.UpdateAddress.uc.UpdateAddress: %v", err)
 		response.Error(c, err)
 		return
 	}
 
-	response.OK(c, nil)
+	response.OK(c, h.newDetailAddressResp(addressess))
 }

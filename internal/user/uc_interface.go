@@ -22,6 +22,6 @@ type UseCase interface {
 	ResetPassWord(ctx context.Context, input ResetPasswordInput) error
 	DistributeNewToken(ctx context.Context, input DistributeNewTokenInput) (output DistributeNewTokenOutput, er error)
 
-	AddAddress(ctx context.Context, sc models.Scope, input AddAddressInput) error
-	UpdateAddress(ctx context.Context, sc models.Scope, input UpdateAddressInput) error
+	AddAddress(ctx context.Context, sc models.Scope, input AddAddressInput) (DetailAddressOutput, error)
+	UpdateAddress(ctx context.Context, sc models.Scope, input UpdateAddressInput) (DetailAddressOutput, error)
 }

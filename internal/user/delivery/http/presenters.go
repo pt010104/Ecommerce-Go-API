@@ -260,3 +260,23 @@ func (r updateAddressReq) toInput() user.UpdateAddressInput {
 		Default:   r.Default,
 	}
 }
+
+type detailAddressResp struct {
+	Addressess []address_obj `json:"addressess"`
+}
+
+func (h handler) newDetailAddressResp(output user.DetailAddressOutput) detailAddressResp {
+	address := make([]address_obj, 0, len(output.Addressess))
+	for _, addr := range output.Addressess {
+		address = append(address, address_obj{
+			ID:       addr.ID.Hex(),
+			Street:   addr.Street,
+			District: addr.District,
+			City:     addr.City,
+			Province: addr.Province,
+			Phone:    addr.Phone,
+			Default:  addr.Default,
+		})
+	}
+	return detailAddressResp{Addressess: address}
+}

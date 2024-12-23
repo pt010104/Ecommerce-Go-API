@@ -76,3 +76,7 @@ type UpdateAddressInput struct {
 	Phone     string
 	Default   bool
 }
+
+type DetailAddressOutput struct {
+	Addressess []models.Address
+}

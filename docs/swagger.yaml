@@ -258,6 +258,13 @@ definitions:
           type: string
         type: array
     type: object
+  http.detailAddressResp:
+    properties:
+      addressess:
+        items:
+          $ref: '#/definitions/http.address_obj'
+        type: array
+    type: object
   http.detailProductResp:
     properties:
       avatar:
@@ -1779,7 +1786,7 @@ paths:
       tags:
       - Address
   /api/v1/users/address/{id}:
-    put:
+    patch:
       consumes:
       - application/json
       description: Update an existing address for a user
@@ -1823,7 +1830,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            $ref: '#/definitions/http.detailAddressResp'
         "400":
           description: Bad Request
           schema:
