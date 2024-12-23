@@ -7,13 +7,13 @@ import (
 )
 
 type Checkout struct {
-	ID        primitive.ObjectID   `bson:"_id"`
-	CartIDs   []primitive.ObjectID `bson:"cart_ids"`
-	UserID    primitive.ObjectID   `bson:"user_id"`
-	Status    string               `bson:"status"`
-	ExpiredAt time.Time            `bson:"expired_at"`
-	CreatedAt time.Time            `bson:"created_at"`
-	UpdatedAt time.Time            `bson:"updated_at"`
+	ID         primitive.ObjectID   `bson:"_id"`
+	ProductIDs []primitive.ObjectID `bson:"product_ids"`
+	UserID     primitive.ObjectID   `bson:"user_id"`
+	Status     string               `bson:"status"`
+	ExpiredAt  time.Time            `bson:"expired_at"`
+	CreatedAt  time.Time            `bson:"created_at"`
+	UpdatedAt  time.Time            `bson:"updated_at"`
 }
 
 const (

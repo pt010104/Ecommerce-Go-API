@@ -6,6 +6,7 @@ import (
 
 	"github.com/pt010104/api-golang/internal/checkout"
 	"github.com/pt010104/api-golang/internal/models"
+	"github.com/pt010104/api-golang/pkg/mongo"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -16,7 +17,6 @@ func (uc implUseCase) Create(ctx context.Context, sc models.Scope, productIDs []
 
 	var products []models.Product
 	var image_urls []string
-	var cartIDs []primitive.ObjectID
 	var productQuantityMap map[string]int
 
 	go func() {
@@ -32,7 +32,7 @@ func (uc implUseCase) Create(ctx context.Context, sc models.Scope, productIDs []
 	go func() {
 		defer wg.Done()
 		var err error
-		cartIDs, productQuantityMap, err = uc.validateCart(ctx, sc, productIDs)
+		_, productQuantityMap, err = uc.validateCart(ctx, sc, productIDs)
 		if err != nil {
 			uc.l.Errorf(ctx, "checkout.usecase.Create.validateCart: %v", err)
 			wgErr = err
@@ -50,7 +50,7 @@ func (uc implUseCase) Create(ctx context.Context, sc models.Scope, productIDs []
 	}
 
 	checkoutModel, err := uc.repo.Create(ctx, sc, checkout.CreateOption{
-		CartIDs: cartIDs,
+		ProductIDs: mongo.ObjectIDsFromHexOrNil(productIDs),
 	})
 	if err != nil {
 		uc.l.Errorf(ctx, "checkout.usecase.Create.repo.Create: %v", err)
