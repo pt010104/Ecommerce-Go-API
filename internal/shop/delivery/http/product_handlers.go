@@ -180,7 +180,7 @@ func (h handler) GetProduct(c *gin.Context) {
 // @Failure		400							{object}	response.Resp	"Bad Request"
 // @Failure		500							{object}	response.Resp	"Internal Server Error"
 //
-// @Router			/api/v1/shops/products/update [Post]
+// @Router			/api/v1/shops/products [PUT]
 func (h handler) UpdateProduct(c *gin.Context) {
 	ctx := c.Request.Context()
 
