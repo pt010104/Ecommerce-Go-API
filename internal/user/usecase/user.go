@@ -408,7 +408,7 @@ func (uc implUsecase) VerifyUser(ctx context.Context, input user.VerifyUserInput
 		Model:      u,
 		IsVerified: true,
 	}
-	_, err = uc.repo.UpdateUser(ctx, opt)
+	_, err = uc.repo.UpdatePatchUser(ctx, opt)
 	if err != nil {
 		uc.l.Errorf(ctx, "user.usecase.VerifyUser.UpdateUser: %v", err)
 		return err

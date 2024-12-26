@@ -73,7 +73,10 @@ func (impl implRepo) buildUpdatePatchUserModel(context context.Context, opt user
 	}
 
 	opt.Model.UpdatedAt = util.Now()
-
+	if opt.IsVerified {
+		setFields["is_verified"] = opt.IsVerified
+		opt.Model.IsVerified = opt.IsVerified
+	}
 	if opt.Password != "" {
 		setFields["password"] = opt.Password
 		opt.Model.Password = opt.Password

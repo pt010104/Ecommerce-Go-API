@@ -13,7 +13,7 @@ var (
 	ErrMismatchedHashAndPassword = pkgErrors.NewHTTPError(120004, "Wrong credentials")
 	ErrEmailExisted              = pkgErrors.NewHTTPError(120005, "email has already been registered")
 	ErrUserNotVerified           = pkgErrors.NewHTTPError(120006, "user not verified")
-	ErrInvalidPasswordFormat     = pkgErrors.NewHTTPError(120007, "password must contain number and digits")
+	ErrInvalidPasswordFormat     = pkgErrors.NewHTTPError(120007, "password must contain number and digits and no special characters")
 	ErrInvalidEmailFormat        = pkgErrors.NewHTTPError(120007, "invalid email")
 	ErrInvalidNameFormat         = pkgErrors.NewHTTPError(120007, "invalid name")
 )
