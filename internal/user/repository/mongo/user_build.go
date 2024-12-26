@@ -66,3 +66,23 @@ func (impl implRepo) buildUpdateUserModel(context context.Context, opt user.Upda
 
 	return update, opt.Model, nil
 }
+func (impl implRepo) buildUpdatePatchUserModel(context context.Context, opt user.UpdateUserOption) (bson.M, models.User, error) {
+	setFields := bson.M{
+
+		"updated_at": util.Now(),
+	}
+
+	opt.Model.UpdatedAt = util.Now()
+
+	if opt.Password != "" {
+		setFields["password"] = opt.Password
+		opt.Model.Password = opt.Password
+	}
+
+	update := bson.M{}
+	if len(setFields) > 0 {
+		update["$set"] = setFields
+	}
+
+	return update, opt.Model, nil
+}

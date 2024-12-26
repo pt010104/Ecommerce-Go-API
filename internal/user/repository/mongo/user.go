@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/user"
@@ -51,6 +52,8 @@ func (repo implRepo) GetUser(ctx context.Context, opt user.GetUserOption) (model
 		repo.l.Errorf(ctx, "survey.repository.mongo.GetUser.col.FindOne: %v", err)
 		return models.User{}, err
 	}
+	//print user
+	fmt.Errorf("user: %v", user)
 
 	return user, nil
 }
@@ -65,6 +68,30 @@ func (repo implRepo) UpdateUser(ctx context.Context, opt user.UpdateUserOption) 
 	}
 
 	update, nm, err := repo.buildUpdateUserModel(ctx, opt)
+	if err != nil {
+		repo.l.Errorf(ctx, "user.repository.mongo.UpdateUser.buildUpdateUserModel: %v", err)
+		return models.User{}, err
+	}
+
+	_, err = col.UpdateOne(ctx, filter, update)
+	if err != nil {
+		repo.l.Errorf(ctx, "user.repository.mongo.UpdateUser.col.UpdateOne: %v", err)
+		return models.User{}, err
+	}
+
+	return nm, nil
+}
+func (repo implRepo) UpdatePatchUser(ctx context.Context, opt user.UpdateUserOption) (models.User, error) {
+	col := repo.getUserCollection()
+
+	filter, err := repo.buildUserDetailQuery(ctx, opt.Model.ID.Hex())
+	if err != nil {
+		repo.l.Errorf(ctx, "user.repository.mongo.GetUser.buildUserDetailQuery: %v", err)
+		return models.User{}, err
+
+	}
+
+	update, nm, err := repo.buildUpdatePatchUserModel(ctx, opt)
 	if err != nil {
 		repo.l.Errorf(ctx, "user.repository.mongo.UpdateUser.buildUpdateUserModel: %v", err)
 		return models.User{}, err

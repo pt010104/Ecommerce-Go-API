@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+
 	"sync"
 	"time"
 
@@ -76,6 +77,7 @@ func (uc implUsecase) SignIn(ctx context.Context, sit user.SignInType) (user.Sig
 	}
 
 	if !u.IsVerified {
+		uc.l.Debugf(ctx, "userveriry:", u.IsVerified)
 		uc.l.Errorf(ctx, "user.usecase.SignIn: user is not verified")
 		return user.SignInOutput{}, user.ErrUserNotVerified
 	}
@@ -368,7 +370,7 @@ func (uc implUsecase) ResetPassWord(ctx context.Context, input user.ResetPasswor
 		Model:    u,
 		Password: newHashesPass,
 	}
-	_, err = uc.repo.UpdateUser(ctx, opt)
+	_, err = uc.repo.UpdatePatchUser(ctx, opt)
 	if err != nil {
 		uc.l.Errorf(ctx, "user.usecase.ResetPassword.UpdateUser: %v", err)
 		return err
