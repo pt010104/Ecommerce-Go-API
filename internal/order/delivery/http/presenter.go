@@ -89,3 +89,23 @@ func (h handler) newCreateCheckoutCheckoutResponse(o order.CreateCheckoutOutput)
 
 	return checkoutResponse
 }
+
+type CreateOrderRequest struct {
+	CheckoutID    string `json:"checkout_id" binding:"required"`
+	PaymentMethod string `json:"payment_method" binding:"required"`
+}
+
+func (r CreateOrderRequest) validate() error {
+	if !mongo.IsObjectID(r.CheckoutID) {
+		return errWrongBody
+	}
+
+	return nil
+}
+
+func (r CreateOrderRequest) toInput() order.CreateOrderInput {
+	return order.CreateOrderInput{
+		CheckoutID:    r.CheckoutID,
+		PaymentMethod: r.PaymentMethod,
+	}
+}

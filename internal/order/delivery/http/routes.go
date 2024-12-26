@@ -6,7 +6,13 @@ import (
 )
 
 func MapRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
+	MapOrderRouters(r, h, mw)
 	MapCheckoutRouters(r, h, mw)
+}
+
+func MapOrderRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
+	r.Use(mw.Auth())
+	r.POST("", h.CreateOrder)
 }
 
 func MapCheckoutRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {

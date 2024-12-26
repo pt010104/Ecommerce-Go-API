@@ -15,6 +15,7 @@ type UseCase interface {
 	GetModel(ctx context.Context, id string) (models.User, error)
 	VerifyUser(ctx context.Context, input VerifyUserInput) error
 	Update(ctx context.Context, sc models.Scope, input UpdateInput) (DetailUserOutput, error)
+	ListUsers(ctx context.Context, sc models.Scope, input ListUserInput) ([]models.User, error)
 
 	DetailKeyToken(ctx context.Context, userID string, sessionID string) (models.KeyToken, error)
 	ForgetPasswordRequest(ctx context.Context, email string) (token string, err error)

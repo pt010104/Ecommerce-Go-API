@@ -24,7 +24,7 @@ func (repo implRepo) buildUserDetailQuery(ctx context.Context, id string) (bson.
 	return filter, nil
 }
 
-func (repo implRepo) buidUserQuery(ctx context.Context, opt user.GetUserOption) (bson.M, error) {
+func (repo implRepo) buidUserQuery(ctx context.Context, opt user.GetFilter) (bson.M, error) {
 	filter := bson.M{}
 	var err error
 
@@ -40,6 +40,10 @@ func (repo implRepo) buidUserQuery(ctx context.Context, opt user.GetUserOption) 
 
 	if opt.Email != "" {
 		filter["email"] = opt.Email
+	}
+
+	if len(opt.IDs) > 0 {
+		filter["_id"] = bson.M{"$in": opt.IDs}
 	}
 
 	return filter, nil

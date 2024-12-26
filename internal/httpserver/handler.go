@@ -29,7 +29,8 @@ import (
 	userUC "github.com/pt010104/api-golang/internal/user/usecase"
 	voucherUC "github.com/pt010104/api-golang/internal/vouchers/usecase"
 
-	producer "github.com/pt010104/api-golang/internal/media/delivery/rabbitmq/producer"
+	mediaProd "github.com/pt010104/api-golang/internal/media/delivery/rabbitmq/producer"
+	orderProd "github.com/pt010104/api-golang/internal/order/delivery/rabbitmq/producer"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
@@ -54,21 +55,24 @@ func (srv HTTPServer) mapHandlers() error {
 	orderRepo := orderRepo.New(srv.l, srv.database)
 
 	//Producer
-	prod := producer.New(srv.l, srv.amqpConn)
-	if err := prod.Run(); err != nil {
+	mediaProd := mediaProd.New(srv.l, srv.amqpConn)
+	if err := mediaProd.Run(); err != nil {
 		return err
 	}
-
+	orderProducer := orderProd.New(srv.l, srv.amqpConn)
+	if err := orderProducer.Run(); err != nil {
+		return err
+	}
 	//Usecase
 	emailUC := emailUC.New(srv.l)
-	mediaUC := mediaUC.New(srv.l, mediaRepo, prod, srv.cloudinary)
+	mediaUC := mediaUC.New(srv.l, mediaRepo, mediaProd, srv.cloudinary)
 	userUC := userUC.New(srv.l, userRepo, emailUC, redisUserRepo, mediaUC)
 	shopUC := shopUC.New(srv.l, shopRepo, nil, userUC, mediaUC)
 	adminUC := adminUC.New(adminRepo, srv.l, shopUC)
 	shopUC.SetAdminUC(adminUC)
 	cartUC := cartUC.New(srv.l, cartRepo, shopUC)
 	voucherUC := voucherUC.New(voucherRepo, srv.l, shopUC)
-	orderUC := orderUC.New(srv.l, orderRepo, shopUC, cartUC, redisOrderRepo)
+	orderUC := orderUC.New(srv.l, orderRepo, shopUC, cartUC, redisOrderRepo, orderProducer, userUC)
 
 	// Handlers
 	userH := userHTTP.New(srv.l, userUC)

@@ -11,9 +11,14 @@ type CreateUserOption struct {
 	Email    string
 }
 
-type GetUserOption struct {
+type GetFilter struct {
 	ID    string
+	IDs   []string
 	Email string
+}
+
+type GetUserOption struct {
+	GetFilter
 }
 
 type KeyTokenRepoOption struct {
@@ -53,4 +58,8 @@ type AddAddressOption struct {
 	Province string
 	Phone    string
 	Default  bool
+}
+
+type ListUserOption struct {
+	GetFilter
 }

@@ -8,6 +8,7 @@ import (
 
 type Handler interface {
 	CreateCheckout(c *gin.Context)
+	CreateOrder(c *gin.Context)
 }
 
 type handler struct {

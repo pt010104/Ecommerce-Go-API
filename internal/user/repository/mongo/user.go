@@ -38,7 +38,7 @@ func (repo implRepo) CreateUser(ctx context.Context, opt user.CreateUserOption) 
 func (repo implRepo) GetUser(ctx context.Context, opt user.GetUserOption) (models.User, error) {
 	col := repo.getUserCollection()
 
-	filter, err := repo.buidUserQuery(ctx, opt)
+	filter, err := repo.buidUserQuery(ctx, opt.GetFilter)
 	if err != nil {
 		repo.l.Errorf(ctx, "user.repository.mongo.GetUser.buidUserQuery: %v", err)
 		return models.User{}, err
@@ -97,4 +97,30 @@ func (repo implRepo) DetailUser(ctx context.Context, id string) (models.User, er
 	}
 
 	return user, nil
+}
+
+func (repo implRepo) ListUser(ctx context.Context, opt user.ListUserOption) ([]models.User, error) {
+	col := repo.getUserCollection()
+
+	filter, err := repo.buidUserQuery(ctx, opt.GetFilter)
+	if err != nil {
+		repo.l.Errorf(ctx, "user.repository.mongo.ListUser.buildUserQuery: %v", err)
+		return nil, err
+	}
+
+	cursor, err := col.Find(ctx, filter)
+	if err != nil {
+		repo.l.Errorf(ctx, "user.repository.mongo.ListUser.col.Find: %v", err)
+		return nil, err
+	}
+
+	var users []models.User
+
+	err = cursor.All(ctx, &users)
+	if err != nil {
+		repo.l.Errorf(ctx, "user.repository.mongo.ListUser.cursor.All: %v", err)
+		return nil, err
+	}
+
+	return users, nil
 }

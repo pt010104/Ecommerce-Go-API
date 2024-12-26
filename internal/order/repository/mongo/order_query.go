@@ -8,18 +8,14 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func (repo implRepo) buildCheckoutDetailQuery(ctx context.Context, sc models.Scope, checkoutID string) (bson.M, error) {
+func (repo implRepo) buildOrderDetailQuery(ctx context.Context, sc models.Scope, orderID string) (bson.M, error) {
 	filter, err := mongo.BuildScopeQuery(ctx, repo.l, sc)
 	if err != nil {
 		repo.l.Errorf(ctx, "Checkout.Repo.buildCheckoutDetailQuery.BuildScopeQuery", err)
 		return nil, err
 	}
 
-	filter = mongo.BuildQueryWithSoftDelete(filter)
-
-	if checkoutID != "" {
-		filter["_id"] = mongo.ObjectIDFromHexOrNil(checkoutID)
-	}
+	filter["_id"] = mongo.ObjectIDFromHexOrNil(orderID)
 
 	return filter, nil
 }

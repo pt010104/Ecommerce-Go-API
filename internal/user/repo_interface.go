@@ -14,6 +14,7 @@ type Repository interface {
 	GetUser(ctx context.Context, opt GetUserOption) (models.User, error)
 	DetailUser(ctx context.Context, id string) (models.User, error)
 	UpdateUser(ctx context.Context, opt UpdateUserOption) (models.User, error)
+	ListUser(ctx context.Context, opt ListUserOption) ([]models.User, error)
 
 	CreateRequestToken(ctx context.Context, id primitive.ObjectID, token string) (models.RequestToken, error)
 

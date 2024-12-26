@@ -1,7 +1,21 @@
 package order
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"github.com/pt010104/api-golang/internal/models"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type CreateCheckoutOption struct {
-	ProductIDs []primitive.ObjectID
+	Products []models.OrderProduct
+}
+
+type UpdateCheckoutOption struct {
+	Model  models.Checkout
+	Status string
+}
+
+type CreateOrderOption struct {
+	CheckoutID    primitive.ObjectID
+	Products      []models.OrderProduct
+	PaymentMethod string
 }

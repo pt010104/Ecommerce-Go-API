@@ -7,12 +7,29 @@ import (
 )
 
 type CreateCheckoutOutput struct {
-	CheckoutID       string             `json:"checkout_id"`
-	ExpiredAt        time.Time          `json:"expired_at"`
-	TotalPriceByShop map[string]float64 `json:"total_price_by_shop"`
-	TotalPrice       float64            `json:"total_price"`
-	Products         []models.Product   `json:"products"`
-	QuantityMap      map[string]int     `json:"quantity_map"`
-	Shops            []models.Shop      `json:"shops"`
-	ImageURLs        []string           `json:"image_urls"`
+	CheckoutID       string
+	ExpiredAt        time.Time
+	TotalPriceByShop map[string]float64
+	TotalPrice       float64
+	Products         []models.Product
+	QuantityMap      map[string]int
+	Shops            []models.Shop
+	ImageURLs        []string
+}
+
+// ------------------------------ //
+
+type CreateOrderInput struct {
+	CheckoutID    string
+	PaymentMethod string
+}
+
+type CreateOrderOutput struct {
+	OrderID string
+}
+
+type ConsumeOrderMsgInput struct {
+	OrderID    string
+	CheckoutID string
+	UserID     string
 }

@@ -80,3 +80,7 @@ type UpdateAddressInput struct {
 type DetailAddressOutput struct {
 	Addressess []models.Address
 }
+
+type ListUserInput struct {
+	IDs []string
+}

@@ -25,7 +25,9 @@ func (uc implUsecase) CreateUser(ctx context.Context, uct user.CreateUserInput) 
 	}
 
 	u, err := uc.repo.GetUser(ctx, user.GetUserOption{
-		Email: uct.Email,
+		GetFilter: user.GetFilter{
+			Email: uct.Email,
+		},
 	})
 	if err != nil {
 		if err != mongo.ErrNoDocuments {
@@ -64,7 +66,9 @@ func (uc implUsecase) SignIn(ctx context.Context, sit user.SignInType) (user.Sig
 	}
 
 	u, err := uc.repo.GetUser(ctx, user.GetUserOption{
-		Email: sit.Email,
+		GetFilter: user.GetFilter{
+			Email: sit.Email,
+		},
 	})
 	if err != nil {
 		uc.l.Errorf(ctx, "user.usecase.SignIn.GetUser: %v", err)
@@ -156,7 +160,9 @@ func (uc implUsecase) SignIn(ctx context.Context, sit user.SignInType) (user.Sig
 
 func (uc implUsecase) ForgetPasswordRequest(ctx context.Context, email string) (token string, err error) {
 	u, err := uc.repo.GetUser(ctx, user.GetUserOption{
-		Email: email,
+		GetFilter: user.GetFilter{
+			Email: email,
+		},
 	})
 	if err != nil {
 		uc.l.Errorf(ctx, "user.usecase.ForgetPasswordRequest: %v", err)
@@ -209,7 +215,9 @@ func (uc implUsecase) ForgetPasswordRequest(ctx context.Context, email string) (
 }
 func (uc implUsecase) VerifyEmail(ctx context.Context, email string) (token string, err error) {
 	u, err := uc.repo.GetUser(ctx, user.GetUserOption{
-		Email: email,
+		GetFilter: user.GetFilter{
+			Email: email,
+		},
 	})
 	if err != nil {
 		uc.l.Errorf(ctx, "user.usecase.Verify: %v", err)
@@ -330,7 +338,9 @@ func (uc implUsecase) LogOut(ctx context.Context, sc models.Scope) error {
 }
 func (uc implUsecase) ResetPassWord(ctx context.Context, input user.ResetPasswordInput) error {
 	u, err := uc.repo.GetUser(ctx, user.GetUserOption{
-		ID: input.UserId,
+		GetFilter: user.GetFilter{
+			ID: input.UserId,
+		},
 	})
 	if err != nil {
 		uc.l.Errorf(ctx, "user.usecase.ResetPassword.GetUser:", user.ErrUserNotFound)
@@ -685,4 +695,18 @@ func (uc implUsecase) UpdateAddress(ctx context.Context, sc models.Scope, input 
 	return user.DetailAddressOutput{
 		Addressess: u.Address,
 	}, nil
+}
+
+func (uc implUsecase) ListUsers(ctx context.Context, sc models.Scope, input user.ListUserInput) ([]models.User, error) {
+	users, err := uc.repo.ListUser(ctx, user.ListUserOption{
+		GetFilter: user.GetFilter{
+			IDs: input.IDs,
+		},
+	})
+	if err != nil {
+		uc.l.Errorf(ctx, "user.usecase.List.repo.ListUser: %v", err)
+		return nil, err
+	}
+
+	return users, nil
 }

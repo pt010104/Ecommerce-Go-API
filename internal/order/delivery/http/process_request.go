@@ -30,3 +30,26 @@ func (h handler) processCreateCheckoutRequest(c *gin.Context) (models.Scope, Cre
 	return sc, req, nil
 
 }
+
+func (h *handler) processCreateOrderRequest(c *gin.Context) (models.Scope, CreateOrderRequest, error) {
+	ctx := c.Request.Context()
+
+	sc, ok := jwt.GetScopeFromContext(ctx)
+	if !ok {
+		h.l.Errorf(ctx, "cart.delivery.http.handler.processCreateCheckoutRequest: unauthorized")
+		return models.Scope{}, CreateOrderRequest{}, pkgErrors.NewUnauthorizedHTTPError()
+	}
+
+	var req CreateOrderRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.l.Errorf(ctx, "order.delivery.http.handler.processCreateOrderRequest: invalid request")
+		return models.Scope{}, req, errWrongBody
+	}
+
+	if err := req.validate(); err != nil {
+		h.l.Errorf(ctx, "order.delivery.http.handler.processCreateOrderRequest: invalid request")
+		return models.Scope{}, req, err
+	}
+
+	return sc, req, nil
+}

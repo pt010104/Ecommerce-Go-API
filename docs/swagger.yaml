@@ -25,6 +25,25 @@ definitions:
       name:
         type: string
     type: object
+  http.CreateCheckoutRequest:
+    properties:
+      product_ids:
+        items:
+          type: string
+        type: array
+    required:
+    - product_ids
+    type: object
+  http.CreateOrderRequest:
+    properties:
+      checkout_id:
+        type: string
+      payment_method:
+        type: string
+    required:
+    - checkout_id
+    - payment_method
+    type: object
   http.DetailVoucherReq:
     properties:
       code:
@@ -170,6 +189,17 @@ definitions:
         type: string
       name:
         type: string
+    type: object
+  http.checkoutResponse:
+    properties:
+      expired_at:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/http.itemResponse'
+        type: array
+      total_price:
+        type: number
     type: object
   http.createCategoryReq:
     properties:
@@ -455,6 +485,19 @@ definitions:
       id:
         type: string
     type: object
+  http.itemResponse:
+    properties:
+      checkout_id:
+        type: string
+      price:
+        type: number
+      product_list:
+        items:
+          $ref: '#/definitions/http.productObject'
+        type: array
+      shop_objects:
+        $ref: '#/definitions/internal_order_delivery_http.shopObject'
+    type: object
   http.listCategoryResponse:
     properties:
       categories:
@@ -489,6 +532,19 @@ definitions:
         type: string
       url:
         type: string
+    type: object
+  http.productObject:
+    properties:
+      price:
+        type: number
+      product_id:
+        type: string
+      product_image:
+        type: string
+      product_name:
+        type: string
+      quantity:
+        type: integer
     type: object
   http.productResponse:
     properties:
@@ -640,6 +696,13 @@ definitions:
         type: integer
       total_pages:
         type: integer
+    type: object
+  internal_order_delivery_http.shopObject:
+    properties:
+      shop_id:
+        type: string
+      shop_name:
+        type: string
     type: object
   internal_shop_delivery_http.avatar_obj:
     properties:
@@ -1018,6 +1081,112 @@ paths:
       summary: Upload media files
       tags:
       - Media
+  /api/v1/orders:
+    post:
+      consumes:
+      - application/json
+      description: Create order
+      parameters:
+      - default: '"*"'
+        description: Access-Control-Allow-Origin
+        in: header
+        name: Access-Control-Allow-Origin
+        type: string
+      - default: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU
+        description: Bearer JWT token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - default: 6707825d45804caaf8316957
+        description: User ID
+        in: header
+        name: x-client-id
+        required: true
+        type: string
+      - default: zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=
+        description: Session ID
+        in: header
+        name: session-id
+        required: true
+        type: string
+      - description: Request Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/http.CreateOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Resp'
+      summary: Create order
+      tags:
+      - Order
+  /api/v1/orders/checkout:
+    post:
+      consumes:
+      - application/json
+      description: Create checkout
+      parameters:
+      - default: '"*"'
+        description: Access-Control-Allow-Origin
+        in: header
+        name: Access-Control-Allow-Origin
+        type: string
+      - default: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU
+        description: Bearer JWT token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - default: 6707825d45804caaf8316957
+        description: User ID
+        in: header
+        name: x-client-id
+        required: true
+        type: string
+      - default: zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=
+        description: Session ID
+        in: header
+        name: session-id
+        required: true
+        type: string
+      - description: Request Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/http.CreateCheckoutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/http.checkoutResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Resp'
+      summary: Create checkout
+      tags:
+      - Order
   /api/v1/shops:
     delete:
       consumes:
