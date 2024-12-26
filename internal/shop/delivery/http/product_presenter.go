@@ -369,6 +369,7 @@ type getAllProductsRespItem struct {
 	Images     []mediaResp    `json:"images,omitempty"`
 	Shop       shopResp       `json:"shop"`
 	Inventory  inventoryResp  `json:"inventory"`
+	Price      float32        `json:"price"`
 }
 
 type categoryResp struct {
@@ -468,6 +469,7 @@ func (h handler) newGetAllProductsResp(output shop.GetAllProductOutput) getAllPr
 			Images:     images,
 			Shop:       shopItem,
 			Inventory:  invItem,
+			Price:      p.P.Price,
 		}
 		items = append(items, item)
 	}
