@@ -231,16 +231,90 @@ func (uc implUseCase) ListOrderShop(ctx context.Context, sc models.Scope, input 
 		return order.ListOrderShopOutput{}, nil
 	}
 
-	productIDs := make([]string, 0)
-	for _, order := range orderModels {
-		for _, product := range order.Products {
-			if product.ShopID.Hex() == sc.ShopID {
-				productIDs = append(productIDs, product.ID.Hex())
+	var (
+		userModels    []models.User
+		addressMerges []string
+		wg            sync.WaitGroup
+		mu            sync.Mutex
+		wgErr         error
+	)
+
+	userDataChan := make(chan struct {
+		user    models.User
+		address string
+	}, len(orderModels))
+
+	for _, orderModel := range orderModels {
+		wg.Add(1)
+		go func(order models.Order) {
+			defer wg.Done()
+
+			userModel, err := uc.userUC.GetModel(ctx, order.UserID.Hex())
+			if err != nil {
+				uc.l.Errorf(ctx, "order.usecase.ListOrderShop.userUC.GetModel", err)
+				mu.Lock()
+				wgErr = err
+				mu.Unlock()
+				return
 			}
-		}
+
+			addressMerge := ""
+			for _, address := range userModel.Address {
+				if address.ID.Hex() == order.AddressID.Hex() {
+					addressMerge = address.Street + ", " + address.District + ", " + address.City + ", " + address.Province
+					break
+				}
+			}
+
+			userDataChan <- struct {
+				user    models.User
+				address string
+			}{
+				user:    userModel,
+				address: addressMerge,
+			}
+		}(orderModel)
 	}
 
-	productIDs = util.RemoveDuplicates(productIDs)
+	go func() {
+		wg.Wait()
+		close(userDataChan)
+	}()
+
+	productIDsChan := make(chan string, 100)
+	go func() {
+		for _, order := range orderModels {
+			for _, product := range order.Products {
+				if product.ShopID.Hex() == sc.ShopID {
+					productIDsChan <- product.ID.Hex()
+				}
+			}
+		}
+		close(productIDsChan)
+	}()
+
+	productIDsMap := make(map[string]struct{})
+	for id := range productIDsChan {
+		productIDsMap[id] = struct{}{}
+	}
+
+	productIDs := make([]string, 0, len(productIDsMap))
+	for id := range productIDsMap {
+		productIDs = append(productIDs, id)
+	}
+
+	for userData := range userDataChan {
+		mu.Lock()
+		userModels = append(userModels, userData.user)
+		if userData.address != "" {
+			addressMerges = append(addressMerges, userData.address)
+		}
+		mu.Unlock()
+	}
+
+	if wgErr != nil {
+		return order.ListOrderShopOutput{}, wgErr
+	}
 
 	p, err := uc.shopUC.ListProduct(ctx, sc, shop.ListProductInput{
 		GetProductFilter: shop.GetProductFilter{
@@ -252,19 +326,34 @@ func (uc implUseCase) ListOrderShop(ctx context.Context, sc models.Scope, input 
 		return order.ListOrderShopOutput{}, err
 	}
 
+	var imageMapMu, productMapMu sync.Mutex
 	imageMap := make(map[string]string)
-	for _, product := range p.Products {
-		if len(product.Images) > 0 {
-			imageMap[product.P.ID.Hex()] = product.Images[0].URL
-		}
-	}
-
 	productMap := make(map[string]models.Product)
-	for _, product := range p.Products {
-		productMap[product.P.ID.Hex()] = product.P
-	}
 
-	orderItems := make([]order.OrderItem, 0)
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		for _, product := range p.Products {
+			if len(product.Images) > 0 {
+				imageMapMu.Lock()
+				imageMap[product.P.ID.Hex()] = product.Images[0].URL
+				imageMapMu.Unlock()
+			}
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		for _, product := range p.Products {
+			productMapMu.Lock()
+			productMap[product.P.ID.Hex()] = product.P
+			productMapMu.Unlock()
+		}
+	}()
+
+	wg.Wait()
+
+	orderItems := make([]order.OrderItem, 0, len(orderModels))
 	for _, orderModel := range orderModels {
 		productItems := make([]order.ProductItem, 0)
 		for _, product := range orderModel.Products {
@@ -286,7 +375,9 @@ func (uc implUseCase) ListOrderShop(ctx context.Context, sc models.Scope, input 
 	}
 
 	return order.ListOrderShopOutput{
-		Orders: orderItems,
+		Orders:        orderItems,
+		AddressMerges: addressMerges,
+		UserModels:    userModels,
 	}, nil
 }
 

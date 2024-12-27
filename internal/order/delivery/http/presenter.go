@@ -150,6 +150,10 @@ func (r ListOrderRequest) toInput() order.ListOrderInput {
 type orderResponse struct {
 	OrderID    string            `json:"order_id"`
 	Status     string            `json:"status"`
+	Address    string            `json:"address,omitempty"`
+	UserName   string            `json:"user_name,omitempty"`
+	UserPhone  string            `json:"user_phone,omitempty"`
+	UserEmail  string            `json:"user_email,omitempty"`
 	TotalPrice float64           `json:"total_price"`
 	Products   []productObject   `json:"products"`
 	CreatedAt  response.DateTime `json:"created_at"`
@@ -196,10 +200,9 @@ func (r ListOrderShopRequest) toInput() order.ListOrderShopInput {
 		Status: r.Status,
 	}
 }
-
 func (h handler) newListOrderShopResponse(o order.ListOrderShopOutput) []orderResponse {
 	resp := make([]orderResponse, 0)
-	for _, order := range o.Orders {
+	for i, order := range o.Orders {
 		products := make([]productObject, 0)
 		for _, p := range order.Products {
 			products = append(products, productObject{
@@ -216,6 +219,10 @@ func (h handler) newListOrderShopResponse(o order.ListOrderShopOutput) []orderRe
 			TotalPrice: order.TotalPrice,
 			Products:   products,
 			CreatedAt:  response.DateTime(order.Order.CreatedAt),
+			Address:    o.AddressMerges[i],
+			UserName:   o.UserModels[i].Name,
+			UserPhone:  o.UserModels[i].Address[0].Phone,
+			UserEmail:  o.UserModels[i].Email,
 		})
 	}
 	return resp

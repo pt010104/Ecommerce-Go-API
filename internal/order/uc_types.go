@@ -63,7 +63,9 @@ type ListOrderShopInput struct {
 }
 
 type ListOrderShopOutput struct {
-	Orders []OrderItem
+	Orders        []OrderItem
+	AddressMerges []string
+	UserModels    []models.User
 }
 
 type UpdateOrderInput struct {
