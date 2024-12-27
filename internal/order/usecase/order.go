@@ -147,6 +147,10 @@ func (uc implUseCase) ListOrder(ctx context.Context, sc models.Scope, input orde
 		return order.ListOrderOutput{}, err
 	}
 
+	if len(orderModels) == 0 {
+		return order.ListOrderOutput{}, nil
+	}
+
 	productIDs := make([]string, 0)
 	for _, order := range orderModels {
 		for _, product := range order.Products {
