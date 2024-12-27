@@ -58,43 +58,27 @@ func (uc implUseCase) CreateCheckout(ctx context.Context, sc models.Scope, produ
 		return order.CreateCheckoutOutput{}, err
 	}
 
-	var shops []models.Shop
-	var totalPricesByShop map[string]float64
-	var totalPrice float64
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		shops, totalPricesByShop, totalPrice, err = uc.calculateTotalPrices(ctx, sc, products, productQuantityMap)
-		if err != nil {
-			uc.l.Errorf(ctx, "order.usecase.CreateCheckout.calculateTotalPrices: %v", err)
-			wgErr = err
-		}
-	}()
+	shops, totalPricesByShop, totalPrice, err := uc.calculateTotalPrices(ctx, sc, products, productQuantityMap)
+	if err != nil {
+		uc.l.Errorf(ctx, "order.usecase.CreateCheckout.calculateTotalPrices: %v", err)
+		return order.CreateCheckoutOutput{}, err
+	}
 
-	var checkoutModel models.Checkout
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		var productCheckouts []models.OrderProduct
-		for _, product := range products {
-			productCheckouts = append(productCheckouts, models.OrderProduct{
-				ID:       product.ID,
-				Quantity: productQuantityMap[product.ID.Hex()],
-			})
-		}
-		checkoutModel, err = uc.repo.CreateCheckout(ctx, sc, order.CreateCheckoutOption{
-			Products:   productCheckouts,
-			TotalPrice: totalPrice,
+	var productCheckouts []models.OrderProduct
+	for _, product := range products {
+		productCheckouts = append(productCheckouts, models.OrderProduct{
+			ID:       product.ID,
+			Quantity: productQuantityMap[product.ID.Hex()],
 		})
-		if err != nil {
-			uc.l.Errorf(ctx, "order.usecase.CreateCheckout.repo.CreateCheckout: %v", err)
-			wgErr = err
-		}
-	}()
+	}
 
-	wg.Wait()
-	if wgErr != nil {
-		return order.CreateCheckoutOutput{}, wgErr
+	checkoutModel, err := uc.repo.CreateCheckout(ctx, sc, order.CreateCheckoutOption{
+		Products:   productCheckouts,
+		TotalPrice: totalPrice,
+	})
+	if err != nil {
+		uc.l.Errorf(ctx, "order.usecase.CreateCheckout.repo.CreateCheckout: %v", err)
+		return order.CreateCheckoutOutput{}, err
 	}
 
 	return order.CreateCheckoutOutput{
