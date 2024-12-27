@@ -695,6 +695,25 @@ definitions:
       phone:
         type: string
     type: object
+  http.updateShopRequest:
+    properties:
+      city:
+        type: string
+      district:
+        type: string
+      ids:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      phone:
+        type: string
+      street:
+        type: string
+    required:
+    - ids
+    type: object
   http.verifyShopResp:
     properties:
       is_verified:
@@ -1351,13 +1370,12 @@ paths:
         name: session-id
         required: true
         type: string
-      - description: IDs
+      - description: Update shop request
         in: body
-        name: ids
+        name: request
+        required: true
         schema:
-          items:
-            type: string
-          type: array
+          $ref: '#/definitions/http.updateShopRequest'
       produces:
       - application/json
       responses:

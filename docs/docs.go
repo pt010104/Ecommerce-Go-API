@@ -956,14 +956,12 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "IDs",
-                        "name": "ids",
+                        "description": "Update shop request",
+                        "name": "request",
                         "in": "body",
+                        "required": true,
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/http.updateShopRequest"
                         }
                     }
                 ],
@@ -3636,6 +3634,35 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "phone": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.updateShopRequest": {
+            "type": "object",
+            "required": [
+                "ids"
+            ],
+            "properties": {
+                "city": {
+                    "type": "string"
+                },
+                "district": {
+                    "type": "string"
+                },
+                "ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "street": {
                     "type": "string"
                 }
             }
