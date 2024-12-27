@@ -350,12 +350,6 @@ func (uc implUsecase) GetProduct(ctx context.Context, sc models.Scope, input sho
 		wgErr       error
 	)
 
-	err := validateProductInput(ctx, sc, input.GetProductFilter)
-	if err != nil {
-		uc.l.Errorf(ctx, "shop.usecase.GetProduct.validateProductInput: %v", err)
-		return shop.GetProductOutput{}, err
-	}
-
 	opt := shop.GetProductOption{
 		GetProductFilter: shop.GetProductFilter{
 			ShopID:  input.ShopID,
