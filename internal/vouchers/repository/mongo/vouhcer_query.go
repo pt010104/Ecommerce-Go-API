@@ -27,7 +27,6 @@ func (repo implRepo) buildVoucherDetailQuery(ctx context.Context, sc models.Scop
 }
 func (repo implRepo) buildVoucherQuery(sc models.Scope, opt vouchers.GetVoucherFilter) (bson.M, error) {
 	filter := bson.M{}
-	filter["scope"] = opt.Scope
 	if len(opt.IDs) > 0 {
 		filter["_id"] = bson.M{"$in": mongo.ObjectIDsFromHexOrNil(opt.IDs)}
 	}
