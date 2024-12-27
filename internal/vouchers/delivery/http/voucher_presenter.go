@@ -268,11 +268,13 @@ func (req applyVoucherReq) toInput() vouchers.ApplyVoucherInput {
 type applyVoucherResp struct {
 	Voucher        detailVoucherResp `json:"voucher"`
 	DiscountAmount float64           `json:"discount_amount"`
+	OrderAmount    float64           `json:"order_amount"`
 }
 
-func (h handler) newApplyVoucherResponse(v models.Voucher, discountAmount float64) applyVoucherResp {
+func (h handler) newApplyVoucherResponse(v models.Voucher, orderAmount float64, discountAmount float64) applyVoucherResp {
 	return applyVoucherResp{
 		Voucher:        h.newDetailResponse(v),
+		OrderAmount:    orderAmount,
 		DiscountAmount: discountAmount,
 	}
 }

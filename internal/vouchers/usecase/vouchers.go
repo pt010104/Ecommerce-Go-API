@@ -106,28 +106,28 @@ func (uc implUsecase) List(ctx context.Context, sc models.Scope, opt vouchers.Ge
 
 }
 
-func (uc implUsecase) ApplyVoucher(ctx context.Context, sc models.Scope, input vouchers.ApplyVoucherInput) (models.Voucher, float64, error) {
+func (uc implUsecase) ApplyVoucher(ctx context.Context, sc models.Scope, input vouchers.ApplyVoucherInput) (models.Voucher, float64, float64, error) {
 	voucher, err := uc.repo.DetailVoucher(ctx, sc, vouchers.DetailVoucherOption{
 		ID:   input.ID,
 		Code: input.Code,
 	})
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return models.Voucher{}, 0, vouchers.ErrVoucherNotFound
+			return models.Voucher{}, 0, 0, vouchers.ErrVoucherNotFound
 		}
 		uc.l.Errorf(ctx, "vouchers.usecase.ApplyVoucher.DetailVoucher: %v", err)
-		return models.Voucher{}, 0, err
+		return models.Voucher{}, 0, 0, err
 	}
 
 	if voucher.ValidFrom.After(util.Now()) || voucher.ValidTo.Before(util.Now()) {
-		return models.Voucher{}, 0, vouchers.ErrVoucherExpired
+		return models.Voucher{}, 0, 0, vouchers.ErrVoucherExpired
 	}
 	if voucher.UsageLimit > 0 && uint(voucher.UsedCount) >= voucher.UsageLimit {
-		return models.Voucher{}, 0, vouchers.ErrVoucherExpired
+		return models.Voucher{}, 0, 0, vouchers.ErrVoucherExpired
 	}
 	if voucher.MinimumOrderAmount > 0 {
 		if input.OrderAmount < voucher.MinimumOrderAmount {
-			return models.Voucher{}, 0, vouchers.ErrVoucherMinimumOrderAmount
+			return models.Voucher{}, 0, 0, vouchers.ErrVoucherMinimumOrderAmount
 		}
 	}
 
@@ -137,7 +137,7 @@ func (uc implUsecase) ApplyVoucher(ctx context.Context, sc models.Scope, input v
 	})
 	if err != nil {
 		uc.l.Errorf(ctx, "vouchers.usecase.ApplyVoucher.UpdateVoucher: %v", err)
-		return models.Voucher{}, 0, err
+		return models.Voucher{}, 0, 0, err
 	}
 
 	discountAmount := 0.0
@@ -158,5 +158,5 @@ func (uc implUsecase) ApplyVoucher(ctx context.Context, sc models.Scope, input v
 		orderAmount = 0
 	}
 
-	return nv, orderAmount, nil
+	return nv, orderAmount, discountAmount, nil
 }

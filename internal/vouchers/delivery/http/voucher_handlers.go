@@ -137,7 +137,7 @@ func (h handler) ApplyVoucher(c *gin.Context) {
 		return
 	}
 
-	voucher, discountAmount, err := h.uc.ApplyVoucher(ctx, sc, req.toInput())
+	voucher, orderAmount, discountAmount, err := h.uc.ApplyVoucher(ctx, sc, req.toInput())
 	if err != nil {
 		h.l.Errorf(ctx, "voucher.delivery.http.handler.ApplyVoucher.ApplyVoucher: %v", err)
 		err = h.mapErrors(err)
@@ -145,5 +145,5 @@ func (h handler) ApplyVoucher(c *gin.Context) {
 		return
 	}
 
-	response.OK(c, h.newApplyVoucherResponse(voucher, discountAmount))
+	response.OK(c, h.newApplyVoucherResponse(voucher, orderAmount, discountAmount))
 }

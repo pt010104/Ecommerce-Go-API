@@ -41,37 +41,9 @@ func (repo implRepo) buildVoucherModel(ctx context.Context, sc models.Scope, opt
 func (repo implRepo) buildVoucherUpdate(ctx context.Context, sc models.Scope, opt vouchers.UpdateVoucherOption) (models.Voucher, bson.M, error) {
 	now := util.Now()
 	updateData := bson.M{
-		"updated_at":              now,
-		"name":                    opt.Data.Name,
-		"code":                    opt.Data.Code,
-		"description":             opt.Data.Description,
-		"valid_from":              opt.Data.ValidFrom,
-		"valid_to":                opt.Data.ValidTo,
-		"usage_limit":             opt.Data.UsageLimit,
-		"applicable_product_ids":  mongo.ObjectIDsFromHexOrNil(opt.Data.ApplicableProductIDs),
-		"applicable_category_ids": mongo.ObjectIDsFromHexOrNil(opt.Data.ApplicableCategorieIDs),
-		"shop_ids":                mongo.ObjectIDsFromHexOrNil(opt.Data.ShopIDs),
-		"minimum_order_amount":    opt.Data.MinimumOrderAmount,
-		"discount_type":           opt.Data.DiscountType,
-		"discount_amount":         opt.Data.DiscountAmount,
-		"max_discount_amount":     opt.Data.MaxDiscountAmount,
-		"scope":                   opt.Data.Scope,
+		"updated_at": now,
 	}
 	opt.Model.UpdatedAt = now
-	opt.Model.Name = opt.Data.Name
-	opt.Model.Code = opt.Data.Code
-	opt.Model.Description = opt.Data.Description
-	opt.Model.ValidFrom = opt.Data.ValidFrom
-	opt.Model.ValidTo = opt.Data.ValidTo
-	opt.Model.UsageLimit = opt.Data.UsageLimit
-	opt.Model.ApplicableProductIDs = mongo.ObjectIDsFromHexOrNil(opt.Data.ApplicableProductIDs)
-	opt.Model.ApplicableCategorieIDs = mongo.ObjectIDsFromHexOrNil(opt.Data.ApplicableCategorieIDs)
-	opt.Model.MinimumOrderAmount = opt.Data.MinimumOrderAmount
-	opt.Model.DiscountType = opt.Data.DiscountType
-	opt.Model.DiscountAmount = opt.Data.DiscountAmount
-	opt.Model.MaxDiscountAmount = opt.Data.MaxDiscountAmount
-	opt.Model.ShopIDs = mongo.ObjectIDsFromHexOrNil(opt.Data.ShopIDs)
-	opt.Model.Scope = opt.Data.Scope
 
 	if opt.Data.UsedCount > 0 {
 		updateData["used_count"] = opt.Data.UsedCount
