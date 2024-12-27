@@ -53,6 +53,26 @@ func (req createVoucherReq) validate() error {
 	return nil
 }
 
+func (h handler) newDetailVoucherResp(v models.Voucher) detailVoucherResp {
+	return detailVoucherResp{
+		ID:                     v.ID.Hex(),
+		Name:                   v.Name,
+		Code:                   v.Code,
+		ValidFrom:              v.ValidFrom.Format(util.DateTimeFormat),
+		ValidTo:                v.ValidTo.Format(util.DateTimeFormat),
+		DiscountType:           v.DiscountType,
+		DiscountAmount:         v.DiscountAmount,
+		Description:            v.Description,
+		UsageLimit:             v.UsageLimit,
+		ApplicableProductIDs:   mongo.HexFromObjectIDsOrNil(v.ApplicableProductIDs),
+		ApplicableCategorieIDs: mongo.HexFromObjectIDsOrNil(v.ApplicableCategorieIDs),
+		MinimumOrderAmount:     v.MinimumOrderAmount,
+		MaxDiscountAmount:      v.MaxDiscountAmount,
+		ShopID:                 v.ShopID.Hex(),
+		CreatedAt:              v.CreatedAt.Format(util.DateTimeFormat),
+	}
+}
+
 func (req createVoucherReq) toInput() vouchers.CreateVoucherInput {
 	validFrom, _ := util.StrToDateTime(req.ValidFrom)
 	validTo, _ := util.StrToDateTime(req.ValidTo)
@@ -88,6 +108,7 @@ type detailVoucherResp struct {
 	MinimumOrderAmount     float64  `json:"minimum_order_amount"`
 	MaxDiscountAmount      float64  `json:"max_discount_amount"`
 	CreatedAt              string   `json:"created_at"`
+	ShopID                 string   `json:"shop_id"`
 }
 type DetailVoucherReq struct {
 	ID   string `uri:"id"`

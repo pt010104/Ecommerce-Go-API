@@ -37,7 +37,7 @@ func (h handler) CreateVoucher(c *gin.Context) {
 		return
 	}
 
-	response.OK(c, u)
+	response.OK(c, h.newDetailVoucherResp(u))
 }
 
 // @Summary Get voucher details

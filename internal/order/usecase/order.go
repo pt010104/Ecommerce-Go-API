@@ -217,3 +217,84 @@ func (uc implUseCase) ListOrder(ctx context.Context, sc models.Scope, input orde
 		Orders: orderItems,
 	}, nil
 }
+
+func (uc implUseCase) ListOrderShop(ctx context.Context, sc models.Scope, input order.ListOrderInput) (order.ListOrderOutput, error) {
+	orderModels, err := uc.repo.ListOrder(ctx, sc, order.ListOrderOption{
+		Status: input.Status,
+		ShopID: sc.ShopID,
+	})
+	if err != nil {
+		uc.l.Errorf(ctx, "order.usecase.ListOrder.repo.ListOrder", err)
+		return order.ListOrderOutput{}, err
+	}
+
+	if len(orderModels) == 0 {
+		return order.ListOrderOutput{}, nil
+	}
+
+	productIDs := make([]string, 0)
+	for _, order := range orderModels {
+		for _, product := range order.Products {
+			productIDs = append(productIDs, product.ID.Hex())
+		}
+	}
+
+	productIDs = util.RemoveDuplicates(productIDs)
+
+	var products []models.Product
+
+	p, err := uc.shopUC.ListProduct(ctx, sc, shop.ListProductInput{
+		GetProductFilter: shop.GetProductFilter{
+			IDs: productIDs,
+		},
+	})
+	if err != nil {
+		uc.l.Errorf(ctx, "order.usecase.validateProducts.shopUC.ListProduct: %v", err)
+		return order.ListOrderOutput{}, err
+	}
+
+	for _, product := range p.Products {
+		products = append(products, product.P)
+	}
+
+	imageMap := make(map[string]string)
+	for _, product := range p.Products {
+		if len(product.Images) > 0 {
+			imageMap[product.P.ID.Hex()] = product.Images[0].URL
+		}
+	}
+
+	productMap := make(map[string]models.Product)
+	for _, product := range products {
+		productMap[product.ID.Hex()] = product
+	}
+	orderItems := make([]order.OrderItem, len(orderModels))
+	for i, orderModel := range orderModels {
+		fmt.Println("orderModel.ID: ", orderModel.ID.Hex())
+		fmt.Println("orderModel.Products: ")
+		util.PrintJson(orderModel.Products)
+		productItems := make([]order.ProductItem, 0)
+		for _, product := range orderModel.Products {
+			fmt.Println("product.ID: ", product.ID.Hex())
+			productItems = append(productItems, order.ProductItem{
+				ProductID:   product.ID.Hex(),
+				ProductName: productMap[product.ID.Hex()].Name,
+				ImageURL:    imageMap[product.ID.Hex()],
+				Price:       productMap[product.ID.Hex()].Price,
+				Quantity:    product.Quantity,
+			})
+		}
+		orderItems[i] = order.OrderItem{
+			Order:      orderModel,
+			Products:   productItems,
+			TotalPrice: orderModel.TotalPrice,
+		}
+
+		fmt.Println("orderItems[i]: ")
+		util.PrintJson(orderItems[i])
+	}
+
+	return order.ListOrderOutput{
+		Orders: orderItems,
+	}, nil
+}

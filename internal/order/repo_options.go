@@ -25,4 +25,5 @@ type CreateOrderOption struct {
 
 type ListOrderOption struct {
 	Status string
+	ShopID string
 }
