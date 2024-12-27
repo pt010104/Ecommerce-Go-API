@@ -39,3 +39,21 @@ type ConsumeOrderMsgInput struct {
 type ListOrderInput struct {
 	Status string
 }
+
+type ProductItem struct {
+	ProductID   string
+	ProductName string
+	ImageURL    string
+	Price       float64
+	Quantity    int
+}
+
+type OrderItem struct {
+	Order      models.Order
+	Products   []ProductItem
+	TotalPrice float64
+}
+
+type ListOrderOutput struct {
+	Orders []OrderItem
+}

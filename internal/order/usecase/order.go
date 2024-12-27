@@ -8,6 +8,7 @@ import (
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/order"
 	"github.com/pt010104/api-golang/internal/order/delivery/rabbitmq"
+	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/internal/vouchers"
 	"github.com/pt010104/api-golang/pkg/util"
 )
@@ -137,14 +138,78 @@ func (uc implUseCase) DetailOrder(ctx context.Context, sc models.Scope, orderID 
 	return orderModel, nil
 }
 
-func (uc implUseCase) ListOrder(ctx context.Context, sc models.Scope, input order.ListOrderInput) ([]models.Order, error) {
-	orderModel, err := uc.repo.ListOrder(ctx, sc, order.ListOrderOption{
+func (uc implUseCase) ListOrder(ctx context.Context, sc models.Scope, input order.ListOrderInput) (order.ListOrderOutput, error) {
+	orderModels, err := uc.repo.ListOrder(ctx, sc, order.ListOrderOption{
 		Status: input.Status,
 	})
 	if err != nil {
 		uc.l.Errorf(ctx, "order.usecase.ListOrder.repo.ListOrder", err)
-		return []models.Order{}, err
+		return order.ListOrderOutput{}, err
 	}
 
-	return orderModel, nil
+	productIDs := make([]string, 0)
+	for _, order := range orderModels {
+		for _, product := range order.Products {
+			productIDs = append(productIDs, product.ID.Hex())
+		}
+	}
+
+	productIDs = util.RemoveDuplicates(productIDs)
+
+	var products []models.Product
+
+	p, err := uc.shopUC.ListProduct(ctx, sc, shop.ListProductInput{
+		GetProductFilter: shop.GetProductFilter{
+			IDs: productIDs,
+		},
+	})
+	if err != nil {
+		uc.l.Errorf(ctx, "order.usecase.validateProducts.shopUC.ListProduct: %v", err)
+		return order.ListOrderOutput{}, err
+	}
+
+	for _, product := range p.Products {
+		products = append(products, product.P)
+	}
+
+	imageMap := make(map[string]string)
+	for _, product := range p.Products {
+		if len(product.Images) > 0 {
+			imageMap[product.P.ID.Hex()] = product.Images[0].URL
+		}
+	}
+
+	productMap := make(map[string]models.Product)
+	for _, product := range products {
+		productMap[product.ID.Hex()] = product
+	}
+	orderItems := make([]order.OrderItem, len(orderModels))
+	for i, orderModel := range orderModels {
+		fmt.Println("orderModel.ID: ", orderModel.ID.Hex())
+		fmt.Println("orderModel.Products: ")
+		util.PrintJson(orderModel.Products)
+		productItems := make([]order.ProductItem, 0)
+		for _, product := range orderModel.Products {
+			fmt.Println("product.ID: ", product.ID.Hex())
+			productItems = append(productItems, order.ProductItem{
+				ProductID:   product.ID.Hex(),
+				ProductName: productMap[product.ID.Hex()].Name,
+				ImageURL:    imageMap[product.ID.Hex()],
+				Price:       productMap[product.ID.Hex()].Price,
+				Quantity:    product.Quantity,
+			})
+		}
+		orderItems[i] = order.OrderItem{
+			Order:      orderModel,
+			Products:   productItems,
+			TotalPrice: orderModel.TotalPrice,
+		}
+
+		fmt.Println("orderItems[i]: ")
+		util.PrintJson(orderItems[i])
+	}
+
+	return order.ListOrderOutput{
+		Orders: orderItems,
+	}, nil
 }

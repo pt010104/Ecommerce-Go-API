@@ -151,17 +151,29 @@ type orderResponse struct {
 	OrderID    string            `json:"order_id"`
 	Status     string            `json:"status"`
 	TotalPrice float64           `json:"total_price"`
+	Products   []productObject   `json:"products"`
 	CreatedAt  response.DateTime `json:"created_at"`
 }
 
-func (h handler) newListOrderResponse(o []models.Order) []orderResponse {
+func (h handler) newListOrderResponse(o order.ListOrderOutput) []orderResponse {
 	resp := make([]orderResponse, 0)
-	for _, order := range o {
+	for _, order := range o.Orders {
+		products := make([]productObject, 0)
+		for _, p := range order.Products {
+			products = append(products, productObject{
+				ProductID:   p.ProductID,
+				ProductName: p.ProductName,
+				Price:       p.Price,
+				Quantity:    p.Quantity,
+			})
+		}
+
 		resp = append(resp, orderResponse{
-			OrderID:    order.ID.Hex(),
-			Status:     order.Status,
+			OrderID:    order.Order.ID.Hex(),
+			Status:     order.Order.Status,
 			TotalPrice: order.TotalPrice,
-			CreatedAt:  response.DateTime(order.CreatedAt),
+			Products:   products,
+			CreatedAt:  response.DateTime(order.Order.CreatedAt),
 		})
 	}
 	return resp

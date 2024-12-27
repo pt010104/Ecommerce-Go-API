@@ -20,7 +20,6 @@ type createVoucherReq struct {
 	ApplicableCategorieIDs []string `json:"applicable_category_ids"`
 	MinimumOrderAmount     float64  `json:"minimum_order_amount"`
 	MaxDiscountAmount      float64  `json:"max_discount_amount"`
-	ShopIDs                []string `json:"shop_ids"`
 }
 
 func (req createVoucherReq) validate() error {
@@ -51,14 +50,6 @@ func (req createVoucherReq) validate() error {
 		}
 	}
 
-	if len(req.ShopIDs) > 0 {
-		for _, id := range req.ShopIDs {
-			if !mongo.IsObjectID(id) {
-				return errWrongBody
-			}
-		}
-	}
-
 	return nil
 }
 
@@ -79,7 +70,6 @@ func (req createVoucherReq) toInput() vouchers.CreateVoucherInput {
 		DiscountType:           req.DiscountType,
 		DiscountAmount:         req.DiscountAmount,
 		MaxDiscountAmount:      req.MaxDiscountAmount,
-		ShopIDs:                req.ShopIDs,
 	}
 }
 
@@ -149,7 +139,7 @@ type ListVoucherReq struct {
 	Codes                  []string `form:"codes"`
 	ApplicableProductIDs   []string `form:"applicable_product_ids"`
 	ApplicableCategorieIDs []string `form:"applicable_category_ids"`
-	ShopIDs                []string `form:"shop_ids"`
+	ShopID                 string   `form:"shop_id"`
 	ValidFrom              string   `form:"valid_from"`
 	ValidTo                string   `form:"valid_to"`
 	Scope                  int      `form:"scope"`
@@ -203,14 +193,6 @@ func (r ListVoucherReq) validate() error {
 		}
 	}
 
-	if len(r.ShopIDs) > 0 {
-		for _, id := range r.ShopIDs {
-			if !mongo.IsObjectID(id) {
-				return errWrongBody
-			}
-		}
-	}
-
 	return nil
 }
 func (r ListVoucherReq) toInput() vouchers.GetVoucherFilter {
@@ -222,9 +204,9 @@ func (r ListVoucherReq) toInput() vouchers.GetVoucherFilter {
 		Codes:                  r.Codes,
 		ApplicableProductIDs:   r.ApplicableProductIDs,
 		ApplicableCategorieIDs: r.ApplicableCategorieIDs,
-		ShopIDs:                r.ShopIDs,
 		ValidFrom:              &validFrom,
 		ValidTo:                &validTo,
+		ShopID:                 r.ShopID,
 	}
 }
 func (h handler) newListResponse(vouchers []models.Voucher) listVoucherResp {

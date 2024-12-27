@@ -35,7 +35,7 @@ type GetVoucherFilter struct {
 	Scope                  int
 	Codes                  []string
 	IDs                    []string
-	ShopIDs                []string
+	ShopID                 string
 	ApplicableCategorieIDs []string
 	ApplicableProductIDs   []string
 }

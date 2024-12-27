@@ -41,8 +41,8 @@ func (repo implRepo) buildVoucherQuery(sc models.Scope, opt vouchers.GetVoucherF
 	if len(opt.ApplicableProductIDs) > 0 {
 		filter["applicable_product_ids"] = bson.M{"$in": mongo.ObjectIDsFromHexOrNil(opt.ApplicableProductIDs)}
 	}
-	if len(opt.ShopIDs) > 0 {
-		filter["shop_ids"] = bson.M{"$in": mongo.ObjectIDsFromHexOrNil(opt.ShopIDs)}
+	if opt.ShopID != "" {
+		filter["shop_id"] = bson.M{"$in": mongo.ObjectIDFromHexOrNil(opt.ShopID)}
 	}
 
 	return filter, nil

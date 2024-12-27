@@ -3165,12 +3165,6 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
-                "shop_ids": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
                 "usage_limit": {
                     "type": "integer"
                 },

@@ -4,7 +4,7 @@ import "time"
 
 type CreateVoucherInput struct {
 	Name                   string
-	ShopIDs                []string
+	ShopID                 string
 	Description            string
 	Code                   string
 	ValidFrom              time.Time

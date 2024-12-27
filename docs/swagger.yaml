@@ -281,10 +281,6 @@ definitions:
         type: number
       name:
         type: string
-      shop_ids:
-        items:
-          type: string
-        type: array
       usage_limit:
         type: integer
       valid_from:

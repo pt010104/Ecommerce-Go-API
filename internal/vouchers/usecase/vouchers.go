@@ -4,15 +4,12 @@ import (
 	"context"
 
 	"github.com/pt010104/api-golang/internal/models"
-	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/internal/vouchers"
 	"github.com/pt010104/api-golang/pkg/mongo"
 	"github.com/pt010104/api-golang/pkg/util"
 )
 
 func (uc implUsecase) CreateVoucher(ctx context.Context, sc models.Scope, input vouchers.CreateVoucherInput) (models.Voucher, error) {
-	role := sc.Role
-
 	if err := uc.validateCreateVoucher(ctx, input); err != nil {
 		uc.l.Errorf(ctx, "vouchers.usecase.CreateVoucher.validateCreateVoucher: %v", err)
 		return models.Voucher{}, err
@@ -38,31 +35,6 @@ func (uc implUsecase) CreateVoucher(ctx context.Context, sc models.Scope, input 
 
 	opt.Data.ShopIDs = []string{sc.ShopID}
 	opt.Data.Scope = models.ScopeShop
-
-	if role == models.RoleAdmin {
-		if len(input.ShopIDs) > 0 {
-			isVerified := true
-			s, err := uc.shopUc.ListShop(ctx, models.Scope{},
-				shop.GetShopsFilter{
-					IDs:        input.ShopIDs,
-					IsVerified: &isVerified,
-				},
-			)
-			if err != nil {
-				uc.l.Errorf(ctx, "vouchers.usecase.CreateVoucher.ListShop: %v", vouchers.ErrShopNotFound)
-				return models.Voucher{}, vouchers.ErrShopNotFound
-			}
-
-			if len(s) != len(input.ShopIDs) {
-				uc.l.Errorf(ctx, "vouchers.usecase.CreateVoucher.ListShop: %v", vouchers.ErrShopNotFound)
-				return models.Voucher{}, vouchers.ErrShopNotFound
-			}
-
-			opt.Data.ShopIDs = input.ShopIDs
-		} else {
-			opt.Data.Scope = models.ScopeAll
-		}
-	}
 
 	v, err := uc.repo.CreateVoucher(ctx, sc, opt)
 	if err != nil {
