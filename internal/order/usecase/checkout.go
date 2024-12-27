@@ -68,6 +68,7 @@ func (uc implUseCase) CreateCheckout(ctx context.Context, sc models.Scope, produ
 	for _, product := range products {
 		productCheckouts = append(productCheckouts, models.OrderProduct{
 			ID:       product.ID,
+			ShopID:   product.ShopID,
 			Quantity: productQuantityMap[product.ID.Hex()],
 		})
 	}

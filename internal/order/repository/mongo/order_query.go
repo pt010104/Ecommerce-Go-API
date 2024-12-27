@@ -34,3 +34,23 @@ func (repo implRepo) buildOrderQuery(ctx context.Context, sc models.Scope, opt o
 
 	return filter, nil
 }
+
+func (repo implRepo) buildOrderShopQuery(ctx context.Context, sc models.Scope, opt order.ListOrderOption) (bson.M, error) {
+	filter, err := mongo.BuildScopeQuery(ctx, repo.l, sc)
+	if err != nil {
+		repo.l.Errorf(ctx, "Order.Repo.buildOrderQuery.BuildScopeQuery", err)
+		return nil, err
+	}
+
+	if opt.Status != "" {
+		filter["status"] = opt.Status
+	}
+
+	filter["products"] = bson.M{
+		"$elemMatch": bson.M{
+			"shop_id": mongo.ObjectIDFromHexOrNil(sc.ShopID),
+		},
+	}
+
+	return filter, nil
+}

@@ -178,3 +178,64 @@ func (h handler) newListOrderResponse(o order.ListOrderOutput) []orderResponse {
 	}
 	return resp
 }
+
+type ListOrderShopRequest struct {
+	Status string `form:"status" binding:"required"`
+}
+
+func (r ListOrderShopRequest) validate() error {
+	if r.Status != models.OrderStatusPending && r.Status != models.OrderStatusProcessing && r.Status != models.OrderStatusShipping && r.Status != models.OrderStatusDelivered && r.Status != models.OrderStatusCanceled {
+		return errWrongBody
+	}
+
+	return nil
+}
+
+func (r ListOrderShopRequest) toInput() order.ListOrderShopInput {
+	return order.ListOrderShopInput{
+		Status: r.Status,
+	}
+}
+
+func (h handler) newListOrderShopResponse(o order.ListOrderShopOutput) []orderResponse {
+	resp := make([]orderResponse, 0)
+	for _, order := range o.Orders {
+		products := make([]productObject, 0)
+		for _, p := range order.Products {
+			products = append(products, productObject{
+				ProductID:   p.ProductID,
+				ProductName: p.ProductName,
+				Price:       p.Price,
+				Quantity:    p.Quantity,
+			})
+		}
+
+		resp = append(resp, orderResponse{
+			OrderID:    order.Order.ID.Hex(),
+			Status:     order.Order.Status,
+			TotalPrice: order.TotalPrice,
+			Products:   products,
+			CreatedAt:  response.DateTime(order.Order.CreatedAt),
+		})
+	}
+	return resp
+}
+
+type UpdateOrderRequest struct {
+	Status string `json:"status" binding:"required"`
+}
+
+func (r UpdateOrderRequest) validate() error {
+	if r.Status != models.OrderStatusPending && r.Status != models.OrderStatusProcessing && r.Status != models.OrderStatusShipping && r.Status != models.OrderStatusDelivered && r.Status != models.OrderStatusCanceled {
+		return errWrongBody
+	}
+
+	return nil
+}
+
+func (r UpdateOrderRequest) toInput(orderID string) order.UpdateOrderInput {
+	return order.UpdateOrderInput{
+		OrderID: orderID,
+		Status:  r.Status,
+	}
+}

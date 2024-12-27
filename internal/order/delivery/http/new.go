@@ -10,6 +10,8 @@ type Handler interface {
 	CreateCheckout(c *gin.Context)
 	CreateOrder(c *gin.Context)
 	ListOrder(c *gin.Context)
+	ListOrderShop(c *gin.Context)
+	UpdateOrder(c *gin.Context)
 }
 
 type handler struct {

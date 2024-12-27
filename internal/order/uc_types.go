@@ -57,3 +57,16 @@ type OrderItem struct {
 type ListOrderOutput struct {
 	Orders []OrderItem
 }
+
+type ListOrderShopInput struct {
+	Status string
+}
+
+type ListOrderShopOutput struct {
+	Orders []OrderItem
+}
+
+type UpdateOrderInput struct {
+	OrderID string
+	Status  string
+}

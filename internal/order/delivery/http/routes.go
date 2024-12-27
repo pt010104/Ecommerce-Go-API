@@ -9,11 +9,14 @@ func MapRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
 	MapOrderRouters(r, h, mw)
 	MapCheckoutRouters(r, h, mw)
 }
-
 func MapOrderRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
 	r.Use(mw.Auth())
 	r.POST("", h.CreateOrder)
 	r.GET("", h.ListOrder)
+
+	r.Use(mw.AuthShop())
+	r.GET("/shop", h.ListOrderShop)
+	r.PATCH("/shop/:order_id", h.UpdateOrder)
 }
 
 func MapCheckoutRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {

@@ -20,4 +20,6 @@ type OrderUC interface {
 	DetailOrder(ctx context.Context, sc models.Scope, orderID string) (models.Order, error)
 	ConsumeOrderMsg(ctx context.Context, sc models.Scope, input ConsumeOrderMsgInput) error
 	ListOrder(ctx context.Context, sc models.Scope, input ListOrderInput) (ListOrderOutput, error)
+	ListOrderShop(ctx context.Context, sc models.Scope, input ListOrderShopInput) (ListOrderShopOutput, error)
+	UpdateOrder(ctx context.Context, sc models.Scope, input UpdateOrderInput) error
 }

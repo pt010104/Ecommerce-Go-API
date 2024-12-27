@@ -218,30 +218,29 @@ func (uc implUseCase) ListOrder(ctx context.Context, sc models.Scope, input orde
 	}, nil
 }
 
-func (uc implUseCase) ListOrderShop(ctx context.Context, sc models.Scope, input order.ListOrderInput) (order.ListOrderOutput, error) {
-	orderModels, err := uc.repo.ListOrder(ctx, sc, order.ListOrderOption{
+func (uc implUseCase) ListOrderShop(ctx context.Context, sc models.Scope, input order.ListOrderShopInput) (order.ListOrderShopOutput, error) {
+	orderModels, err := uc.repo.ListOrderShop(ctx, sc, order.ListOrderOption{
 		Status: input.Status,
-		ShopID: sc.ShopID,
 	})
 	if err != nil {
-		uc.l.Errorf(ctx, "order.usecase.ListOrder.repo.ListOrder", err)
-		return order.ListOrderOutput{}, err
+		uc.l.Errorf(ctx, "order.usecase.ListOrderShop.repo.ListOrderShop", err)
+		return order.ListOrderShopOutput{}, err
 	}
 
 	if len(orderModels) == 0 {
-		return order.ListOrderOutput{}, nil
+		return order.ListOrderShopOutput{}, nil
 	}
 
 	productIDs := make([]string, 0)
 	for _, order := range orderModels {
 		for _, product := range order.Products {
-			productIDs = append(productIDs, product.ID.Hex())
+			if product.ShopID.Hex() == sc.ShopID {
+				productIDs = append(productIDs, product.ID.Hex())
+			}
 		}
 	}
 
 	productIDs = util.RemoveDuplicates(productIDs)
-
-	var products []models.Product
 
 	p, err := uc.shopUC.ListProduct(ctx, sc, shop.ListProductInput{
 		GetProductFilter: shop.GetProductFilter{
@@ -249,12 +248,8 @@ func (uc implUseCase) ListOrderShop(ctx context.Context, sc models.Scope, input 
 		},
 	})
 	if err != nil {
-		uc.l.Errorf(ctx, "order.usecase.validateProducts.shopUC.ListProduct: %v", err)
-		return order.ListOrderOutput{}, err
-	}
-
-	for _, product := range p.Products {
-		products = append(products, product.P)
+		uc.l.Errorf(ctx, "order.usecase.ListOrderShop.shopUC.ListProduct: %v", err)
+		return order.ListOrderShopOutput{}, err
 	}
 
 	imageMap := make(map[string]string)
@@ -265,36 +260,51 @@ func (uc implUseCase) ListOrderShop(ctx context.Context, sc models.Scope, input 
 	}
 
 	productMap := make(map[string]models.Product)
-	for _, product := range products {
-		productMap[product.ID.Hex()] = product
+	for _, product := range p.Products {
+		productMap[product.P.ID.Hex()] = product.P
 	}
-	orderItems := make([]order.OrderItem, len(orderModels))
-	for i, orderModel := range orderModels {
-		fmt.Println("orderModel.ID: ", orderModel.ID.Hex())
-		fmt.Println("orderModel.Products: ")
-		util.PrintJson(orderModel.Products)
+
+	orderItems := make([]order.OrderItem, 0)
+	for _, orderModel := range orderModels {
 		productItems := make([]order.ProductItem, 0)
 		for _, product := range orderModel.Products {
-			fmt.Println("product.ID: ", product.ID.Hex())
-			productItems = append(productItems, order.ProductItem{
-				ProductID:   product.ID.Hex(),
-				ProductName: productMap[product.ID.Hex()].Name,
-				ImageURL:    imageMap[product.ID.Hex()],
-				Price:       productMap[product.ID.Hex()].Price,
-				Quantity:    product.Quantity,
-			})
+			if product.ShopID.Hex() == sc.ShopID {
+				productItems = append(productItems, order.ProductItem{
+					ProductID:   product.ID.Hex(),
+					ProductName: productMap[product.ID.Hex()].Name,
+					ImageURL:    imageMap[product.ID.Hex()],
+					Price:       productMap[product.ID.Hex()].Price,
+					Quantity:    product.Quantity,
+				})
+			}
 		}
-		orderItems[i] = order.OrderItem{
+		orderItems = append(orderItems, order.OrderItem{
 			Order:      orderModel,
 			Products:   productItems,
 			TotalPrice: orderModel.TotalPrice,
-		}
-
-		fmt.Println("orderItems[i]: ")
-		util.PrintJson(orderItems[i])
+		})
 	}
 
-	return order.ListOrderOutput{
+	return order.ListOrderShopOutput{
 		Orders: orderItems,
 	}, nil
+}
+
+func (uc implUseCase) UpdateOrder(ctx context.Context, sc models.Scope, input order.UpdateOrderInput) error {
+	orderModel, err := uc.repo.DetailOrder(ctx, sc, input.OrderID)
+	if err != nil {
+		uc.l.Errorf(ctx, "order.usecase.UpdateOrder.repo.DetailOrder", err)
+		return err
+	}
+
+	err = uc.repo.UpdateOrder(ctx, sc, order.UpdateOrderOption{
+		Model:  orderModel,
+		Status: input.Status,
+	})
+	if err != nil {
+		uc.l.Errorf(ctx, "order.usecase.UpdateOrder.repo.UpdateOrder", err)
+		return err
+	}
+
+	return nil
 }

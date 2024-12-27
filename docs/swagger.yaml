@@ -87,6 +87,13 @@ definitions:
     required:
     - items
     type: object
+  http.UpdateOrderRequest:
+    properties:
+      status:
+        type: string
+    required:
+    - status
+    type: object
   http.UpdateProductReq:
     properties:
       category_ids:
@@ -1292,6 +1299,115 @@ paths:
           schema:
             $ref: '#/definitions/response.Resp'
       summary: Create checkout
+      tags:
+      - Order
+  /api/v1/orders/shop:
+    get:
+      consumes:
+      - application/json
+      description: List orders for shop
+      parameters:
+      - default: '"*"'
+        description: Access-Control-Allow-Origin
+        in: header
+        name: Access-Control-Allow-Origin
+        type: string
+      - default: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU
+        description: Bearer JWT token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - default: 6707825d45804caaf8316957
+        description: User ID
+        in: header
+        name: x-client-id
+        required: true
+        type: string
+      - default: zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=
+        description: Session ID
+        in: header
+        name: session-id
+        required: true
+        type: string
+      - in: query
+        name: status
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Resp'
+      summary: List order shop
+      tags:
+      - Order
+  /api/v1/orders/shop/{order_id}:
+    patch:
+      consumes:
+      - application/json
+      description: Update order status
+      parameters:
+      - default: '"*"'
+        description: Access-Control-Allow-Origin
+        in: header
+        name: Access-Control-Allow-Origin
+        type: string
+      - default: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU
+        description: Bearer JWT token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - default: 6707825d45804caaf8316957
+        description: User ID
+        in: header
+        name: x-client-id
+        required: true
+        type: string
+      - default: zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=
+        description: Session ID
+        in: header
+        name: session-id
+        required: true
+        type: string
+      - description: Order ID
+        in: path
+        name: order_id
+        required: true
+        type: string
+      - description: Request Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/http.UpdateOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Resp'
+      summary: Update order
       tags:
       - Order
   /api/v1/shops:

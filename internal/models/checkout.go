@@ -8,6 +8,7 @@ import (
 
 type OrderProduct struct {
 	ID       primitive.ObjectID `bson:"_id"`
+	ShopID   primitive.ObjectID `bson:"shop_id"`
 	Quantity int                `bson:"quantity"`
 }
 

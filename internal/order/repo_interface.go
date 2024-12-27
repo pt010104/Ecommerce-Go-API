@@ -15,6 +15,8 @@ type OrderRepo interface {
 	CreateOrder(ctx context.Context, sc models.Scope, opt CreateOrderOption) (models.Order, error)
 	DetailOrder(ctx context.Context, sc models.Scope, orderID string) (models.Order, error)
 	ListOrder(ctx context.Context, sc models.Scope, opt ListOrderOption) ([]models.Order, error)
+	ListOrderShop(ctx context.Context, sc models.Scope, opt ListOrderOption) ([]models.Order, error)
+	UpdateOrder(ctx context.Context, sc models.Scope, opt UpdateOrderOption) error
 }
 
 type CheckoutRepo interface {
