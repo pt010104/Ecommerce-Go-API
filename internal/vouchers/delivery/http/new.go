@@ -10,6 +10,7 @@ type Handler interface {
 	CreateVoucher(c *gin.Context)
 	DetailVoucher(c *gin.Context)
 	ListVoucher(c *gin.Context)
+	ApplyVoucher(c *gin.Context)
 }
 
 type handler struct {

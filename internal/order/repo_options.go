@@ -20,3 +20,7 @@ type CreateOrderOption struct {
 	PaymentMethod string
 	AddressID     string
 }
+
+type ListOrderOption struct {
+	Status string
+}

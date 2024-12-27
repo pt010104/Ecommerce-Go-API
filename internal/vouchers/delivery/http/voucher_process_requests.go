@@ -76,3 +76,26 @@ func (h handler) processListVoucherRequest(c *gin.Context) (ListVoucherReq, mode
 	return req, sc, nil
 
 }
+
+func (h handler) processApplyVoucherRequest(c *gin.Context) (applyVoucherReq, models.Scope, error) {
+	ctx := c.Request.Context()
+
+	sc, ok := jwt.GetScopeFromContext(ctx)
+	if !ok {
+		h.l.Errorf(ctx, "voucher.http.delivery.http.handler.processApplyVoucherRequest: unauthorized")
+		return applyVoucherReq{}, models.Scope{}, pkgErrors.NewUnauthorizedHTTPError()
+	}
+
+	var req applyVoucherReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.l.Errorf(ctx, "voucher.delivery.http.handler.processApplyVoucherRequest: invalid request")
+		return applyVoucherReq{}, models.Scope{}, errWrongBody
+	}
+
+	if err := req.validate(); err != nil {
+		h.l.Errorf(ctx, "voucher.delivery.http.handler.processApplyVoucherRequest: invalid request %v", err)
+		return applyVoucherReq{}, models.Scope{}, errWrongBody
+	}
+
+	return req, sc, nil
+}

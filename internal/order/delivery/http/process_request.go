@@ -53,3 +53,26 @@ func (h *handler) processCreateOrderRequest(c *gin.Context) (models.Scope, Creat
 
 	return sc, req, nil
 }
+
+func (h *handler) processListOrderRequest(c *gin.Context) (models.Scope, ListOrderRequest, error) {
+	ctx := c.Request.Context()
+
+	sc, ok := jwt.GetScopeFromContext(ctx)
+	if !ok {
+		h.l.Errorf(ctx, "order.delivery.http.handler.processListOrderRequest: unauthorized")
+		return models.Scope{}, ListOrderRequest{}, pkgErrors.NewUnauthorizedHTTPError()
+	}
+
+	var req ListOrderRequest
+	if err := c.ShouldBindQuery(&req); err != nil {
+		h.l.Errorf(ctx, "order.delivery.http.handler.processListOrderRequest: invalid request")
+		return models.Scope{}, req, errWrongBody
+	}
+
+	if err := req.validate(); err != nil {
+		h.l.Errorf(ctx, "order.delivery.http.handler.processListOrderRequest: invalid request")
+		return models.Scope{}, req, err
+	}
+
+	return sc, req, nil
+}

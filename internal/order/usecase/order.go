@@ -105,3 +105,15 @@ func (uc implUseCase) DetailOrder(ctx context.Context, sc models.Scope, orderID 
 
 	return orderModel, nil
 }
+
+func (uc implUseCase) ListOrder(ctx context.Context, sc models.Scope, input order.ListOrderInput) ([]models.Order, error) {
+	orderModel, err := uc.repo.ListOrder(ctx, sc, order.ListOrderOption{
+		Status: input.Status,
+	})
+	if err != nil {
+		uc.l.Errorf(ctx, "order.usecase.ListOrder.repo.ListOrder", err)
+		return []models.Order{}, err
+	}
+
+	return orderModel, nil
+}

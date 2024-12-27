@@ -234,3 +234,45 @@ func (h handler) newListResponse(vouchers []models.Voucher) listVoucherResp {
 	}
 	return res
 }
+
+type applyVoucherReq struct {
+	ID          string  `json:"id"`
+	Code        string  `json:"code""`
+	OrderAmount float64 `json:"order_amount" binding:"required"`
+}
+
+func (req applyVoucherReq) validate() error {
+	if req.ID != "" {
+		if !mongo.IsObjectID(req.ID) {
+			return errWrongBody
+		}
+	}
+	if req.ID == "" && req.Code == "" {
+		return errWrongBody
+	}
+	if req.OrderAmount < 0 {
+		return errWrongBody
+	}
+
+	return nil
+}
+
+func (req applyVoucherReq) toInput() vouchers.ApplyVoucherInput {
+	return vouchers.ApplyVoucherInput{
+		ID:          req.ID,
+		Code:        req.Code,
+		OrderAmount: req.OrderAmount,
+	}
+}
+
+type applyVoucherResp struct {
+	Voucher        detailVoucherResp `json:"voucher"`
+	DiscountAmount float64           `json:"discount_amount"`
+}
+
+func (h handler) newApplyVoucherResponse(v models.Voucher, discountAmount float64) applyVoucherResp {
+	return applyVoucherResp{
+		Voucher:        h.newDetailResponse(v),
+		DiscountAmount: discountAmount,
+	}
+}

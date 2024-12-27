@@ -95,10 +95,15 @@ type CreateOrderRequest struct {
 	CheckoutID    string `json:"checkout_id" binding:"required"`
 	PaymentMethod string `json:"payment_method" binding:"required"`
 	AddressID     string `json:"address_id" binding:"required"`
+	VoucherID     string `json:"voucher_id"`
 }
 
 func (r CreateOrderRequest) validate() error {
 	if !mongo.IsObjectID(r.CheckoutID) {
+		return errWrongBody
+	}
+
+	if r.VoucherID != "" && !mongo.IsObjectID(r.VoucherID) {
 		return errWrongBody
 	}
 
@@ -110,6 +115,7 @@ func (r CreateOrderRequest) toInput() order.CreateOrderInput {
 		CheckoutID:    r.CheckoutID,
 		PaymentMethod: r.PaymentMethod,
 		AddressID:     r.AddressID,
+		VoucherID:     r.VoucherID,
 	}
 }
 
@@ -121,4 +127,42 @@ func (h handler) newCreateOrderResponse(o models.Order) createOrderResponse {
 	return createOrderResponse{
 		OrderID: o.ID.Hex(),
 	}
+}
+
+type ListOrderRequest struct {
+	Status string `form:"status" binding:"required"`
+}
+
+func (r ListOrderRequest) validate() error {
+	if r.Status != models.OrderStatusPending && r.Status != models.OrderStatusProcessing && r.Status != models.OrderStatusShipping && r.Status != models.OrderStatusDelivered && r.Status != models.OrderStatusCanceled {
+		return errWrongBody
+	}
+
+	return nil
+}
+
+func (r ListOrderRequest) toInput() order.ListOrderInput {
+	return order.ListOrderInput{
+		Status: r.Status,
+	}
+}
+
+type orderResponse struct {
+	OrderID    string            `json:"order_id"`
+	Status     string            `json:"status"`
+	TotalPrice float64           `json:"total_price"`
+	CreatedAt  response.DateTime `json:"created_at"`
+}
+
+func (h handler) newListOrderResponse(o []models.Order) []orderResponse {
+	resp := make([]orderResponse, 0)
+	for _, order := range o {
+		resp = append(resp, orderResponse{
+			OrderID:    order.ID.Hex(),
+			Status:     order.Status,
+			TotalPrice: order.TotalPrice,
+			CreatedAt:  response.DateTime(order.CreatedAt),
+		})
+	}
+	return resp
 }

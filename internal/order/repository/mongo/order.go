@@ -51,3 +51,28 @@ func (repo implRepo) DetailOrder(ctx context.Context, sc models.Scope, orderID s
 
 	return order, nil
 }
+
+func (repo implRepo) ListOrder(ctx context.Context, sc models.Scope, opt order.ListOrderOption) ([]models.Order, error) {
+	col := repo.getOrderCollection()
+
+	filter, err := repo.buildOrderQuery(ctx, sc, opt)
+	if err != nil {
+		repo.l.Errorf(ctx, "Order.Repo.ListOrder.buildOrderQuery", err)
+		return []models.Order{}, err
+	}
+
+	cursor, err := col.Find(ctx, filter)
+	if err != nil {
+		repo.l.Errorf(ctx, "Order.Repo.ListOrder.Find", err)
+		return []models.Order{}, err
+	}
+
+	var orders []models.Order
+	err = cursor.All(ctx, &orders)
+	if err != nil {
+		repo.l.Errorf(ctx, "Order.Repo.ListOrder.All", err)
+		return []models.Order{}, err
+	}
+
+	return orders, nil
+}

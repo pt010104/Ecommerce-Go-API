@@ -42,6 +42,8 @@ definitions:
         type: string
       payment_method:
         type: string
+      voucher_id:
+        type: string
     required:
     - address_id
     - checkout_id
@@ -178,6 +180,17 @@ definitions:
     - phone
     - province
     - street
+    type: object
+  http.applyVoucherReq:
+    properties:
+      code:
+        type: string
+      id:
+        type: string
+      order_amount:
+        type: number
+    required:
+    - order_amount
     type: object
   http.categoryObject:
     properties:
@@ -1121,6 +1134,56 @@ paths:
       tags:
       - Media
   /api/v1/orders:
+    get:
+      consumes:
+      - application/json
+      description: List order
+      parameters:
+      - default: '"*"'
+        description: Access-Control-Allow-Origin
+        in: header
+        name: Access-Control-Allow-Origin
+        type: string
+      - default: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU
+        description: Bearer JWT token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - default: 6707825d45804caaf8316957
+        description: User ID
+        in: header
+        name: x-client-id
+        required: true
+        type: string
+      - default: zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=
+        description: Session ID
+        in: header
+        name: session-id
+        required: true
+        type: string
+      - in: query
+        name: status
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Resp'
+      summary: List order
+      tags:
+      - Order
     post:
       consumes:
       - application/json
@@ -2504,6 +2567,59 @@ paths:
           schema:
             $ref: '#/definitions/response.Resp'
       summary: Create a voucher
+      tags:
+      - Voucher
+  /api/v1/vouchers/apply:
+    post:
+      consumes:
+      - application/json
+      description: Apply a voucher to calculate discount amount
+      parameters:
+      - default: '"*"'
+        description: Access-Control-Allow-Origin
+        in: header
+        name: Access-Control-Allow-Origin
+        type: string
+      - default: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU
+        description: Bearer JWT token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - default: 6707825d45804caaf8316957
+        description: User ID
+        in: header
+        name: x-client-id
+        required: true
+        type: string
+      - default: zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=
+        description: Session ID
+        in: header
+        name: session-id
+        required: true
+        type: string
+      - description: Apply voucher request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/http.applyVoucherReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Resp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Resp'
+      summary: Apply a voucher
       tags:
       - Voucher
   /api/v1/vouchers/by-code{code}:

@@ -482,6 +482,78 @@ const docTemplate = `{
             }
         },
         "/api/v1/orders": {
+            "get": {
+                "description": "List order",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Order"
+                ],
+                "summary": "List order",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU",
+                        "description": "Bearer JWT token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "6707825d45804caaf8316957",
+                        "description": "User ID",
+                        "name": "x-client-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
+                        "description": "Session ID",
+                        "name": "session-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "status",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create order",
                 "consumes": [
@@ -2506,6 +2578,83 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/vouchers/apply": {
+            "post": {
+                "description": "Apply a voucher to calculate discount amount",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Voucher"
+                ],
+                "summary": "Apply a voucher",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"*\"",
+                        "description": "Access-Control-Allow-Origin",
+                        "name": "Access-Control-Allow-Origin",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjAxMTk2NjgsImlhdCI6MTcyODU4MzY2OCwic3ViIjoiNjcwNzgyNWQ0NTgwNGNhYWY4MzE2OTU3Iiwic2Vzc2lvbl9pZCI6InpnSFJMd1NmTnNQVnk2d2g3M0ZLVmpqZXV6T1ZnWGZSMjdRYVd1eGtsdzQ9IiwidHlwZSI6IiIsInJlZnJlc2giOmZhbHNlfQ.Pti0gJ5fO4WjGTsxShGv90pr0E_0jMJdWFEUJYKG4VU",
+                        "description": "Bearer JWT token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "6707825d45804caaf8316957",
+                        "description": "User ID",
+                        "name": "x-client-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "zgHRLwSfNsPVy6wh73FKVjjeuzOVgXfR27QaWuxklw4=",
+                        "description": "Session ID",
+                        "name": "session-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Apply voucher request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.applyVoucherReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Resp"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/vouchers/by-code{code}": {
             "get": {
                 "description": "Get details of a specific voucher , pass id or code as param one of them must be presented if search by id change the route to by-id/id",
@@ -2654,6 +2803,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "payment_method": {
+                    "type": "string"
+                },
+                "voucher_id": {
                     "type": "string"
                 }
             }
@@ -2852,6 +3004,23 @@ const docTemplate = `{
                 },
                 "street": {
                     "type": "string"
+                }
+            }
+        },
+        "http.applyVoucherReq": {
+            "type": "object",
+            "required": [
+                "order_amount"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "order_amount": {
+                    "type": "number"
                 }
             }
         },

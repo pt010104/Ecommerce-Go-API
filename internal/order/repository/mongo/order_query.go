@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/pt010104/api-golang/internal/models"
+	"github.com/pt010104/api-golang/internal/order"
 	"github.com/pt010104/api-golang/pkg/mongo"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -16,6 +17,20 @@ func (repo implRepo) buildOrderDetailQuery(ctx context.Context, sc models.Scope,
 	}
 
 	filter["_id"] = mongo.ObjectIDFromHexOrNil(orderID)
+
+	return filter, nil
+}
+
+func (repo implRepo) buildOrderQuery(ctx context.Context, sc models.Scope, opt order.ListOrderOption) (bson.M, error) {
+	filter, err := mongo.BuildScopeQuery(ctx, repo.l, sc)
+	if err != nil {
+		repo.l.Errorf(ctx, "Order.Repo.buildOrderQuery.BuildScopeQuery", err)
+		return nil, err
+	}
+
+	if opt.Status != "" {
+		filter["status"] = opt.Status
+	}
 
 	return filter, nil
 }

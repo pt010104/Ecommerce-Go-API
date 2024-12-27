@@ -23,6 +23,7 @@ type CreateOrderInput struct {
 	CheckoutID    string
 	PaymentMethod string
 	AddressID     string
+	VoucherID     string
 }
 
 type CreateOrderOutput struct {
@@ -33,4 +34,8 @@ type ConsumeOrderMsgInput struct {
 	OrderID    string
 	CheckoutID string
 	UserID     string
+}
+
+type ListOrderInput struct {
+	Status string
 }
