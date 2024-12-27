@@ -648,25 +648,41 @@ func (uc implUsecase) UpdateProduct(ctx context.Context, sc models.Scope, input 
 		return models.Product{}, shop.ErrNoPermissionToUpdate
 	}
 	p, err := uc.repo.UpdateProduct(ctx, sc, shop.UpdateProductOption{
-		Name:            input.Name,
-		ID:              input.ID,
-		Price:           input.Price,
-		StockLevel:      input.StockLevel,
-		ReorderLevel:    input.ReorderLevel,
-		ReorderQuantity: input.ReorderQuantity,
-		CategoryID:      input.CategoryID,
-		MediaIDs:        input.MediaIDs,
-		Alias:           util.BuildAlias(input.Name),
-		Model:           input.Model,
+		Name:       input.Name,
+		ID:         input.ID,
+		Price:      input.Price,
+		CategoryID: input.CategoryID,
+		MediaIDs:   input.MediaIDs,
+		Alias:      util.BuildAlias(input.Name),
+		Model:      input.Model,
 	})
 	if err != nil {
 		uc.l.Errorf(ctx, "shop.usecase.UpdateProduct.repoUpdateProduct: %v", err)
 		return models.Product{}, err
 	}
+
 	p1, err1 := uc.repo.Detailproduct(ctx, p.ID)
 	if err1 != nil {
 		uc.l.Errorf(ctx, "shop.usecase.UpdateProduct.repoDetailProduct: %v", err1)
 		return models.Product{}, err1
 	}
+
+	invenModel, err := uc.repo.DetailInventory(ctx, p1.InventoryID)
+	if err != nil {
+		uc.l.Errorf(ctx, "shop.usecase.UpdateProduct.DetailInventory: %v", err1)
+		return models.Product{}, err1
+	}
+
+	_, err = uc.repo.UpdateInventory(ctx, sc, shop.UpdateInventoryOption{
+		Model:           invenModel,
+		StockLevel:      &input.StockLevel,
+		ReorderLevel:    &input.ReorderLevel,
+		ReorderQuantity: &input.ReorderQuantity,
+	})
+	if err != nil {
+		uc.l.Errorf(ctx, "shop.usecase.UpdateProduct.UpdateInventory: %v", err1)
+		return models.Product{}, err1
+	}
+
 	return p1, nil
 }
