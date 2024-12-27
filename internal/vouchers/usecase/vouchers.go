@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"sort"
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/vouchers"
@@ -64,7 +65,6 @@ func (uc implUsecase) Detail(ctx context.Context, sc models.Scope, input voucher
 }
 
 func (uc implUsecase) List(ctx context.Context, sc models.Scope, opt vouchers.GetVoucherFilter) ([]models.Voucher, error) {
-
 	vouchers1, err := uc.repo.ListVoucher(ctx, sc, opt)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -74,8 +74,12 @@ func (uc implUsecase) List(ctx context.Context, sc models.Scope, opt vouchers.Ge
 		uc.l.Errorf(ctx, "vouchers.usecase.List.ListVoucher: %v", err)
 		return []models.Voucher{}, err
 	}
-	return vouchers1, nil
 
+	sort.Slice(vouchers1, func(i, j int) bool {
+		return vouchers1[i].CreatedAt.After(vouchers1[j].CreatedAt)
+	})
+
+	return vouchers1, nil
 }
 
 func (uc implUsecase) ApplyVoucher(ctx context.Context, sc models.Scope, input vouchers.ApplyVoucherInput) (models.Voucher, float64, float64, error) {

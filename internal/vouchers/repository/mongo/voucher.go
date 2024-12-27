@@ -44,6 +44,7 @@ func (repo implRepo) DetailVoucher(ctx context.Context, sc models.Scope, opt vou
 
 	return voucher, nil
 }
+
 func (repo implRepo) ListVoucher(ctx context.Context, sc models.Scope, opt vouchers.GetVoucherFilter) ([]models.Voucher, error) {
 	col := repo.getVoucherCollection()
 
@@ -78,6 +79,7 @@ func (repo implRepo) ListVoucher(ctx context.Context, sc models.Scope, opt vouch
 
 	return vouchers, nil
 }
+
 func (repo implRepo) UpdateVoucher(ctx context.Context, sc models.Scope, option vouchers.UpdateVoucherOption) (models.Voucher, error) {
 	col := repo.getVoucherCollection()
 
