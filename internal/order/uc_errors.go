@@ -11,4 +11,5 @@ var (
 	ErrCheckoutExpired       = errors.New("checkout expired")
 	ErrTooManyRetries        = errors.New("too many retries due to concurrent modifications")
 	ErrRedisNotFound         = errors.New("redis: nil")
+	ErrAddressNotFound       = errors.New("address not found")
 )

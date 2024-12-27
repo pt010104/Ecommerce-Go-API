@@ -247,8 +247,7 @@ func (uc implUsecase) ListProduct(ctx context.Context, sc models.Scope, input sh
 		categoryIDs = append(categoryIDs, id)
 	}
 
-	wg.Add(2)
-
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		var err error
@@ -262,6 +261,7 @@ func (uc implUsecase) ListProduct(ctx context.Context, sc models.Scope, input sh
 
 	}()
 
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		var err error

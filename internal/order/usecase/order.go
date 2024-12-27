@@ -13,15 +13,37 @@ import (
 func (uc implUseCase) CreateOrder(ctx context.Context, sc models.Scope, input order.CreateOrderInput) error {
 	checkoutModel, err := uc.repo.DetailCheckout(ctx, sc, input.CheckoutID)
 	if err != nil {
+		uc.l.Errorf(ctx, "order.usecase.CreateOrder.repo.DetailCheckout", err)
 		return err
 	}
 
 	if checkoutModel.Status != models.CheckoutStatusPending {
+		uc.l.Errorf(ctx, "order.usecase.CreateOrder.repo.DetailCheckout", order.ErrCheckoutStatusInvalid)
 		return order.ErrCheckoutStatusInvalid
 	}
 
 	if checkoutModel.ExpiredAt.Before(util.Now()) {
+		uc.l.Errorf(ctx, "order.usecase.CreateOrder.repo.DetailCheckout", order.ErrCheckoutExpired)
 		return order.ErrCheckoutExpired
+	}
+
+	userModel, err := uc.userUC.GetModel(ctx, sc.UserID)
+	if err != nil {
+		uc.l.Errorf(ctx, "order.usecase.CreateOrder.userUC.GetModel", err)
+		return err
+	}
+
+	var existAddress bool
+	for _, address := range userModel.Address {
+		if address.ID.Hex() == input.AddressID {
+			existAddress = true
+			break
+		}
+	}
+
+	if !existAddress {
+		uc.l.Errorf(ctx, "order.usecase.CreateOrder.userUC.GetModel", order.ErrAddressNotFound)
+		return order.ErrAddressNotFound
 	}
 
 	var wg sync.WaitGroup
@@ -48,6 +70,7 @@ func (uc implUseCase) CreateOrder(ctx context.Context, sc models.Scope, input or
 			CheckoutID:    checkoutModel.ID,
 			Products:      checkoutModel.Products,
 			PaymentMethod: input.PaymentMethod,
+			AddressID:     input.AddressID,
 		})
 		if err != nil {
 			uc.l.Errorf(ctx, "order.usecase.CreateOrder.repo.CreateOrder", err)

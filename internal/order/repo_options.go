@@ -18,4 +18,5 @@ type CreateOrderOption struct {
 	CheckoutID    primitive.ObjectID
 	Products      []models.OrderProduct
 	PaymentMethod string
+	AddressID     string
 }

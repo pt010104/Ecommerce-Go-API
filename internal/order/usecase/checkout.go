@@ -62,15 +62,15 @@ func (uc implUseCase) CreateCheckout(ctx context.Context, sc models.Scope, produ
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		var products []models.OrderProduct
+		var productCheckouts []models.OrderProduct
 		for _, product := range products {
-			products = append(products, models.OrderProduct{
+			productCheckouts = append(productCheckouts, models.OrderProduct{
 				ID:       product.ID,
 				Quantity: productQuantityMap[product.ID.Hex()],
 			})
 		}
 		checkoutModel, err = uc.repo.CreateCheckout(ctx, sc, order.CreateCheckoutOption{
-			Products: products,
+			Products: productCheckouts,
 		})
 		if err != nil {
 			uc.l.Errorf(ctx, "order.usecase.CreateCheckout.repo.CreateCheckout: %v", err)

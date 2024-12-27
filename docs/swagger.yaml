@@ -36,11 +36,14 @@ definitions:
     type: object
   http.CreateOrderRequest:
     properties:
+      address_id:
+        type: string
       checkout_id:
         type: string
       payment_method:
         type: string
     required:
+    - address_id
     - checkout_id
     - payment_method
     type: object
@@ -192,6 +195,8 @@ definitions:
     type: object
   http.checkoutResponse:
     properties:
+      checkout_id:
+        type: string
       expired_at:
         type: string
       items:
@@ -489,8 +494,6 @@ definitions:
     type: object
   http.itemResponse:
     properties:
-      checkout_id:
-        type: string
       price:
         type: number
       product_list:

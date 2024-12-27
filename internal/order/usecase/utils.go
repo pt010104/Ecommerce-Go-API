@@ -7,6 +7,7 @@ import (
 	"github.com/pt010104/api-golang/internal/cart"
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/order"
+	"github.com/pt010104/api-golang/internal/resources"
 	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/pkg/mongo"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -197,4 +198,22 @@ func (uc implUseCase) calculateTotalPricesByShop(ctx context.Context, sc models.
 	}
 
 	return totalPricesByShop, nil
+}
+
+func (uc implUseCase) filterProductsByShop(products []resources.OrderProductEmail, shopID string) []resources.OrderProductEmail {
+	var filtered []resources.OrderProductEmail
+	for _, p := range products {
+		if p.ShopID == shopID {
+			filtered = append(filtered, p)
+		}
+	}
+	return filtered
+}
+
+func (uc implUseCase) calculateShopTotal(products []resources.OrderProductEmail) float64 {
+	total := 0.0
+	for _, p := range products {
+		total += p.SubTotal
+	}
+	return total
 }

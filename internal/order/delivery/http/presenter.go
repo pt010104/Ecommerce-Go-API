@@ -38,13 +38,13 @@ type productObject struct {
 }
 
 type itemResponse struct {
-	CheckoutID  string          `json:"checkout_id"`
 	ShopObjects shopObject      `json:"shop_objects"`
 	ProductList []productObject `json:"product_list"`
 	Price       float32         `json:"price"`
 }
 
 type checkoutResponse struct {
+	CheckoutID string            `json:"checkout_id"`
 	Items      []itemResponse    `json:"items"`
 	TotalPrice float32           `json:"total_price"`
 	ExpiredAt  response.DateTime `json:"expired_at"`
@@ -77,7 +77,6 @@ func (h handler) newCreateCheckoutCheckoutResponse(o order.CreateCheckoutOutput)
 		}
 
 		checkoutResponse.Items = append(checkoutResponse.Items, itemResponse{
-			CheckoutID:  o.CheckoutID,
 			ShopObjects: shopObject,
 			ProductList: productList,
 			Price:       float32(o.TotalPriceByShop[shop.ID.Hex()]),
@@ -86,6 +85,7 @@ func (h handler) newCreateCheckoutCheckoutResponse(o order.CreateCheckoutOutput)
 
 	checkoutResponse.TotalPrice = float32(o.TotalPrice)
 	checkoutResponse.ExpiredAt = response.DateTime(o.ExpiredAt)
+	checkoutResponse.CheckoutID = o.CheckoutID
 
 	return checkoutResponse
 }
@@ -93,6 +93,7 @@ func (h handler) newCreateCheckoutCheckoutResponse(o order.CreateCheckoutOutput)
 type CreateOrderRequest struct {
 	CheckoutID    string `json:"checkout_id" binding:"required"`
 	PaymentMethod string `json:"payment_method" binding:"required"`
+	AddressID     string `json:"address_id" binding:"required"`
 }
 
 func (r CreateOrderRequest) validate() error {
@@ -107,5 +108,6 @@ func (r CreateOrderRequest) toInput() order.CreateOrderInput {
 	return order.CreateOrderInput{
 		CheckoutID:    r.CheckoutID,
 		PaymentMethod: r.PaymentMethod,
+		AddressID:     r.AddressID,
 	}
 }

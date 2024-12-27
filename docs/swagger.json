@@ -2633,10 +2633,14 @@
         "http.CreateOrderRequest": {
             "type": "object",
             "required": [
+                "address_id",
                 "checkout_id",
                 "payment_method"
             ],
             "properties": {
+                "address_id": {
+                    "type": "string"
+                },
                 "checkout_id": {
                     "type": "string"
                 },
@@ -2867,6 +2871,9 @@
         "http.checkoutResponse": {
             "type": "object",
             "properties": {
+                "checkout_id": {
+                    "type": "string"
+                },
                 "expired_at": {
                     "type": "string"
                 },
@@ -3313,9 +3320,6 @@
         "http.itemResponse": {
             "type": "object",
             "properties": {
-                "checkout_id": {
-                    "type": "string"
-                },
                 "price": {
                     "type": "number"
                 },

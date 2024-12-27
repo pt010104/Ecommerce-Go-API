@@ -22,6 +22,7 @@ type CreateCheckoutOutput struct {
 type CreateOrderInput struct {
 	CheckoutID    string
 	PaymentMethod string
+	AddressID     string
 }
 
 type CreateOrderOutput struct {

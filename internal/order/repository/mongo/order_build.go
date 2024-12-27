@@ -20,6 +20,7 @@ func (repo implRepo) buildOrderModel(ctx context.Context, sc models.Scope, opt o
 		Products:      opt.Products,
 		Status:        models.OrderStatusPending,
 		PaymentMethod: opt.PaymentMethod,
+		AddressID:     mongo.ObjectIDFromHexOrNil(opt.AddressID),
 		CreatedAt:     now,
 		UpdatedAt:     now,
 	}

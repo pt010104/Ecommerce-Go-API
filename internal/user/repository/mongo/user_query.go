@@ -43,7 +43,7 @@ func (repo implRepo) buidUserQuery(ctx context.Context, opt user.GetFilter) (bso
 	}
 
 	if len(opt.IDs) > 0 {
-		filter["_id"] = bson.M{"$in": opt.IDs}
+		filter["_id"] = bson.M{"$in": mongo.ObjectIDsFromHexOrNil(opt.IDs)}
 	}
 
 	return filter, nil

@@ -9,7 +9,6 @@ import (
 type OrderProduct struct {
 	ID       primitive.ObjectID `bson:"_id"`
 	Quantity int                `bson:"quantity"`
-	ShopID   primitive.ObjectID `bson:"shop_id"`
 }
 
 type Checkout struct {

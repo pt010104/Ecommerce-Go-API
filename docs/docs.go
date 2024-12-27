@@ -2644,10 +2644,14 @@ const docTemplate = `{
         "http.CreateOrderRequest": {
             "type": "object",
             "required": [
+                "address_id",
                 "checkout_id",
                 "payment_method"
             ],
             "properties": {
+                "address_id": {
+                    "type": "string"
+                },
                 "checkout_id": {
                     "type": "string"
                 },
@@ -2878,6 +2882,9 @@ const docTemplate = `{
         "http.checkoutResponse": {
             "type": "object",
             "properties": {
+                "checkout_id": {
+                    "type": "string"
+                },
                 "expired_at": {
                     "type": "string"
                 },
@@ -3324,9 +3331,6 @@ const docTemplate = `{
         "http.itemResponse": {
             "type": "object",
             "properties": {
-                "checkout_id": {
-                    "type": "string"
-                },
                 "price": {
                     "type": "number"
                 },

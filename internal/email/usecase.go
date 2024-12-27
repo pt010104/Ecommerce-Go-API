@@ -7,8 +7,7 @@ import (
 )
 
 type UseCase interface {
+	SendEmail(ctx context.Context, data resources.EmailData) error
 	SendVerificationEmail(userEmail string, verificationToken string) error
 	SendResetPasswordEmail(userEmail string, verificationToken string) error
-
-	SendEmail(ctx context.Context, data resources.EmailData) error
 }

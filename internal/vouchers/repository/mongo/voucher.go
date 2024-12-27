@@ -2,7 +2,6 @@ package mongo
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/vouchers"
@@ -52,7 +51,6 @@ func (repo implRepo) ListVoucher(ctx context.Context, sc models.Scope, opt vouch
 		repo.l.Errorf(ctx, "voucher.repository.mongo.buildVoucherQuery: %v", err)
 		return []models.Voucher{}, err
 	}
-	fmt.Print(filter)
 
 	cursor, err := col.Find(ctx, filter)
 	if err != nil {

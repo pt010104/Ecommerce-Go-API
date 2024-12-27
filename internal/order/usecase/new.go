@@ -21,7 +21,7 @@ type implUseCase struct {
 	userUC    user.UseCase
 }
 
-func New(l log.Logger, repo order.Repo, shopUC shop.UseCase, cartUC cart.UseCase, redisRepo order.Redis, prod producer.Producer, userUC user.UseCase) order.UseCase {
+func New(l log.Logger, repo order.Repo, shopUC shop.UseCase, cartUC cart.UseCase, redisRepo order.Redis, prod producer.Producer, emailUC email.UseCase, userUC user.UseCase) order.UseCase {
 	return &implUseCase{
 		l:         l,
 		repo:      repo,
@@ -29,6 +29,7 @@ func New(l log.Logger, repo order.Repo, shopUC shop.UseCase, cartUC cart.UseCase
 		cartUC:    cartUC,
 		redisRepo: redisRepo,
 		prod:      prod,
+		emailUC:   emailUC,
 		userUC:    userUC,
 	}
 }

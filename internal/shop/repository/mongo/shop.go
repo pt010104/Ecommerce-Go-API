@@ -2,7 +2,6 @@ package mongo
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
@@ -104,7 +103,6 @@ func (repo implRepo) GetShopIDByUserID(ctx context.Context, sc models.Scope, use
 	filter := repo.buildGetShopIDByUserIdQuery(ctx, userID)
 	var s models.Shop
 	//print filter
-	fmt.Println(filter)
 	err := col.FindOne(ctx, filter).Decode(&s)
 	if err != nil {
 		repo.l.Errorf(ctx, "shop.repository.mongo.GetShopIDByUserID.FindOne: %v", err)
