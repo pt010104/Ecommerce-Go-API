@@ -143,6 +143,7 @@ func (uc implUsecase) Update(ctx context.Context, sc models.Scope, input shop.Up
 					Model:      s,
 					Name:       input.Name,
 					Alias:      util.BuildAlias(input.Name),
+					Phone:      input.Phone,
 					City:       input.City,
 					District:   input.District,
 					Street:     input.Street,
