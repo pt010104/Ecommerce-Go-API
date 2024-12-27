@@ -389,6 +389,8 @@ definitions:
         items:
           $ref: '#/definitions/http.categoryResp'
         type: array
+      description:
+        type: string
       id:
         type: string
       images:
@@ -547,6 +549,8 @@ definitions:
         items:
           $ref: '#/definitions/http.categoryObject'
         type: array
+      description:
+        type: string
       id:
         type: string
       inventory_object:

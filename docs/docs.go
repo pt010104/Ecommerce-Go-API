@@ -3475,6 +3475,9 @@ const docTemplate = `{
                         "$ref": "#/definitions/http.categoryResp"
                     }
                 },
+                "description": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
@@ -3716,6 +3719,9 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/http.categoryObject"
                     }
+                },
+                "description": {
+                    "type": "string"
                 },
                 "id": {
                     "type": "string"
