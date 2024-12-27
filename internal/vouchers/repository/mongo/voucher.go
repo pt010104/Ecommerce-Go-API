@@ -2,10 +2,10 @@ package mongo
 
 import (
 	"context"
-	"time"
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/vouchers"
+	"github.com/pt010104/api-golang/pkg/util"
 
 	"go.mongodb.org/mongo-driver/bson"
 	mongo1 "go.mongodb.org/mongo-driver/mongo"
@@ -53,11 +53,12 @@ func (repo implRepo) ListVoucher(ctx context.Context, sc models.Scope, opt vouch
 		return []models.Voucher{}, err
 	}
 
-	now := time.Now()
+	now := util.Now()
 	filter = bson.M{
 		"$and": []bson.M{
 			filter,
-			{"valid_from": bson.M{"$gt": now}},
+			{"valid_from": bson.M{"$lte": now}},
+			{"valid_to": bson.M{"$gte": now}},
 		},
 	}
 
