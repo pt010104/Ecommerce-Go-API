@@ -529,7 +529,6 @@ func (uc implUsecase) DetailKeyToken(ctx context.Context, userID string, session
 
 	return k, nil
 }
-
 func (uc implUsecase) Update(ctx context.Context, sc models.Scope, input user.UpdateInput) (user.DetailUserOutput, error) {
 	var u models.User
 	var avatar models.Media
@@ -567,6 +566,25 @@ func (uc implUsecase) Update(ctx context.Context, sc models.Scope, input user.Up
 		return user.DetailUserOutput{}, wgErr
 	}
 
+	if input.Email != "" && input.Email != u.Email {
+		existingUser, err := uc.repo.GetUser(ctx, user.GetUserOption{
+			GetFilter: user.GetFilter{
+				Email: input.Email,
+			},
+		})
+		if err != nil {
+			if err != mongo.ErrNoDocuments {
+				uc.l.Errorf(ctx, "user.usecase.Update.GetUser: %v", err)
+				return user.DetailUserOutput{}, err
+			}
+		}
+
+		if existingUser.ID != primitive.NilObjectID {
+			uc.l.Errorf(ctx, "user.usecase.Update: email already exists")
+			return user.DetailUserOutput{}, user.ErrEmailExisted
+		}
+	}
+
 	nu, err := uc.repo.UpdateUser(ctx, user.UpdateUserOption{
 		Model:   u,
 		Email:   input.Email,
@@ -590,7 +608,6 @@ func (uc implUsecase) Update(ctx context.Context, sc models.Scope, input user.Up
 		User:       nu,
 		Avatar_URL: avatar.URL,
 	}, nil
-
 }
 
 func (uc implUsecase) AddAddress(ctx context.Context, sc models.Scope, input user.AddAddressInput) (user.DetailAddressOutput, error) {
