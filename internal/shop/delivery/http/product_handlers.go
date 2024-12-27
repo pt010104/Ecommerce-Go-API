@@ -148,7 +148,7 @@ func (h handler) GetProduct(c *gin.Context) {
 		response.Error(c, errWrongPaginationQuery)
 		return
 	}
-
+	pagQuery.Adjust()
 	o, err2 := h.uc.GetProduct(ctx, sc, shop.GetProductInput{
 		GetProductFilter: req.toInput(),
 		PagQuery:         pagQuery,

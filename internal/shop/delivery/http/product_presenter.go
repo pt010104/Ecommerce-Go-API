@@ -193,9 +193,9 @@ type listProductMetaResponse struct {
 	paginator.PaginatorResponse
 }
 type getProductResp struct {
-	meta       listMetaResponse
-	Items      []listProductItem `json:"products"`
-	ShopObject shopObject        `json:"shop_object"`
+	Meta       listProductMetaResponse `json:"meta"`
+	Items      []listProductItem       `json:"products"`
+	ShopObject shopObject              `json:"shop_object"`
 }
 type categoryObject struct {
 	ID   string `json:"id"`
@@ -267,7 +267,7 @@ func (h handler) getProductResp(output shop.GetProductOutput) getProductResp {
 	}
 
 	return getProductResp{
-		meta: listMetaResponse{
+		Meta: listProductMetaResponse{
 			PaginatorResponse: output.Pag.ToResponse(),
 		},
 		Items:      list,
