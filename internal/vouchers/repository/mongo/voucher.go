@@ -2,10 +2,12 @@ package mongo
 
 import (
 	"context"
+	"time"
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/vouchers"
 
+	"go.mongodb.org/mongo-driver/bson"
 	mongo1 "go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -42,7 +44,6 @@ func (repo implRepo) DetailVoucher(ctx context.Context, sc models.Scope, opt vou
 
 	return voucher, nil
 }
-
 func (repo implRepo) ListVoucher(ctx context.Context, sc models.Scope, opt vouchers.GetVoucherFilter) ([]models.Voucher, error) {
 	col := repo.getVoucherCollection()
 
@@ -50,6 +51,14 @@ func (repo implRepo) ListVoucher(ctx context.Context, sc models.Scope, opt vouch
 	if err != nil {
 		repo.l.Errorf(ctx, "voucher.repository.mongo.buildVoucherQuery: %v", err)
 		return []models.Voucher{}, err
+	}
+
+	now := time.Now()
+	filter = bson.M{
+		"$and": []bson.M{
+			filter,
+			{"valid_from": bson.M{"$gt": now}},
+		},
 	}
 
 	cursor, err := col.Find(ctx, filter)
