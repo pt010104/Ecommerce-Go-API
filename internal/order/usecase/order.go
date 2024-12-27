@@ -10,27 +10,27 @@ import (
 	"github.com/pt010104/api-golang/pkg/util"
 )
 
-func (uc implUseCase) CreateOrder(ctx context.Context, sc models.Scope, input order.CreateOrderInput) error {
+func (uc implUseCase) CreateOrder(ctx context.Context, sc models.Scope, input order.CreateOrderInput) (models.Order, error) {
 	checkoutModel, err := uc.repo.DetailCheckout(ctx, sc, input.CheckoutID)
 	if err != nil {
 		uc.l.Errorf(ctx, "order.usecase.CreateOrder.repo.DetailCheckout", err)
-		return err
+		return models.Order{}, err
 	}
 
 	if checkoutModel.Status != models.CheckoutStatusPending {
 		uc.l.Errorf(ctx, "order.usecase.CreateOrder.repo.DetailCheckout", order.ErrCheckoutStatusInvalid)
-		return order.ErrCheckoutStatusInvalid
+		return models.Order{}, order.ErrCheckoutStatusInvalid
 	}
 
 	if checkoutModel.ExpiredAt.Before(util.Now()) {
 		uc.l.Errorf(ctx, "order.usecase.CreateOrder.repo.DetailCheckout", order.ErrCheckoutExpired)
-		return order.ErrCheckoutExpired
+		return models.Order{}, order.ErrCheckoutExpired
 	}
 
 	userModel, err := uc.userUC.GetModel(ctx, sc.UserID)
 	if err != nil {
 		uc.l.Errorf(ctx, "order.usecase.CreateOrder.userUC.GetModel", err)
-		return err
+		return models.Order{}, err
 	}
 
 	var existAddress bool
@@ -43,7 +43,7 @@ func (uc implUseCase) CreateOrder(ctx context.Context, sc models.Scope, input or
 
 	if !existAddress {
 		uc.l.Errorf(ctx, "order.usecase.CreateOrder.userUC.GetModel", order.ErrAddressNotFound)
-		return order.ErrAddressNotFound
+		return models.Order{}, order.ErrAddressNotFound
 	}
 
 	var wg sync.WaitGroup
@@ -80,7 +80,7 @@ func (uc implUseCase) CreateOrder(ctx context.Context, sc models.Scope, input or
 
 	wg.Wait()
 	if wgErr != nil {
-		return wgErr
+		return models.Order{}, wgErr
 	}
 
 	err = uc.PublishOrder(ctx, sc, rabbitmq.OrderMessage{
@@ -90,10 +90,10 @@ func (uc implUseCase) CreateOrder(ctx context.Context, sc models.Scope, input or
 	})
 	if err != nil {
 		uc.l.Errorf(ctx, "order.usecase.CreateOrder.PublishOrder", err)
-		return err
+		return models.Order{}, err
 	}
 
-	return nil
+	return orderModel, nil
 }
 
 func (uc implUseCase) DetailOrder(ctx context.Context, sc models.Scope, orderID string) (models.Order, error) {

@@ -1,6 +1,7 @@
 package http
 
 import (
+	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/order"
 	"github.com/pt010104/api-golang/pkg/mongo"
 	"github.com/pt010104/api-golang/pkg/response"
@@ -109,5 +110,15 @@ func (r CreateOrderRequest) toInput() order.CreateOrderInput {
 		CheckoutID:    r.CheckoutID,
 		PaymentMethod: r.PaymentMethod,
 		AddressID:     r.AddressID,
+	}
+}
+
+type createOrderResponse struct {
+	OrderID string `json:"order_id"`
+}
+
+func (h handler) newCreateOrderResponse(o models.Order) createOrderResponse {
+	return createOrderResponse{
+		OrderID: o.ID.Hex(),
 	}
 }

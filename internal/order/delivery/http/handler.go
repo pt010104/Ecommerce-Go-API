@@ -71,12 +71,12 @@ func (h *handler) CreateOrder(c *gin.Context) {
 		return
 	}
 
-	err = h.uc.CreateOrder(ctx, sc, req.toInput())
+	o, err := h.uc.CreateOrder(ctx, sc, req.toInput())
 	if err != nil {
 		h.l.Errorf(ctx, "order.delivery.http.handler.CreateOrder: %v", err)
 		response.Error(c, h.mapErrors(err))
 		return
 	}
 
-	response.OK(c, nil)
+	response.OK(c, h.newCreateOrderResponse(o))
 }
