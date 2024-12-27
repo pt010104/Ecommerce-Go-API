@@ -2097,7 +2097,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -2142,7 +2143,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -2267,7 +2269,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -2301,7 +2304,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:
@@ -2344,7 +2348,8 @@ paths:
       responses:
         "200":
           description: OK
-          schema: {}
+          schema:
+            type: object
         "400":
           description: Bad Request
           schema:

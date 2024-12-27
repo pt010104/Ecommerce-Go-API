@@ -6,7 +6,7 @@ import (
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/pkg/mongo"
-
+	"github.com/pt010104/api-golang/pkg/util"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -32,6 +32,7 @@ func (repo implRepo) buildProductQuery(sc models.Scope, opt shop.GetProductFilte
 		filter["$or"] = []bson.M{
 			{"name": bson.M{"$regex": opt.Search, "$options": "i"}},
 			{"shop_name": bson.M{"$regex": opt.Search, "$options": "i"}},
+			{"alias": bson.M{"$regex": util.BuildAlias(opt.Search), "$options": "i"}},
 		}
 	}
 

@@ -14,6 +14,7 @@ type CreateProductInput struct {
 	ReorderQuantity *uint
 	CategoryIDs     []string
 	MediaIDs        []string
+	Alias           string
 }
 type DetailProductOutput struct {
 	ID           string

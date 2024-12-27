@@ -62,6 +62,7 @@ func (uc implUsecase) CreateProduct(ctx context.Context, sc models.Scope, input 
 		ShopID:      shopID,
 		CategoryID:  mongo.ObjectIDsFromHexOrNil(input.CategoryIDs),
 		MediaIDs:    media_ids,
+		Alias:       util.BuildAlias(input.Name),
 	})
 	if err != nil {
 		uc.l.Errorf(ctx, "shop.usecase.product.createproduct: ", err)
