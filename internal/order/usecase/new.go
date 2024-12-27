@@ -7,6 +7,7 @@ import (
 	"github.com/pt010104/api-golang/internal/order/delivery/rabbitmq/producer"
 	"github.com/pt010104/api-golang/internal/shop"
 	"github.com/pt010104/api-golang/internal/user"
+	"github.com/pt010104/api-golang/internal/vouchers"
 	"github.com/pt010104/api-golang/pkg/log"
 )
 
@@ -19,9 +20,10 @@ type implUseCase struct {
 	prod      producer.Producer
 	emailUC   email.UseCase
 	userUC    user.UseCase
+	voucherUC vouchers.UseCase
 }
 
-func New(l log.Logger, repo order.Repo, shopUC shop.UseCase, cartUC cart.UseCase, redisRepo order.Redis, prod producer.Producer, emailUC email.UseCase, userUC user.UseCase) order.UseCase {
+func New(l log.Logger, repo order.Repo, shopUC shop.UseCase, cartUC cart.UseCase, redisRepo order.Redis, prod producer.Producer, emailUC email.UseCase, userUC user.UseCase, voucherUC vouchers.UseCase) order.UseCase {
 	return &implUseCase{
 		l:         l,
 		repo:      repo,
@@ -31,5 +33,6 @@ func New(l log.Logger, repo order.Repo, shopUC shop.UseCase, cartUC cart.UseCase
 		prod:      prod,
 		emailUC:   emailUC,
 		userUC:    userUC,
+		voucherUC: voucherUC,
 	}
 }

@@ -21,6 +21,8 @@ import (
 	userRepo "github.com/pt010104/api-golang/internal/user/repository/mongo"
 	redisUserRepo "github.com/pt010104/api-golang/internal/user/repository/redis"
 	userUC "github.com/pt010104/api-golang/internal/user/usecase"
+	voucherRepo "github.com/pt010104/api-golang/internal/vouchers/repository/mongo"
+	voucherUC "github.com/pt010104/api-golang/internal/vouchers/usecase"
 	"github.com/pt010104/api-golang/pkg/log"
 	"github.com/pt010104/api-golang/pkg/rabbitmq"
 	"github.com/pt010104/api-golang/pkg/redis"
@@ -61,6 +63,7 @@ func (s Server) Run() error {
 	redisOrderRepo := redisOrderRepo.New(s.l, s.redis)
 	redisUserRepo := redisUserRepo.New(s.l, s.redis)
 	adminRepo := adminRepo.New(s.l, s.db)
+	voucherRepo := voucherRepo.New(s.l, s.db)
 
 	prod := producer.New(s.l, s.conn)
 	if err := prod.Run(); err != nil {
@@ -77,7 +80,8 @@ func (s Server) Run() error {
 	userUC := userUC.New(s.l, userRepo, emailUC, redisUserRepo, mediaUC)
 	shopUC := shopUC.New(s.l, shopRepo, nil, userUC, mediaUC)
 	cartUC := cartUC.New(s.l, cartRepo, shopUC)
-	orderUC := orderUC.New(s.l, orderRepo, shopUC, cartUC, redisOrderRepo, orderProducer, emailUC, userUC)
+	voucherUC := voucherUC.New(voucherRepo, s.l, shopUC)
+	orderUC := orderUC.New(s.l, orderRepo, shopUC, cartUC, redisOrderRepo, orderProducer, emailUC, userUC, voucherUC)
 	adminUC := adminUC.New(adminRepo, s.l, shopUC)
 
 	shopUC.SetAdminUC(adminUC)

@@ -21,6 +21,7 @@ func (repo implRepo) buildOrderModel(ctx context.Context, sc models.Scope, opt o
 		Status:        models.OrderStatusPending,
 		PaymentMethod: opt.PaymentMethod,
 		AddressID:     mongo.ObjectIDFromHexOrNil(opt.AddressID),
+		TotalPrice:    opt.TotalPrice,
 		CreatedAt:     now,
 		UpdatedAt:     now,
 	}

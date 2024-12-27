@@ -17,13 +17,14 @@ func (repo implRepo) buildCheckoutModel(ctx context.Context, sc models.Scope, op
 	now := util.Now()
 
 	p := models.Checkout{
-		ID:        primitive.NewObjectID(),
-		Products:  opt.Products,
-		UserID:    mongo.ObjectIDFromHexOrNil(sc.UserID),
-		Status:    models.CheckoutStatusPending,
-		ExpiredAt: now.Add(time.Minute * 10),
-		UpdatedAt: now,
-		CreatedAt: now,
+		ID:         primitive.NewObjectID(),
+		Products:   opt.Products,
+		UserID:     mongo.ObjectIDFromHexOrNil(sc.UserID),
+		Status:     models.CheckoutStatusPending,
+		TotalPrice: opt.TotalPrice,
+		ExpiredAt:  now.Add(time.Minute * 10),
+		UpdatedAt:  now,
+		CreatedAt:  now,
 	}
 
 	return p, nil

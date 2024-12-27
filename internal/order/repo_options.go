@@ -6,7 +6,8 @@ import (
 )
 
 type CreateCheckoutOption struct {
-	Products []models.OrderProduct
+	Products   []models.OrderProduct
+	TotalPrice float64
 }
 
 type UpdateCheckoutOption struct {
@@ -19,6 +20,7 @@ type CreateOrderOption struct {
 	Products      []models.OrderProduct
 	PaymentMethod string
 	AddressID     string
+	TotalPrice    float64
 }
 
 type ListOrderOption struct {

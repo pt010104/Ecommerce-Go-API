@@ -58,6 +58,19 @@ func (uc implUseCase) CreateCheckout(ctx context.Context, sc models.Scope, produ
 		return order.CreateCheckoutOutput{}, err
 	}
 
+	var shops []models.Shop
+	var totalPricesByShop map[string]float64
+	var totalPrice float64
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		shops, totalPricesByShop, totalPrice, err = uc.calculateTotalPrices(ctx, sc, products, productQuantityMap)
+		if err != nil {
+			uc.l.Errorf(ctx, "order.usecase.CreateCheckout.calculateTotalPrices: %v", err)
+			wgErr = err
+		}
+	}()
+
 	var checkoutModel models.Checkout
 	wg.Add(1)
 	go func() {
@@ -70,23 +83,11 @@ func (uc implUseCase) CreateCheckout(ctx context.Context, sc models.Scope, produ
 			})
 		}
 		checkoutModel, err = uc.repo.CreateCheckout(ctx, sc, order.CreateCheckoutOption{
-			Products: productCheckouts,
+			Products:   productCheckouts,
+			TotalPrice: totalPrice,
 		})
 		if err != nil {
 			uc.l.Errorf(ctx, "order.usecase.CreateCheckout.repo.CreateCheckout: %v", err)
-			wgErr = err
-		}
-	}()
-
-	var shops []models.Shop
-	var totalPricesByShop map[string]float64
-	var totalPrice float64
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		shops, totalPricesByShop, totalPrice, err = uc.calculateTotalPrices(ctx, sc, products, productQuantityMap)
-		if err != nil {
-			uc.l.Errorf(ctx, "order.usecase.CreateCheckout.calculateTotalPrices: %v", err)
 			wgErr = err
 		}
 	}()

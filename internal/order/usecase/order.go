@@ -7,6 +7,7 @@ import (
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/order"
 	"github.com/pt010104/api-golang/internal/order/delivery/rabbitmq"
+	"github.com/pt010104/api-golang/internal/vouchers"
 	"github.com/pt010104/api-golang/pkg/util"
 )
 
@@ -27,27 +28,53 @@ func (uc implUseCase) CreateOrder(ctx context.Context, sc models.Scope, input or
 		return models.Order{}, order.ErrCheckoutExpired
 	}
 
-	userModel, err := uc.userUC.GetModel(ctx, sc.UserID)
-	if err != nil {
-		uc.l.Errorf(ctx, "order.usecase.CreateOrder.userUC.GetModel", err)
-		return models.Order{}, err
-	}
-
-	var existAddress bool
-	for _, address := range userModel.Address {
-		if address.ID.Hex() == input.AddressID {
-			existAddress = true
-			break
-		}
-	}
-
-	if !existAddress {
-		uc.l.Errorf(ctx, "order.usecase.CreateOrder.userUC.GetModel", order.ErrAddressNotFound)
-		return models.Order{}, order.ErrAddressNotFound
-	}
-
 	var wg sync.WaitGroup
 	var wgErr error
+	var totalPrice float64
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		userModel, err := uc.userUC.GetModel(ctx, sc.UserID)
+		if err != nil {
+			uc.l.Errorf(ctx, "order.usecase.CreateOrder.userUC.GetModel", err)
+			wgErr = err
+		}
+
+		var existAddress bool
+		for _, address := range userModel.Address {
+			if address.ID.Hex() == input.AddressID {
+				existAddress = true
+				break
+			}
+		}
+		if !existAddress {
+			uc.l.Errorf(ctx, "order.usecase.CreateOrder.userUC.GetModel", order.ErrAddressNotFound)
+			wgErr = order.ErrAddressNotFound
+		}
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if input.VoucherID != "" {
+			var err error
+			_, totalPrice, _, err = uc.voucherUC.ApplyVoucher(ctx, sc, vouchers.ApplyVoucherInput{
+				ID:          input.VoucherID,
+				OrderAmount: checkoutModel.TotalPrice,
+			})
+			if err != nil {
+				uc.l.Errorf(ctx, "order.usecase.CreateOrder.voucherUC.ApplyVoucher", err)
+				wgErr = err
+			}
+		}
+	}()
+
+	wg.Wait()
+	if wgErr != nil {
+		return models.Order{}, wgErr
+	}
+
 	var orderModel models.Order
 
 	wg.Add(1)
@@ -71,6 +98,7 @@ func (uc implUseCase) CreateOrder(ctx context.Context, sc models.Scope, input or
 			Products:      checkoutModel.Products,
 			PaymentMethod: input.PaymentMethod,
 			AddressID:     input.AddressID,
+			TotalPrice:    totalPrice,
 		})
 		if err != nil {
 			uc.l.Errorf(ctx, "order.usecase.CreateOrder.repo.CreateOrder", err)

@@ -12,13 +12,14 @@ type OrderProduct struct {
 }
 
 type Checkout struct {
-	ID        primitive.ObjectID `bson:"_id"`
-	Products  []OrderProduct     `bson:"products"`
-	UserID    primitive.ObjectID `bson:"user_id"`
-	Status    string             `bson:"status"`
-	ExpiredAt time.Time          `bson:"expired_at"`
-	CreatedAt time.Time          `bson:"created_at"`
-	UpdatedAt time.Time          `bson:"updated_at"`
+	ID         primitive.ObjectID `bson:"_id"`
+	Products   []OrderProduct     `bson:"products"`
+	UserID     primitive.ObjectID `bson:"user_id"`
+	Status     string             `bson:"status"`
+	TotalPrice float64            `bson:"total_price"`
+	ExpiredAt  time.Time          `bson:"expired_at"`
+	CreatedAt  time.Time          `bson:"created_at"`
+	UpdatedAt  time.Time          `bson:"updated_at"`
 }
 
 const (

@@ -72,7 +72,7 @@ func (srv HTTPServer) mapHandlers() error {
 	shopUC.SetAdminUC(adminUC)
 	cartUC := cartUC.New(srv.l, cartRepo, shopUC)
 	voucherUC := voucherUC.New(voucherRepo, srv.l, shopUC)
-	orderUC := orderUC.New(srv.l, orderRepo, shopUC, cartUC, redisOrderRepo, orderProducer, emailUC, userUC)
+	orderUC := orderUC.New(srv.l, orderRepo, shopUC, cartUC, redisOrderRepo, orderProducer, emailUC, userUC, voucherUC)
 
 	// Handlers
 	userH := userHTTP.New(srv.l, userUC)
