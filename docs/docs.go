@@ -1873,9 +1873,7 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {
-                            "type": "object"
-                        }
+                        "schema": {}
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1941,9 +1939,7 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {
-                            "type": "object"
-                        }
+                        "schema": {}
                     },
                     "400": {
                         "description": "Bad Request",
@@ -2131,9 +2127,7 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {
-                            "type": "object"
-                        }
+                        "schema": {}
                     },
                     "400": {
                         "description": "Bad Request",
@@ -2184,9 +2178,7 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {
-                            "type": "object"
-                        }
+                        "schema": {}
                     },
                     "400": {
                         "description": "Bad Request",
@@ -2249,9 +2241,7 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {
-                            "type": "object"
-                        }
+                        "schema": {}
                     },
                     "400": {
                         "description": "Bad Request",
