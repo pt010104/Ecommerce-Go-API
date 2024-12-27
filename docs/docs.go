@@ -3372,6 +3372,7 @@ const docTemplate = `{
             "required": [
                 "category_id",
                 "category_name",
+                "description",
                 "id",
                 "inventory_name",
                 "name",
@@ -3397,6 +3398,9 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                },
+                "description": {
+                    "type": "string"
                 },
                 "id": {
                     "type": "string"

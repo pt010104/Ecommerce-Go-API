@@ -3361,6 +3361,7 @@
             "required": [
                 "category_id",
                 "category_name",
+                "description",
                 "id",
                 "inventory_name",
                 "name",
@@ -3386,6 +3387,9 @@
                     "items": {
                         "type": "string"
                     }
+                },
+                "description": {
+                    "type": "string"
                 },
                 "id": {
                     "type": "string"
