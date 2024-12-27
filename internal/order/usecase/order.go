@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"github.com/pt010104/api-golang/internal/models"
@@ -28,9 +29,11 @@ func (uc implUseCase) CreateOrder(ctx context.Context, sc models.Scope, input or
 		return models.Order{}, order.ErrCheckoutExpired
 	}
 
+	fmt.Println("checkoutModel.TotalPrice", checkoutModel.TotalPrice)
+
 	var wg sync.WaitGroup
 	var wgErr error
-	var totalPrice float64
+	totalPrice := checkoutModel.TotalPrice
 
 	wg.Add(1)
 	go func() {
