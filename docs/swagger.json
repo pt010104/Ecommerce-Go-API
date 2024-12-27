@@ -3464,6 +3464,9 @@
                         "$ref": "#/definitions/http.categoryResp"
                     }
                 },
+                "description": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
@@ -3705,6 +3708,9 @@
                     "items": {
                         "$ref": "#/definitions/http.categoryObject"
                     }
+                },
+                "description": {
+                    "type": "string"
                 },
                 "id": {
                     "type": "string"
