@@ -34,20 +34,20 @@ type productObject struct {
 	ProductID    string  `json:"product_id"`
 	ProductName  string  `json:"product_name"`
 	ProductImage string  `json:"product_image,omitempty"`
-	Price        float32 `json:"price"`
+	Price        float64 `json:"price"`
 	Quantity     int     `json:"quantity"`
 }
 
 type itemResponse struct {
 	ShopObjects shopObject      `json:"shop_objects"`
 	ProductList []productObject `json:"product_list"`
-	Price       float32         `json:"price"`
+	Price       float64         `json:"price"`
 }
 
 type checkoutResponse struct {
 	CheckoutID string            `json:"checkout_id"`
 	Items      []itemResponse    `json:"items"`
-	TotalPrice float32           `json:"total_price"`
+	TotalPrice float64           `json:"total_price"`
 	ExpiredAt  response.DateTime `json:"expired_at"`
 }
 
@@ -80,11 +80,11 @@ func (h handler) newCreateCheckoutCheckoutResponse(o order.CreateCheckoutOutput)
 		checkoutResponse.Items = append(checkoutResponse.Items, itemResponse{
 			ShopObjects: shopObject,
 			ProductList: productList,
-			Price:       float32(o.TotalPriceByShop[shop.ID.Hex()]),
+			Price:       float64(o.TotalPriceByShop[shop.ID.Hex()]),
 		})
 	}
 
-	checkoutResponse.TotalPrice = float32(o.TotalPrice)
+	checkoutResponse.TotalPrice = float64(o.TotalPrice)
 	checkoutResponse.ExpiredAt = response.DateTime(o.ExpiredAt)
 	checkoutResponse.CheckoutID = o.CheckoutID
 

@@ -360,6 +360,8 @@ func (uc implUsecase) GetProduct(ctx context.Context, sc models.Scope, input sho
 		PagQuery: input.PagQuery,
 	}
 
+	util.PrintJson(opt)
+
 	wg.Add(1)
 	go func() {
 		defer wg.Done()

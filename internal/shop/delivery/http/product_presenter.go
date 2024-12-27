@@ -12,7 +12,7 @@ import (
 
 type createProductReq struct {
 	Name            string   `json:"name" binding:"required"`
-	Price           float32  `json:"price" binding:"required"`
+	Price           float64  `json:"price" binding:"required"`
 	StockLevel      uint     `json:"stock_level" binding:"required"`
 	ReorderLevel    *uint    `json:"reorder_level" binding:"required" `
 	ReorderQuantity *uint    `json:"reorder_quantity" binding:"required"`
@@ -92,7 +92,7 @@ type detailProductResp struct {
 	ShopName      string       `json:"shop_name" binding:"required"`
 	ShopID        string       `json:"shop_id" binding:"required"`
 	InventoryName string       `json:"inventory_name" binding:"required"`
-	Price         float32      `json:"price" binding:"required"`
+	Price         float64      `json:"price" binding:"required"`
 	Avatar        []avatar_obj `json:"avatar,omitempty"`
 }
 
@@ -212,7 +212,7 @@ type listProductItem struct {
 	Name            string           `json:"name"`
 	ShopID          string           `json:"shop_id"`
 	InventoryObject inventoryObject  `json:"inventory_object"`
-	Price           float32          `json:"price"`
+	Price           float64          `json:"price"`
 	CategoryObjects []categoryObject `json:"category_objects"`
 	Avatar          []avatar_obj     `json:"avatar,omitempty"`
 }
@@ -278,7 +278,7 @@ func (h handler) getProductResp(output shop.GetProductOutput) getProductResp {
 type UpdateProductReq struct {
 	ID              string   `json:"id" binding:"required"`
 	Name            string   `json:"name" binding:"required"`
-	Price           float32  `json:"price" binding:"required"`
+	Price           float64  `json:"price" binding:"required"`
 	StockLevel      uint     `json:"stock_level" binding:"required"`
 	ReorderLevel    uint     `json:"reorder_level" binding:"required"`
 	ReorderQuantity uint     `json:"reorder_quantity" binding:"required"`
@@ -330,7 +330,7 @@ type updateProductResp struct {
 	ShopName      string       `json:"shop_name,omitempty"`
 	ShopID        string       `json:"shop_id,omitempty"`
 	InventoryName string       `json:"inventory_name,omitempty"`
-	Price         float32      `json:"price,omitempty"`
+	Price         float64      `json:"price,omitempty"`
 	Avatar        []avatar_obj `json:"avatar,omitempty"`
 }
 
@@ -369,7 +369,7 @@ type getAllProductsRespItem struct {
 	Images     []mediaResp    `json:"images,omitempty"`
 	Shop       shopResp       `json:"shop"`
 	Inventory  inventoryResp  `json:"inventory"`
-	Price      float32        `json:"price"`
+	Price      float64        `json:"price"`
 }
 
 type categoryResp struct {

@@ -233,7 +233,7 @@ type GetCartItemResponse struct {
 	Quantity    int         `json:"quantity"`
 	MediaS      []Media_Obj `json:"medias,omitempty"`
 	ProductName string      `json:"product_name"`
-	Price       float32     `json:"price"`
+	Price       float64     `json:"price"`
 }
 
 // func from models.media to Media_Obj

@@ -7,7 +7,7 @@ import (
 
 type CreateProductInput struct {
 	Name            string
-	Price           float32
+	Price           float64
 	InventoryID     string
 	StockLevel      uint
 	ReorderLevel    *uint
@@ -23,7 +23,7 @@ type DetailProductOutput struct {
 	Medias       []models.Media
 	Shop         models.Shop
 	Inventory    models.Inventory
-	Price        float32
+	Price        float64
 }
 type GetProductOption struct {
 	GetProductFilter
@@ -50,7 +50,7 @@ type GetProductOutput struct {
 type UpdateProductInput struct {
 	Name            string
 	ID              string
-	Price           float32
+	Price           float64
 	StockLevel      uint
 	ReorderLevel    *uint
 	ReorderQuantity *uint

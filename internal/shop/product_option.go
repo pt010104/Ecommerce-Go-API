@@ -7,7 +7,7 @@ import (
 
 type CreateProductOption struct {
 	Name        string
-	Price       float32
+	Price       float64
 	InventoryID primitive.ObjectID
 	ShopID      primitive.ObjectID
 	CategoryID  []primitive.ObjectID
@@ -23,7 +23,7 @@ type GetProductFilter struct {
 type UpdateProductOption struct {
 	Name            string
 	ID              primitive.ObjectID
-	Price           float32
+	Price           float64
 	Model           models.Product
 	Alias           string
 	StockLevel      uint

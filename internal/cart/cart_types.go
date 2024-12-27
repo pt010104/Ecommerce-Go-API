@@ -35,7 +35,7 @@ type ProductItem struct {
 	ProductID   string
 	Medias      []models.Media
 	Quantity    int
-	Price       float32
+	Price       float64
 	ProductName string
 }
 

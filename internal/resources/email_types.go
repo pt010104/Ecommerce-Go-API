@@ -17,7 +17,7 @@ type OrderProductEmail struct {
 	ProductID   string
 	ProductName string
 	Quantity    int
-	Price       float32
+	Price       float64
 	ShopName    string
 	SubTotal    float64
 	ShopID      string
