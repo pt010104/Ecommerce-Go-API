@@ -647,7 +647,18 @@ func (uc implUsecase) UpdateProduct(ctx context.Context, sc models.Scope, input 
 
 		return models.Product{}, shop.ErrNoPermissionToUpdate
 	}
-	p, err := uc.repo.UpdateProduct(ctx, sc, input)
+	p, err := uc.repo.UpdateProduct(ctx, sc, shop.UpdateProductOption{
+		Name:            input.Name,
+		ID:              input.ID,
+		Price:           input.Price,
+		StockLevel:      input.StockLevel,
+		ReorderLevel:    input.ReorderLevel,
+		ReorderQuantity: input.ReorderQuantity,
+		CategoryID:      input.CategoryID,
+		MediaIDs:        input.MediaIDs,
+		Alias:           util.BuildAlias(input.Name),
+		Model:           input.Model,
+	})
 	if err != nil {
 		uc.l.Errorf(ctx, "shop.usecase.UpdateProduct.repoUpdateProduct: %v", err)
 		return models.Product{}, err

@@ -57,6 +57,7 @@ type UpdateProductInput struct {
 	ReorderQuantity *uint
 	CategoryID      []string
 	MediaIDs        []string
+	Alias           string
 }
 type GetAllProductItem struct {
 	P         models.Product
