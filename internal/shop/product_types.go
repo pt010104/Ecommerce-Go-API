@@ -19,6 +19,7 @@ type CreateProductInput struct {
 type DetailProductOutput struct {
 	ID           string
 	Name         string
+	Description  string
 	CategoryName []string
 	Category     []models.Category
 	Medias       []models.Media

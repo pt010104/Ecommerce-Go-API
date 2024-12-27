@@ -175,8 +175,8 @@ func (uc *implUsecase) DetailProduct(ctx context.Context, sc models.Scope, produ
 		Inventory:    inventory,
 		Medias:       medias,
 		Shop:         shopDetail,
-
-		Price: u.Price,
+		Description:  u.Description,
+		Price:        u.Price,
 	}
 
 	return output, nil

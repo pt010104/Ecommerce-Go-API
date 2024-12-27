@@ -87,6 +87,7 @@ type avatar_obj struct {
 type detailProductResp struct {
 	ID            string       `json:"id" binding:"required"`
 	Name          string       `json:"name" binding:"required"`
+	Description   string       `json:"description" binding:"required"`
 	CategoryName  []string     `json:"category_name" binding:"required"`
 	CategoryID    []string     `json:"category_id" binding:"required"`
 	ShopName      string       `json:"shop_name" binding:"required"`
@@ -112,6 +113,7 @@ func (h handler) newDetailProductResponse(p shop.DetailProductOutput) detailProd
 	return detailProductResp{
 		ID:            p.ID,
 		Name:          p.Name,
+		Description:   p.Description,
 		CategoryName:  p.CategoryName,
 		CategoryID:    categoryIDs,
 		ShopName:      p.Shop.Name,
