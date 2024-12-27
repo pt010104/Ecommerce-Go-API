@@ -349,6 +349,8 @@ func (uc implUsecase) GetProduct(ctx context.Context, sc models.Scope, input sho
 		shop1       models.Shop
 		wg          sync.WaitGroup
 		wgErr       error
+		mediaMap    map[primitive.ObjectID][]models.Media
+		allMediaIDs []string
 	)
 
 	opt := shop.GetProductOption{
@@ -361,24 +363,11 @@ func (uc implUsecase) GetProduct(ctx context.Context, sc models.Scope, input sho
 		PagQuery: input.PagQuery,
 	}
 
-	util.PrintJson(opt)
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		var err error
-		s, pag, err = uc.repo.GetProduct(ctx, models.Scope{}, opt)
-		if err != nil {
-			uc.l.Errorf(ctx, "shop.usecase.GetProduct.repo.GetProduct: %v", err)
-			wgErr = err
-			return
-		}
-	}()
-
-	wg.Wait()
-
-	if wgErr != nil {
-		return shop.GetProductOutput{}, wgErr
+	var err error
+	s, pag, err = uc.repo.GetProduct(ctx, models.Scope{}, opt)
+	if err != nil {
+		uc.l.Errorf(ctx, "shop.usecase.GetProduct.repo.GetProduct: %v", err)
+		return shop.GetProductOutput{}, err
 	}
 
 	var inventoryIDs []string
@@ -388,12 +377,15 @@ func (uc implUsecase) GetProduct(ctx context.Context, sc models.Scope, input sho
 		for _, catID := range p.CategoryID {
 			categoryIDSet[catID.Hex()] = struct{}{}
 		}
+		allMediaIDs = append(allMediaIDs, mongo.HexFromObjectIDsOrNil(p.MediaIDs)...)
 	}
 
 	var categoryIDs []string
 	for id := range categoryIDSet {
 		categoryIDs = append(categoryIDs, id)
 	}
+
+	allMediaIDs = util.RemoveDuplicates(allMediaIDs)
 
 	wg.Add(3)
 
@@ -449,6 +441,29 @@ func (uc implUsecase) GetProduct(ctx context.Context, sc models.Scope, input sho
 		inventoryMap[inv.ID] = inv
 	}
 
+	if len(allMediaIDs) > 0 {
+		allMedia, err := uc.mediaUC.List(ctx, models.Scope{}, media.ListInput{
+			GetFilter: media.GetFilter{IDs: allMediaIDs},
+		})
+		if err != nil {
+			uc.l.Errorf(ctx, "shop.usecase.GetProduct.mediaUC.List: %v", err)
+			return shop.GetProductOutput{}, err
+		}
+
+		mediaMap = make(map[primitive.ObjectID][]models.Media)
+		for _, p := range s {
+			var productMedia []models.Media
+			for _, m := range allMedia {
+				for _, mediaID := range p.MediaIDs {
+					if m.ID == mediaID {
+						productMedia = append(productMedia, m)
+					}
+				}
+			}
+			mediaMap[p.ID] = productMedia
+		}
+	}
+
 	var list []shop.ProductOutPutItem
 	for _, p := range s {
 		var cates []models.Category
@@ -457,19 +472,12 @@ func (uc implUsecase) GetProduct(ctx context.Context, sc models.Scope, input sho
 				cates = append(cates, cate)
 			}
 		}
-		avatar, err := uc.mediaUC.List(ctx, models.Scope{}, media.ListInput{
-			GetFilter: media.GetFilter{IDs: mongo.HexFromObjectIDsOrNil(p.MediaIDs)},
-		})
 
-		if err != nil {
-			uc.l.Errorf(ctx, "shop.usecase.GetProduct: %v", err)
-			return shop.GetProductOutput{}, err
-		}
 		item := shop.ProductOutPutItem{
 			P:         p,
 			Inventory: inventoryMap[p.InventoryID],
 			Cate:      cates,
-			Images:    avatar,
+			Images:    mediaMap[p.ID],
 		}
 		list = append(list, item)
 	}
@@ -490,29 +498,19 @@ func (uc implUsecase) GetAll(ctx context.Context, sc models.Scope, input shop.Ge
 		shops       []models.Shop
 		wg          sync.WaitGroup
 		wgErr       error
+		mediaMap    map[primitive.ObjectID][]models.Media
+		allMediaIDs []string
 	)
 
 	opt := shop.GetProductOption{
-
 		GetProductFilter: input.GetProductFilter,
 		PagQuery:         input.PagQuery,
 	}
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		var err error
-		s, pag, err = uc.repo.GetProduct(ctx, models.Scope{}, opt)
-		if err != nil {
-			uc.l.Errorf(ctx, "shop.usecase.GetAll.repo.GetProduct: %v", err)
-			wgErr = err
-			return
-		}
-	}()
-
-	wg.Wait()
-	if wgErr != nil {
-		return shop.GetAllProductOutput{}, wgErr
+	s, pag, err := uc.repo.GetProduct(ctx, models.Scope{}, opt)
+	if err != nil {
+		uc.l.Errorf(ctx, "shop.usecase.GetAll.repo.GetProduct: %v", err)
+		return shop.GetAllProductOutput{}, err
 	}
 
 	var inventoryIDs []string
@@ -525,6 +523,7 @@ func (uc implUsecase) GetAll(ctx context.Context, sc models.Scope, input shop.Ge
 			categoryIDSet[catID.Hex()] = struct{}{}
 		}
 		shopIDSet[p.ShopID] = struct{}{}
+		allMediaIDs = append(allMediaIDs, mongo.HexFromObjectIDsOrNil(p.MediaIDs)...)
 	}
 
 	var categoryIDs []string
@@ -537,7 +536,9 @@ func (uc implUsecase) GetAll(ctx context.Context, sc models.Scope, input shop.Ge
 		shopIDs = append(shopIDs, sid)
 	}
 
-	wg.Add(3)
+	allMediaIDs = util.RemoveDuplicates(allMediaIDs)
+
+	wg.Add(4)
 	go func() {
 		defer wg.Done()
 		var err error
@@ -566,7 +567,6 @@ func (uc implUsecase) GetAll(ctx context.Context, sc models.Scope, input shop.Ge
 	go func() {
 		defer wg.Done()
 		var err error
-		// Assuming there's a method to get multiple shops by their IDs
 		shops, err = uc.repo.ListShop(ctx, models.Scope{}, shop.GetShopsFilter{
 			IDs: mongo.HexFromObjectIDsOrNil(shopIDs),
 		})
@@ -574,6 +574,33 @@ func (uc implUsecase) GetAll(ctx context.Context, sc models.Scope, input shop.Ge
 			uc.l.Errorf(ctx, "shop.usecase.GetAll.repo.ListShops: %v", err)
 			wgErr = err
 			return
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		if len(allMediaIDs) > 0 {
+			allMedia, err := uc.mediaUC.List(ctx, models.Scope{}, media.ListInput{
+				GetFilter: media.GetFilter{IDs: allMediaIDs},
+			})
+			if err != nil {
+				uc.l.Errorf(ctx, "shop.usecase.GetAll.mediaUC.List: %v", err)
+				wgErr = err
+				return
+			}
+
+			mediaMap = make(map[primitive.ObjectID][]models.Media)
+			for _, p := range s {
+				var productMedia []models.Media
+				for _, m := range allMedia {
+					for _, mediaID := range p.MediaIDs {
+						if m.ID == mediaID {
+							productMedia = append(productMedia, m)
+						}
+					}
+				}
+				mediaMap[p.ID] = productMedia
+			}
 		}
 	}()
 
@@ -598,7 +625,6 @@ func (uc implUsecase) GetAll(ctx context.Context, sc models.Scope, input shop.Ge
 	}
 
 	var list []shop.GetAllProductItem
-
 	for _, p := range s {
 		var cates []models.Category
 		for _, catID := range p.CategoryID {
@@ -607,19 +633,11 @@ func (uc implUsecase) GetAll(ctx context.Context, sc models.Scope, input shop.Ge
 			}
 		}
 
-		avatar, err := uc.mediaUC.List(ctx, models.Scope{}, media.ListInput{
-			GetFilter: media.GetFilter{IDs: mongo.HexFromObjectIDsOrNil(p.MediaIDs)},
-		})
-		if err != nil {
-			uc.l.Errorf(ctx, "shop.usecase.GetAll: %v", err)
-			return shop.GetAllProductOutput{}, err
-		}
-
 		item := shop.GetAllProductItem{
 			P:         p,
 			Inventory: inventoryMap[p.InventoryID],
 			Cate:      cates,
-			Images:    avatar,
+			Images:    mediaMap[p.ID],
 			Shop:      shopMap[p.ShopID],
 		}
 		list = append(list, item)
