@@ -3478,12 +3478,25 @@ const docTemplate = `{
         },
         "http.inventoryObject": {
             "type": "object",
+            "required": [
+                "reorder_level",
+                "reorder_quantity"
+            ],
             "properties": {
                 "id": {
                     "type": "string"
                 },
                 "name": {
                     "type": "string"
+                },
+                "reorder_level": {
+                    "type": "integer"
+                },
+                "reorder_quantity": {
+                    "type": "integer"
+                },
+                "sold": {
+                    "type": "integer"
                 },
                 "stock_level": {
                     "type": "integer"

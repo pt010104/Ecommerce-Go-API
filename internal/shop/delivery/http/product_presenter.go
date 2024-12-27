@@ -202,9 +202,12 @@ type categoryObject struct {
 	Name string `json:"name"`
 }
 type inventoryObject struct {
-	ID         string `json:"id"`
-	Name       string `json:"name"`
-	StockLevel int    `json:"stock_level"`
+	ID              string `json:"id"`
+	Name            string `json:"name"`
+	StockLevel      int    `json:"stock_level"`
+	ReorderLevel    *uint  `json:"reorder_level" binding:"required" `
+	ReorderQuantity *uint  `json:"reorder_quantity" binding:"required"`
+	Sold            int    `json:"sold"`
 }
 
 type listProductItem struct {
@@ -250,8 +253,11 @@ func (h handler) getProductResp(output shop.GetProductOutput) getProductResp {
 			ID:   s.P.ID.Hex(),
 			Name: s.P.Name,
 			InventoryObject: inventoryObject{
-				ID:         s.Inventory.ID.Hex(),
-				StockLevel: int(s.Inventory.StockLevel),
+				ID:              s.Inventory.ID.Hex(),
+				StockLevel:      int(s.Inventory.StockLevel),
+				ReorderLevel:    s.Inventory.ReorderLevel,
+				ReorderQuantity: s.Inventory.ReorderQuantity,
+				Sold:            int(s.Inventory.SoldQuantity),
 			},
 			Price:           s.P.Price,
 			CategoryObjects: categories,

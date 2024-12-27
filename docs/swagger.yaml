@@ -499,8 +499,17 @@ definitions:
         type: string
       name:
         type: string
+      reorder_level:
+        type: integer
+      reorder_quantity:
+        type: integer
+      sold:
+        type: integer
       stock_level:
         type: integer
+    required:
+    - reorder_level
+    - reorder_quantity
     type: object
   http.inventoryResp:
     properties:
