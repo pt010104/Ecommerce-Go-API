@@ -12,4 +12,5 @@ func MapRouters(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
 	r.GET("by-id/:id", h.DetailVoucher)
 	r.POST("", h.CreateVoucher)
 	r.GET("", h.ListVoucher)
+	r.POST("apply", h.ApplyVoucher)
 }
