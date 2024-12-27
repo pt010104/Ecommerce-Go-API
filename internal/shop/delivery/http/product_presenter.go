@@ -213,6 +213,7 @@ type inventoryObject struct {
 type listProductItem struct {
 	ID              string           `json:"id"`
 	Name            string           `json:"name"`
+	Description     string           `json:"description"`
 	ShopID          string           `json:"shop_id"`
 	InventoryObject inventoryObject  `json:"inventory_object"`
 	Price           float64          `json:"price"`
@@ -250,8 +251,9 @@ func (h handler) getProductResp(output shop.GetProductOutput) getProductResp {
 			})
 		}
 		item := listProductItem{
-			ID:   s.P.ID.Hex(),
-			Name: s.P.Name,
+			ID:          s.P.ID.Hex(),
+			Name:        s.P.Name,
+			Description: s.P.Description,
 			InventoryObject: inventoryObject{
 				ID:              s.Inventory.ID.Hex(),
 				StockLevel:      int(s.Inventory.StockLevel),
@@ -369,13 +371,14 @@ func (h handler) newUpdateProductResponse(p models.Product) updateProductResp {
 }
 
 type getAllProductsRespItem struct {
-	ID         string         `json:"id"`
-	Name       string         `json:"name"`
-	Categories []categoryResp `json:"categories,omitempty"`
-	Images     []mediaResp    `json:"images,omitempty"`
-	Shop       shopResp       `json:"shop"`
-	Inventory  inventoryResp  `json:"inventory"`
-	Price      float64        `json:"price"`
+	ID          string         `json:"id"`
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
+	Categories  []categoryResp `json:"categories,omitempty"`
+	Images      []mediaResp    `json:"images,omitempty"`
+	Shop        shopResp       `json:"shop"`
+	Inventory   inventoryResp  `json:"inventory"`
+	Price       float64        `json:"price"`
 }
 
 type categoryResp struct {
@@ -469,13 +472,14 @@ func (h handler) newGetAllProductsResp(output shop.GetAllProductOutput) getAllPr
 		}
 
 		item := getAllProductsRespItem{
-			ID:         p.P.ID.Hex(),
-			Name:       p.P.Name,
-			Categories: categories,
-			Images:     images,
-			Shop:       shopItem,
-			Inventory:  invItem,
-			Price:      p.P.Price,
+			ID:          p.P.ID.Hex(),
+			Name:        p.P.Name,
+			Description: p.P.Description,
+			Categories:  categories,
+			Images:      images,
+			Shop:        shopItem,
+			Inventory:   invItem,
+			Price:       p.P.Price,
 		}
 		items = append(items, item)
 	}
