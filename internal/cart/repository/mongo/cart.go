@@ -7,6 +7,7 @@ import (
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/pkg/paginator"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -147,4 +148,15 @@ func (repo implRepo) GetCart(ctx context.Context, sc models.Scope, opt cart.GetO
 		CurrentPage: opt.PagQuery.Page,
 	}, nil
 
+}
+
+func (repo implRepo) Delete(ctx context.Context, sc models.Scope, id primitive.ObjectID) error {
+	col := repo.getCartCollection()
+
+	_, err := col.DeleteOne(ctx, bson.M{"_id": id})
+	if err != nil {
+		repo.l.Errorf(ctx, "cart.repository.mongo.Delete.DeleteOne: %v", err)
+		return err
+	}
+	return nil
 }

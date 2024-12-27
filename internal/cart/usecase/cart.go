@@ -44,20 +44,29 @@ func (uc implUseCase) Update(ctx context.Context, sc models.Scope, input cart.Up
 		uc.l.Errorf(ctx, "cart.Usecase.Update.ListCart", cart.ErrCartNotFound)
 		return cart.UpdateOutput{}, cart.ErrCartNotFound
 	}
-
 	var wg sync.WaitGroup
 	var wgErr error
 	var Mutex sync.Mutex
 	var updatedCarts []models.Cart
 
-	wg.Add(len(carts))
 	for _, c := range carts {
+		wg.Add(1)
 		go func(c models.Cart) {
 			defer wg.Done()
 			for i, item := range data.CartItems {
 				if item.Quantity == 0 {
 					data.CartItems = append(data.CartItems[:i], data.CartItems[i+1:]...)
 				}
+			}
+
+			if len(data.CartItems) == 0 {
+				err := uc.repo.Delete(ctx, sc, c.ID)
+				if err != nil {
+					uc.l.Errorf(ctx, "cart.Usecase.Update.Delete", err)
+					wgErr = err
+					return
+				}
+				return
 			}
 
 			updatedCart, err := uc.repo.Update(ctx, sc, cart.UpdateCartOption{

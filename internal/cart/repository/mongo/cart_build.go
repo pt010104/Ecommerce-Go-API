@@ -45,6 +45,7 @@ func (repo implRepo) buildCartUpdateModel(ctx context.Context, sc models.Scope, 
 		setFields["items"] = opt.NewItemList
 	} else {
 		unsetFields["items"] = ""
+		unsetFields[""] = ""
 	}
 	opt.Model.Items = opt.NewItemList
 
