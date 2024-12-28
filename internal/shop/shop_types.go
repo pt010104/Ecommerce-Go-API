@@ -70,4 +70,5 @@ type MostSolProductItem struct {
 type ReportOutput struct {
 	MostViewedProducts []models.Product
 	MostSoldProducts   []MostSolProductItem
+	MostViewTrend      []models.Product
 }

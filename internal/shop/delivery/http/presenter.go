@@ -249,9 +249,16 @@ type MostViewedProductItem struct {
 	Viewed      int    `json:"viewed"`
 }
 
+type MostViewTrendItem struct {
+	ProductID   string `json:"id"`
+	ProductName string `json:"name"`
+	ViewTrend   int    `json:"view_trend"`
+}
+
 type reportResponse struct {
 	MostViewedProducts []MostViewedProductItem `json:"most_viewed_products"`
 	MostSoldProducts   []MostSolProductItem    `json:"most_sold_products"`
+	MostViewTrend      []MostViewTrendItem     `json:"most_view_trend"`
 }
 
 func (h handler) newReportResponse(report shop.ReportOutput) reportResponse {
@@ -272,8 +279,18 @@ func (h handler) newReportResponse(report shop.ReportOutput) reportResponse {
 		}
 	}
 
+	mostViewTrend := make([]MostViewTrendItem, len(report.MostViewTrend))
+	for i, v := range report.MostViewTrend {
+		mostViewTrend[i] = MostViewTrendItem{
+			ProductID:   v.ID.Hex(),
+			ProductName: v.Name,
+			ViewTrend:   v.ViewTrend,
+		}
+	}
+
 	return reportResponse{
 		MostViewedProducts: mostViewedProducts,
 		MostSoldProducts:   mostSoldProducts,
+		MostViewTrend:      mostViewTrend,
 	}
 }

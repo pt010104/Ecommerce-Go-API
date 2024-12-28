@@ -196,14 +196,15 @@ func (uc implUsecase) GetIDByUserID(ctx context.Context, sc models.Scope, userID
 
 func (uc implUsecase) Report(ctx context.Context, sc models.Scope) (shop.ReportOutput, error) {
 	var (
-		mostViewedProducts         []models.Product
-		mostSoldInventories        []models.Inventory
-		wg                         sync.WaitGroup
-		mu                         sync.Mutex
-		errMostViewed, errMostSold error
+		mostViewedProducts                           []models.Product
+		mostSoldInventories                          []models.Inventory
+		mostViewTrend                                []models.Product
+		wg                                           sync.WaitGroup
+		mu                                           sync.Mutex
+		errMostViewed, errMostSold, errMostViewTrend error
 	)
 
-	wg.Add(2)
+	wg.Add(3)
 
 	go func() {
 		defer wg.Done()
@@ -231,6 +232,19 @@ func (uc implUsecase) Report(ctx context.Context, sc models.Scope) (shop.ReportO
 		}
 	}()
 
+	go func() {
+		defer wg.Done()
+		var err error
+		mostViewTrend, err = uc.repo.GetMostViewTrend(ctx, sc)
+		if err != nil {
+			mu.Lock()
+			errMostViewTrend = err
+			mu.Unlock()
+			uc.l.Errorf(ctx, "shop.usecase.Report.GetMostViewTrend: %v", err)
+			return
+		}
+	}()
+
 	wg.Wait()
 
 	if errMostViewed != nil {
@@ -239,6 +253,10 @@ func (uc implUsecase) Report(ctx context.Context, sc models.Scope) (shop.ReportO
 
 	if errMostSold != nil {
 		return shop.ReportOutput{}, errMostSold
+	}
+
+	if errMostViewTrend != nil {
+		return shop.ReportOutput{}, errMostViewTrend
 	}
 
 	invenMap := make(map[string]int)
@@ -279,5 +297,6 @@ func (uc implUsecase) Report(ctx context.Context, sc models.Scope) (shop.ReportO
 	return shop.ReportOutput{
 		MostViewedProducts: mostViewedProducts,
 		MostSoldProducts:   mostSoldProducts,
+		MostViewTrend:      mostViewTrend,
 	}, nil
 }

@@ -36,4 +36,6 @@ type Repository interface {
 
 	GetMostViewedProducts(ctx context.Context, sc models.Scope) ([]models.Product, error)
 	GetMostSoldInventory(ctx context.Context, sc models.Scope) ([]models.Inventory, error)
+	GetMostViewTrend(ctx context.Context, sc models.Scope) ([]models.Product, error)
+	UpdateManyProductViewTrend(ctx context.Context, sc models.Scope, IDs []string) error
 }

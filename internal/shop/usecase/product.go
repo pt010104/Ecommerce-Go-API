@@ -524,6 +524,7 @@ func (uc implUsecase) GetAll(ctx context.Context, sc models.Scope, input shop.Ge
 		wgErr       error
 		mediaMap    map[primitive.ObjectID][]models.Media
 		allMediaIDs []string
+		productIDs  []string
 	)
 
 	opt := shop.GetProductOption{
@@ -548,6 +549,7 @@ func (uc implUsecase) GetAll(ctx context.Context, sc models.Scope, input shop.Ge
 		}
 		shopIDSet[p.ShopID] = struct{}{}
 		allMediaIDs = append(allMediaIDs, mongo.HexFromObjectIDsOrNil(p.MediaIDs)...)
+		productIDs = append(productIDs, p.ID.Hex())
 	}
 
 	var categoryIDs []string
@@ -562,7 +564,19 @@ func (uc implUsecase) GetAll(ctx context.Context, sc models.Scope, input shop.Ge
 
 	allMediaIDs = util.RemoveDuplicates(allMediaIDs)
 
-	wg.Add(4)
+	wg.Add(5)
+	go func() {
+		defer wg.Done()
+		if input.GetProductFilter.Search != "" {
+			err := uc.repo.UpdateManyProductViewTrend(ctx, models.Scope{}, productIDs)
+			if err != nil {
+				uc.l.Errorf(ctx, "shop.usecase.GetAll.repo.UpdateProduct: %v", err)
+				wgErr = err
+				return
+			}
+		}
+	}()
+
 	go func() {
 		defer wg.Done()
 		var err error

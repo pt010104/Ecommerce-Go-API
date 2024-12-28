@@ -5,6 +5,7 @@ import (
 
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
+	pkgMongo "github.com/pt010104/api-golang/pkg/mongo"
 	"github.com/pt010104/api-golang/pkg/paginator"
 	"github.com/pt010104/api-golang/pkg/util"
 	"go.mongodb.org/mongo-driver/bson"
@@ -220,6 +221,37 @@ func (repo implRepo) GetMostViewedProducts(ctx context.Context, sc models.Scope)
 	err = cursor.All(ctx, &products)
 	if err != nil {
 		repo.l.Errorf(ctx, "shop.repository.mongo.GetMostViewedProducts.All: %v", err)
+		return []models.Product{}, err
+	}
+
+	return products, nil
+}
+
+func (repo implRepo) UpdateManyProductViewTrend(ctx context.Context, sc models.Scope, IDs []string) error {
+	col := repo.getProductCollection()
+	filter := bson.M{"_id": bson.M{"$in": pkgMongo.ObjectIDsFromHexOrNil(IDs)}}
+	update := bson.M{
+		"$inc": bson.M{"view_trend": 1},
+		"$set": bson.M{"updated_at": util.Now()},
+	}
+	_, err := col.UpdateMany(ctx, filter, update)
+	return err
+}
+
+func (repo implRepo) GetMostViewTrend(ctx context.Context, sc models.Scope) ([]models.Product, error) {
+	col := repo.getProductCollection()
+	filter := bson.M{"view_trend": bson.M{"$gt": 0}}
+	cursor, err := col.Find(ctx, filter, options.Find().SetSort(bson.D{{Key: "view_trend", Value: -1}, {Key: "_id", Value: -1}}))
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.GetMostViewTrend.Find: %v", err)
+		return []models.Product{}, err
+	}
+	defer cursor.Close(ctx)
+
+	var products []models.Product
+	err = cursor.All(ctx, &products)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.GetMostViewTrend.All: %v", err)
 		return []models.Product{}, err
 	}
 
