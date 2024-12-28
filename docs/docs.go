@@ -3369,6 +3369,20 @@ const docTemplate = `{
         },
         "http.detailProductResp": {
             "type": "object",
+<<<<<<< HEAD
+=======
+            "required": [
+                "category_id",
+                "category_name",
+                "description",
+                "id",
+                "inventory_name",
+                "name",
+                "price",
+                "shop_id",
+                "shop_name"
+            ],
+>>>>>>> f1e52fe379cf61f384ebd0d0e5602ba046c163cd
             "properties": {
                 "avatar": {
                     "type": "array",

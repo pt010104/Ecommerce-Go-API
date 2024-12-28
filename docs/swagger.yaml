@@ -344,8 +344,21 @@ definitions:
         type: string
       shop_name:
         type: string
+<<<<<<< HEAD
       view:
         type: integer
+=======
+    required:
+    - category_id
+    - category_name
+    - description
+    - id
+    - inventory_name
+    - name
+    - price
+    - shop_id
+    - shop_name
+>>>>>>> f1e52fe379cf61f384ebd0d0e5602ba046c163cd
     type: object
   http.detailResp:
     properties:
