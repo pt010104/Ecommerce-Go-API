@@ -243,8 +243,13 @@ type reportResponse struct {
 }
 
 func (h handler) newReportResponse(report shop.ReportOutput) reportResponse {
+	mostViewedProducts := make([]models.Product, len(report.MostViewedProducts))
+	copy(mostViewedProducts, report.MostViewedProducts)
+	mostSoldProducts := make([]models.Product, len(report.MostSoldProducts))
+	copy(mostSoldProducts, report.MostSoldProducts)
+
 	return reportResponse{
-		MostViewedProducts: report.MostViewedProducts,
-		MostSoldProducts:   report.MostSoldProducts,
+		MostViewedProducts: mostViewedProducts,
+		MostSoldProducts:   mostSoldProducts,
 	}
 }
