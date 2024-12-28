@@ -35,5 +35,5 @@ type Repository interface {
 	UpdateViewProduct(ctx context.Context, id primitive.ObjectID) error
 
 	GetMostViewedProducts(ctx context.Context, sc models.Scope) ([]models.Product, error)
-	GetMostSoldProducts(ctx context.Context, sc models.Scope) ([]models.Product, error)
+	GetMostSoldInventory(ctx context.Context, sc models.Scope) ([]models.Inventory, error)
 }

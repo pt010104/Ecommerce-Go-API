@@ -237,16 +237,40 @@ func (h handler) newUpdateShopResp(shops []models.Shop) []updateResp {
 	return res
 }
 
+type MostSolProductItem struct {
+	ProductID   string `json:"id"`
+	ProductName string `json:"name"`
+	Sold        int    `json:"sold"`
+}
+
+type MostViewedProductItem struct {
+	ProductID   string `json:"id"`
+	ProductName string `json:"name"`
+	Viewed      int    `json:"viewed"`
+}
+
 type reportResponse struct {
-	MostViewedProducts []models.Product `json:"most_viewed_products"`
-	MostSoldProducts   []models.Product `json:"most_sold_products"`
+	MostViewedProducts []MostViewedProductItem `json:"most_viewed_products"`
+	MostSoldProducts   []MostSolProductItem    `json:"most_sold_products"`
 }
 
 func (h handler) newReportResponse(report shop.ReportOutput) reportResponse {
-	mostViewedProducts := make([]models.Product, len(report.MostViewedProducts))
-	copy(mostViewedProducts, report.MostViewedProducts)
-	mostSoldProducts := make([]models.Product, len(report.MostSoldProducts))
-	copy(mostSoldProducts, report.MostSoldProducts)
+	mostViewedProducts := make([]MostViewedProductItem, len(report.MostViewedProducts))
+	for i, v := range report.MostViewedProducts {
+		mostViewedProducts[i] = MostViewedProductItem{
+			ProductID:   v.ID.Hex(),
+			ProductName: v.Name,
+			Viewed:      v.View,
+		}
+	}
+	mostSoldProducts := make([]MostSolProductItem, len(report.MostSoldProducts))
+	for i, v := range report.MostSoldProducts {
+		mostSoldProducts[i] = MostSolProductItem{
+			ProductID:   v.ProductID,
+			ProductName: v.ProductName,
+			Sold:        v.Sold,
+		}
+	}
 
 	return reportResponse{
 		MostViewedProducts: mostViewedProducts,

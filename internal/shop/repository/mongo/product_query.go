@@ -43,6 +43,10 @@ func (repo implRepo) buildProductQuery(sc models.Scope, opt shop.GetProductFilte
 		filter["shop_id"] = bson.M{"$eq": mongo.ObjectIDFromHexOrNil(opt.ShopID)}
 	}
 
+	if len(opt.InventoryIDs) > 0 {
+		filter["inventory_id"] = bson.M{"$in": mongo.ObjectIDsFromHexOrNil(opt.InventoryIDs)}
+	}
+
 	if len(opt.CateIDs) > 0 {
 		filter["categoryid"] = bson.M{"$in": mongo.ObjectIDsFromHexOrNil(opt.CateIDs)}
 	}

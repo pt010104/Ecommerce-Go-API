@@ -225,23 +225,3 @@ func (repo implRepo) GetMostViewedProducts(ctx context.Context, sc models.Scope)
 
 	return products, nil
 }
-
-func (repo implRepo) GetMostSoldProducts(ctx context.Context, sc models.Scope) ([]models.Product, error) {
-	col := repo.getProductCollection()
-	filter := bson.M{"sold": bson.M{"$gt": 0}}
-	cursor, err := col.Find(ctx, filter, options.Find().SetSort(bson.D{{Key: "sold", Value: -1}, {Key: "_id", Value: -1}}))
-	if err != nil {
-		repo.l.Errorf(ctx, "shop.repository.mongo.GetMostSoldProducts.Find: %v", err)
-		return []models.Product{}, err
-	}
-	defer cursor.Close(ctx)
-
-	var products []models.Product
-	err = cursor.All(ctx, &products)
-	if err != nil {
-		repo.l.Errorf(ctx, "shop.repository.mongo.GetMostSoldProducts.All: %v", err)
-		return []models.Product{}, err
-	}
-
-	return products, nil
-}

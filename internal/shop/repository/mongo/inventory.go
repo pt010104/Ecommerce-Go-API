@@ -6,8 +6,10 @@ import (
 	"github.com/pt010104/api-golang/internal/models"
 	"github.com/pt010104/api-golang/internal/shop"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const (
@@ -121,4 +123,26 @@ func (repo implRepo) DeleteInventory(ctx context.Context, sc models.Scope, ids [
 	}
 
 	return nil
+}
+
+func (repo implRepo) GetMostSoldInventory(ctx context.Context, sc models.Scope) ([]models.Inventory, error) {
+	col := repo.getInventoryCollection()
+	filter := bson.M{
+		"sold_quantity": bson.M{"$gt": 0},
+	}
+	cursor, err := col.Find(ctx, filter, options.Find().SetSort(bson.D{{Key: "sold_quantity", Value: -1}, {Key: "_id", Value: -1}}))
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.GetMostSoldInventory.Find: %v", err)
+		return []models.Inventory{}, err
+	}
+	defer cursor.Close(ctx)
+
+	var inventories []models.Inventory
+	err = cursor.All(ctx, &inventories)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.GetMostSoldInventory.All: %v", err)
+		return []models.Inventory{}, err
+	}
+
+	return inventories, nil
 }

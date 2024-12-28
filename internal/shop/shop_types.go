@@ -61,7 +61,13 @@ type GetProductInput struct {
 	PagQuery paginator.PaginatorQuery
 }
 
+type MostSolProductItem struct {
+	ProductID   string
+	ProductName string
+	Sold        int
+}
+
 type ReportOutput struct {
 	MostViewedProducts []models.Product
-	MostSoldProducts   []models.Product
+	MostSoldProducts   []MostSolProductItem
 }

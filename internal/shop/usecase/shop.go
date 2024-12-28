@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"github.com/pt010104/api-golang/internal/models"
@@ -194,16 +195,85 @@ func (uc implUsecase) GetIDByUserID(ctx context.Context, sc models.Scope, userID
 }
 
 func (uc implUsecase) Report(ctx context.Context, sc models.Scope) (shop.ReportOutput, error) {
-	mostViewedProducts, err := uc.repo.GetMostViewedProducts(ctx, sc)
+	var (
+		mostViewedProducts         []models.Product
+		mostSoldInventories        []models.Inventory
+		wg                         sync.WaitGroup
+		mu                         sync.Mutex
+		errMostViewed, errMostSold error
+	)
+
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+		var err error
+		mostViewedProducts, err = uc.repo.GetMostViewedProducts(ctx, sc)
+		if err != nil {
+			mu.Lock()
+			errMostViewed = err
+			mu.Unlock()
+			uc.l.Errorf(ctx, "shop.usecase.Report.GetMostViewedProducts: %v", err)
+			return
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		var err error
+		mostSoldInventories, err = uc.repo.GetMostSoldInventory(ctx, sc)
+		if err != nil {
+			mu.Lock()
+			errMostSold = err
+			mu.Unlock()
+			uc.l.Errorf(ctx, "shop.usecase.Report.GetMostSoldInventory: %v", err)
+			return
+		}
+	}()
+
+	wg.Wait()
+
+	if errMostViewed != nil {
+		return shop.ReportOutput{}, errMostViewed
+	}
+
+	if errMostSold != nil {
+		return shop.ReportOutput{}, errMostSold
+	}
+
+	invenMap := make(map[string]int)
+	var inventoryIDs []string
+	for _, v := range mostSoldInventories {
+		inventoryIDs = append(inventoryIDs, v.ID.Hex())
+		invenMap[v.ID.Hex()] = int(v.SoldQuantity)
+	}
+
+	fmt.Println(inventoryIDs)
+
+	if len(inventoryIDs) == 0 {
+		return shop.ReportOutput{
+			MostViewedProducts: mostViewedProducts,
+			MostSoldProducts:   []shop.MostSolProductItem{},
+		}, nil
+	}
+
+	products, err := uc.repo.ListProduct(ctx, sc, shop.GetProductFilter{
+		InventoryIDs: inventoryIDs,
+		ShopID:       sc.ShopID,
+	})
 	if err != nil {
-		uc.l.Errorf(ctx, "shop.usecase.Report: %v", err)
+		uc.l.Errorf(ctx, "shop.usecase.Report.ListProduct: %v", err)
 		return shop.ReportOutput{}, err
 	}
 
-	mostSoldProducts, err := uc.repo.GetMostSoldProducts(ctx, sc)
-	if err != nil {
-		uc.l.Errorf(ctx, "shop.usecase.Report: %v", err)
-		return shop.ReportOutput{}, err
+	var mostSoldProducts []shop.MostSolProductItem
+
+	for _, v := range products {
+		mostSoldProducts = append(mostSoldProducts, shop.MostSolProductItem{
+			ProductID:   v.ID.Hex(),
+			ProductName: v.Name,
+			Sold:        invenMap[v.InventoryID.Hex()],
+		})
 	}
 
 	return shop.ReportOutput{

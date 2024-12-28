@@ -15,10 +15,11 @@ type CreateProductOption struct {
 	MediaIDs    []primitive.ObjectID
 }
 type GetProductFilter struct {
-	CateIDs []string
-	IDs     []string
-	Search  string
-	ShopID  string
+	CateIDs      []string
+	IDs          []string
+	Search       string
+	ShopID       string
+	InventoryIDs []string
 }
 type UpdateProductOption struct {
 	Name            string
