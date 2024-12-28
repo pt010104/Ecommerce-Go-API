@@ -32,4 +32,5 @@ type Repository interface {
 	Delete(ctx context.Context, sc models.Scope, ud []string) (err error)
 	GetProduct(ctx context.Context, sc models.Scope, opt GetProductOption) ([]models.Product, paginator.Paginator, error)
 	UpdateProduct(ctx context.Context, sc models.Scope, option UpdateProductOption) (models.Product, error)
+	UpdateViewProduct(ctx context.Context, id primitive.ObjectID) error
 }

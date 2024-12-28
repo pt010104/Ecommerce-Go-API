@@ -330,6 +330,8 @@ definitions:
         items:
           type: string
         type: array
+      description:
+        type: string
       id:
         type: string
       inventory_name:
@@ -342,15 +344,8 @@ definitions:
         type: string
       shop_name:
         type: string
-    required:
-    - category_id
-    - category_name
-    - id
-    - inventory_name
-    - name
-    - price
-    - shop_id
-    - shop_name
+      view:
+        type: integer
     type: object
   http.detailResp:
     properties:

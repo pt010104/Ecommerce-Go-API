@@ -85,16 +85,17 @@ type avatar_obj struct {
 	URL     string `json:"url"`
 }
 type detailProductResp struct {
-	ID            string       `json:"id" binding:"required"`
-	Name          string       `json:"name" binding:"required"`
-	Description   string       `json:"description" binding:"required"`
-	CategoryName  []string     `json:"category_name" binding:"required"`
-	CategoryID    []string     `json:"category_id" binding:"required"`
-	ShopName      string       `json:"shop_name" binding:"required"`
-	ShopID        string       `json:"shop_id" binding:"required"`
-	InventoryName string       `json:"inventory_name" binding:"required"`
-	Price         float64      `json:"price" binding:"required"`
+	ID            string       `json:"id"`
+	Name          string       `json:"name"`
+	Description   string       `json:"description"`
+	CategoryName  []string     `json:"category_name"`
+	CategoryID    []string     `json:"category_id"`
+	ShopName      string       `json:"shop_name"`
+	ShopID        string       `json:"shop_id"`
+	InventoryName string       `json:"inventory_name"`
+	Price         float64      `json:"price"`
 	Avatar        []avatar_obj `json:"avatar,omitempty"`
+	View          int          `json:"view"`
 }
 
 func (h handler) newDetailProductResponse(p shop.DetailProductOutput) detailProductResp {
@@ -121,6 +122,7 @@ func (h handler) newDetailProductResponse(p shop.DetailProductOutput) detailProd
 		InventoryName: p.Inventory.ID.Hex(),
 		Price:         p.Price,
 		Avatar:        images,
+		View:          p.View,
 	}
 
 }

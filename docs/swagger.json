@@ -3358,16 +3358,6 @@
         },
         "http.detailProductResp": {
             "type": "object",
-            "required": [
-                "category_id",
-                "category_name",
-                "id",
-                "inventory_name",
-                "name",
-                "price",
-                "shop_id",
-                "shop_name"
-            ],
             "properties": {
                 "avatar": {
                     "type": "array",
@@ -3387,6 +3377,9 @@
                         "type": "string"
                     }
                 },
+                "description": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
@@ -3404,6 +3397,9 @@
                 },
                 "shop_name": {
                     "type": "string"
+                },
+                "view": {
+                    "type": "integer"
                 }
             }
         },

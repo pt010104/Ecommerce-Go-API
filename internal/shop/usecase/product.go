@@ -82,14 +82,37 @@ func (uc *implUsecase) DetailProduct(ctx context.Context, sc models.Scope, produ
 		err           error
 		mu            sync.Mutex
 		wg            sync.WaitGroup
+		wgErr         error
 
 		medias []models.Media
 	)
 
-	u, err = uc.repo.Detailproduct(ctx, productID)
-	if err != nil {
-		uc.l.Errorf(ctx, "shop.product.usecase.detail.product", err)
-		return shop.DetailProductOutput{}, err
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		u, err = uc.repo.Detailproduct(ctx, productID)
+		if err != nil {
+			uc.l.Errorf(ctx, "shop.product.usecase.detail.product", err)
+			wgErr = err
+			return
+		}
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		err = uc.repo.UpdateViewProduct(ctx, productID)
+		if err != nil {
+			uc.l.Errorf(ctx, "shop.product.usecase.detail.product", err)
+			wgErr = err
+			return
+		}
+	}()
+
+	wg.Wait()
+
+	if wgErr != nil {
+		return shop.DetailProductOutput{}, wgErr
 	}
 
 	for _, id := range u.CategoryID {
@@ -174,6 +197,7 @@ func (uc *implUsecase) DetailProduct(ctx context.Context, sc models.Scope, produ
 		Category:     category,
 		Inventory:    inventory,
 		Medias:       medias,
+		View:         u.View,
 		Shop:         shopDetail,
 		Description:  u.Description,
 		Price:        u.Price,

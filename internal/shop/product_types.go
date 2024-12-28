@@ -20,6 +20,7 @@ type DetailProductOutput struct {
 	ID           string
 	Name         string
 	Description  string
+	View         int
 	CategoryName []string
 	Category     []models.Category
 	Medias       []models.Media

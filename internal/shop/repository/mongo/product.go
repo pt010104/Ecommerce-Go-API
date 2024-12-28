@@ -195,3 +195,11 @@ func (repo implRepo) UpdateProduct(ctx context.Context, sc models.Scope, option 
 
 	return option.Model, nil
 }
+
+func (repo implRepo) UpdateViewProduct(ctx context.Context, id primitive.ObjectID) error {
+	col := repo.getProductCollection()
+	filter := bson.M{"_id": id}
+	update := bson.M{"$inc": bson.M{"view": 1}}
+	_, err := col.UpdateOne(ctx, filter, update)
+	return err
+}
