@@ -60,3 +60,8 @@ type GetProductInput struct {
 	GetProductFilter
 	PagQuery paginator.PaginatorQuery
 }
+
+type ReportOutput struct {
+	MostViewedProducts []models.Product
+	MostSoldProducts   []models.Product
+}

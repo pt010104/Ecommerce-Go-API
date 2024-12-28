@@ -195,11 +195,53 @@ func (repo implRepo) UpdateProduct(ctx context.Context, sc models.Scope, option 
 
 	return option.Model, nil
 }
-
 func (repo implRepo) UpdateViewProduct(ctx context.Context, id primitive.ObjectID) error {
 	col := repo.getProductCollection()
 	filter := bson.M{"_id": id}
-	update := bson.M{"$inc": bson.M{"view": 1}}
+	update := bson.M{
+		"$inc": bson.M{"view": 1},
+		"$set": bson.M{"updated_at": util.Now()},
+	}
 	_, err := col.UpdateOne(ctx, filter, update)
 	return err
+}
+
+func (repo implRepo) GetMostViewedProducts(ctx context.Context, sc models.Scope) ([]models.Product, error) {
+	col := repo.getProductCollection()
+	filter := bson.M{"view": bson.M{"$gt": 0}}
+	cursor, err := col.Find(ctx, filter, options.Find().SetSort(bson.D{{Key: "view", Value: -1}, {Key: "_id", Value: -1}}))
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.GetMostViewedProducts.Find: %v", err)
+		return []models.Product{}, err
+	}
+	defer cursor.Close(ctx)
+
+	var products []models.Product
+	err = cursor.All(ctx, &products)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.GetMostViewedProducts.All: %v", err)
+		return []models.Product{}, err
+	}
+
+	return products, nil
+}
+
+func (repo implRepo) GetMostSoldProducts(ctx context.Context, sc models.Scope) ([]models.Product, error) {
+	col := repo.getProductCollection()
+	filter := bson.M{"sold": bson.M{"$gt": 0}}
+	cursor, err := col.Find(ctx, filter, options.Find().SetSort(bson.D{{Key: "sold", Value: -1}, {Key: "_id", Value: -1}}))
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.GetMostSoldProducts.Find: %v", err)
+		return []models.Product{}, err
+	}
+	defer cursor.Close(ctx)
+
+	var products []models.Product
+	err = cursor.All(ctx, &products)
+	if err != nil {
+		repo.l.Errorf(ctx, "shop.repository.mongo.GetMostSoldProducts.All: %v", err)
+		return []models.Product{}, err
+	}
+
+	return products, nil
 }

@@ -192,3 +192,22 @@ func (uc implUsecase) GetIDByUserID(ctx context.Context, sc models.Scope, userID
 
 	return id, nil
 }
+
+func (uc implUsecase) Report(ctx context.Context, sc models.Scope) (shop.ReportOutput, error) {
+	mostViewedProducts, err := uc.repo.GetMostViewedProducts(ctx, sc)
+	if err != nil {
+		uc.l.Errorf(ctx, "shop.usecase.Report: %v", err)
+		return shop.ReportOutput{}, err
+	}
+
+	mostSoldProducts, err := uc.repo.GetMostSoldProducts(ctx, sc)
+	if err != nil {
+		uc.l.Errorf(ctx, "shop.usecase.Report: %v", err)
+		return shop.ReportOutput{}, err
+	}
+
+	return shop.ReportOutput{
+		MostViewedProducts: mostViewedProducts,
+		MostSoldProducts:   mostSoldProducts,
+	}, nil
+}

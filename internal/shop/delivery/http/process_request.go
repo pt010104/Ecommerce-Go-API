@@ -115,3 +115,15 @@ func (h handler) processGetShopIDByUserIDRequest(c *gin.Context) (models.Scope, 
 
 	return sc, req, nil
 }
+
+func (h handler) processReportRequest(c *gin.Context) (models.Scope, error) {
+	ctx := c.Request.Context()
+
+	sc, ok := jwt.GetScopeFromContext(ctx)
+	if !ok {
+		h.l.Errorf(ctx, "cart.delivery.http.handler.processaddToCartRequest: unauthorized")
+		return models.Scope{}, pkgErrors.NewUnauthorizedHTTPError()
+	}
+
+	return sc, nil
+}

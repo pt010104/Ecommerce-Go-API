@@ -304,3 +304,24 @@ func (h handler) GetAll(c *gin.Context) {
 
 	response.OK(c, h.newGetAllProductsResp(p))
 }
+
+func (h handler) Report(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	sc, err := h.processReportRequest(c)
+	if err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.Report: %v", err)
+		response.Error(c, err)
+		return
+	}
+
+	report, err := h.uc.Report(ctx, sc)
+	if err != nil {
+		h.l.Errorf(ctx, "shop.delivery.http.Report: %v", err)
+		err := h.mapErrors(err)
+		response.Error(c, err)
+		return
+	}
+
+	response.OK(c, h.newReportResponse(report))
+}

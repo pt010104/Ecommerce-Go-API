@@ -33,4 +33,7 @@ type Repository interface {
 	GetProduct(ctx context.Context, sc models.Scope, opt GetProductOption) ([]models.Product, paginator.Paginator, error)
 	UpdateProduct(ctx context.Context, sc models.Scope, option UpdateProductOption) (models.Product, error)
 	UpdateViewProduct(ctx context.Context, id primitive.ObjectID) error
+
+	GetMostViewedProducts(ctx context.Context, sc models.Scope) ([]models.Product, error)
+	GetMostSoldProducts(ctx context.Context, sc models.Scope) ([]models.Product, error)
 }

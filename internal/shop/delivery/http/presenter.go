@@ -236,3 +236,15 @@ func (h handler) newUpdateShopResp(shops []models.Shop) []updateResp {
 
 	return res
 }
+
+type reportResponse struct {
+	MostViewedProducts []models.Product `json:"most_viewed_products"`
+	MostSoldProducts   []models.Product `json:"most_sold_products"`
+}
+
+func (h handler) newReportResponse(report shop.ReportOutput) reportResponse {
+	return reportResponse{
+		MostViewedProducts: report.MostViewedProducts,
+		MostSoldProducts:   report.MostSoldProducts,
+	}
+}
