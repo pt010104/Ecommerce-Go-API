@@ -123,6 +123,7 @@ func (uc implUseCase) ConsumeOrderMsg(ctx context.Context, sc models.Scope, inpu
 				ID:            product.P.InventoryID,
 				StockLevel:    util.ToPointer(stockLevel),
 				ReservedLevel: reservedLevel,
+				SoldQuantity:  product.Inventory.SoldQuantity + uint(productOrder.Quantity),
 			})
 			if err != nil {
 				uc.l.Errorf(ctx, "order.usecase.ConsumeOrderMsg.shopUC.UpdateInventory", err)
